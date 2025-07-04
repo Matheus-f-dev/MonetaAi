@@ -21,7 +21,7 @@ O sistema permite que usuários organizem suas finanças de maneira simples e ef
 ### Funcionalidades já implementadas
 - [x] Cadastro de usuários  
 - [x] Login com autenticação  
-- [x] Redefinição de senha
+- [ ] Redefinição de senha (em andamento)
 - [x] Cadastro da média salarial  
 
 ### Funcionalidades em desenvolvimento
