@@ -29,7 +29,7 @@ O sistema permite que usuários organizem suas finanças de maneira simples e ef
 - [ ] Personalização da interface  
 - [ ] Gráfico de gastos  
 - [ ] Registros no WhatsApp através do chatbot  
-- [ ] Cadastro da média salarial  
+- [x] Cadastro da média salarial  
 - [ ] Filtro de gastos por categoria  
 
 ---
