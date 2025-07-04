@@ -21,7 +21,8 @@ O sistema permite que usuários organizem suas finanças de maneira simples e ef
 ### Funcionalidades já implementadas
 - [x] Cadastro de usuários  
 - [x] Login com autenticação  
-- [x] Redefinição de senha  
+- [x] Redefinição de senha
+- [x] Cadastro da média salarial  
 
 ### Funcionalidades em desenvolvimento
 - [ ] Integração com rede social  
@@ -29,7 +30,6 @@ O sistema permite que usuários organizem suas finanças de maneira simples e ef
 - [ ] Personalização da interface  
 - [ ] Gráfico de gastos  
 - [ ] Registros no WhatsApp através do chatbot  
-- [x] Cadastro da média salarial  
 - [ ] Filtro de gastos por categoria  
 
 ---
