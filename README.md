@@ -22,11 +22,11 @@ O sistema permite que usuários organizem suas finanças de maneira simples e ef
 - [x] Cadastro de usuários  
 - [x] Login com autenticação  
 - [x] Redefinição de senha (em andamento)
-- [x] Cadastro da média salarial  
+- [x] Cadastro da média salarial
+- [x] Visualizar histórico de atividades
 
 ### Funcionalidades em desenvolvimento
-- [ ] Integração com rede social  
-- [ ] Visualizar histórico de atividades  
+- [ ] Integração com rede social   
 - [ ] Personalização da interface  
 - [ ] Gráfico de gastos  
 - [ ] Registros no WhatsApp através do chatbot  
