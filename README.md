@@ -24,13 +24,14 @@ O sistema permite que usuários organizem suas finanças de maneira simples e ef
 - [x] Redefinição de senha (em andamento)
 - [x] Cadastro da média salarial
 - [x] Visualizar histórico de atividades
+- [x] Filtro de gastos por categoria
+- [x] Integração com rede social  
 
 ### Funcionalidades em desenvolvimento
-- [ ] Integração com rede social   
+  
 - [ ] Personalização da interface  
 - [ ] Gráfico de gastos  
 - [ ] Registros no WhatsApp através do chatbot  
-- [ ] Filtro de gastos por categoria  
 
 ---
 
