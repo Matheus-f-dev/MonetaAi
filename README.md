@@ -51,7 +51,6 @@ Oferecer uma alternativa gratuita e inteligente para controle financeiro pessoal
 ---
 
 
-link github frontend:https://github.com/joaoaseixas/MonetaAi-Front
 
 ## 📲 Contato
 
