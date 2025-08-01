@@ -1,0 +1,144 @@
+/* #mensagem {
+  margin-top: 15px;
+  font-weight: bold;
+  padding: 10px;
+  border-radius: 6px;
+  display: none;
+}
+
+#mensagem.sucesso {
+  color: #155724;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+}
+
+#mensagem.erro {
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+}
+
+
+body, html {
+  height: 100%;
+  overflow: hidden;
+}
+
+.brand-name {
+  color: #00ffc8;
+  text-decoration: none;
+}
+
+.background {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+   background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #00ffc8);
+  background-size: 400% 400%;
+  animation: gradiente 15s ease infinite;
+}
+
+.login-card {
+  width: 400px;
+  margin: 80px auto;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(15px);
+  padding: 40px;
+  border-radius: 18px;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+  color: #fff;
+  text-align: center;
+}
+
+.login-card h2 {
+  font-size: 26px;
+  margin-bottom: 8px;
+}
+
+.login-card h2 span {
+  color: #00ffc8;
+}
+
+.login-card p {
+  font-size: 14px;
+  margin-bottom: 25px;
+  color: #cfcfcf;
+}
+
+.login-form label {
+  display: block;
+  text-align: left;
+  margin: 12px 0 6px;
+  font-size: 14px;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background: #f0f0f0;
+  margin-bottom: 10px;
+}
+
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper input {
+  padding-right: 35px;
+}
+
+.password-wrapper button {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.password-wrapper img {
+  width: 20px;
+  opacity: 0.7;
+}
+
+.login-btn {
+  width: 100%;
+  background: #00ffc8;
+  color: #000;
+  font-weight: bold;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  transition: 0.3s;
+  cursor: pointer;
+  margin-top: 15px;
+}
+
+.login-btn:hover {
+  background: #00d5a8;
+}
+
+.footer-links {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.footer-links a {
+  color: #b5f7ee;
+  text-decoration: none;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+}
+
+@keyframes gradiente {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+} */

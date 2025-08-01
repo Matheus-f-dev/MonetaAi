@@ -1,0 +1,108 @@
+@keyframes gradiente {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.brand-name{
+  color: #00ffc8;
+  text-decoration: none;
+}
+
+.login-card { 
+  width: 380px;
+  margin: 100px auto;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(15px);
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  color: #fff;
+  text-align: center;
+}
+
+.login-card h2 {
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+.login-card h2 span {
+  color: #00ffc8;
+}
+
+.login-card p {
+  font-size: 14px;
+  margin-bottom: 30px;
+  color: #cfcfcf;
+}
+
+.login-form label {
+  display: block;
+  text-align: left;
+  margin: 10px 0 5px;
+  font-size: 14px;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background: #f0f0f0;
+  margin-bottom: 15px;
+}
+
+.password-wrapper {
+  position: relative;
+}
+
+.botao{
+  position: absolute;
+  bottom: 1.3vh;
+  left: 13%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding-left: 67%;
+
+}
+
+.Teste  {
+  width: 15px;
+  opacity: 0.7;
+
+}
+
+
+
+.login-btn {
+  width: 100%;
+  background: #00ffc8;
+  color: #000;
+  font-weight: bold;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+.login-btn:hover {
+  background: #00d5a8;
+}
+
+.footer-links {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.footer-links a {
+  color: #b5f7ee;
+  text-decoration: none;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+}
