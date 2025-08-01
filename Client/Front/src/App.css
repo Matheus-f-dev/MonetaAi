@@ -1,0 +1,31 @@
+:root {
+    --primary-color: #00ff77;
+    --primary-hover: #25d36598;
+    --background-light: #f5f3ff;
+    --text-color: #333;
+    --box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #ffffff;
+    color: var(--text-color);
+}
+
+
+.background {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(120deg, #25434e 0%, #234652 100%);
+  z-index: 0;
+}
+
