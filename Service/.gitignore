@@ -10,3 +10,6 @@ node_modules/
 # Pastas de build/output (opcional)
 dist/
 build/
+
+
+serviceAccountKey.json
