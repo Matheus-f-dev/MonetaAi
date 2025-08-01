@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastro</title>
+  <link rel="stylesheet" href="/css/cadastro.css" />
+</head>
+<body>
+  <h2>Cadastro</h2>
+  <% if (erro) { %>
+    <p style="color:red;"><%= erro %></p>
+  <% } %>
+  <form method="POST" action="/cadastro">
+    <input type="text" name="nome" placeholder="Seu nome" required />
+    <input type="email" name="email" placeholder="Seu email" required />
+    <input type="number" name="salario" placeholder="Seu salario"  required />
+    <input type="password" name="senha" placeholder="Senha" required />
+    <input type="password" name="confirmar" placeholder="Confirmar senha" required />
+    <button type="submit">Cadastrar</button>
+  </form>
+  <button onclick="location.href='/login'">Voltar</button>
+
+</body>
+</html>

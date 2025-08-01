@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Histórico de Atividades</title>
+  <link rel="stylesheet" href="/css/historico.css" />
+</head>
+<body>
+  <h1>✅ Histórico de Atividades</h1>
+
+  <button class="botao" onclick="abrirModal()">+ Nova Transação</button>
+  <button class="botao" onclick="adicionarExemplo()">Adicionar Exemplo</button>
+  <button class="botao" onclick="limparHistorico()">Limpar Histórico</button>
+  <button class="botao" onclick="abrirModalFiltro()">Filtrar por categoria</button>
+  <button onclick="location.href='/login'" class="botao">Voltar</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Ação</th>
+        <th>Descrição</th>
+        <th>Categoria</th> <!-- ADICIONADO -->
+        <th>Data/Hora</th>
+      </tr>
+    </thead>
+    <tbody id="tabela-historico"></tbody>
+  </table>
+
+  <!-- Modal: Nova Transação -->
+  <div id="modal">
+    <form onsubmit="enviarTransacao(event)">
+      <h2>Adicionar Nova Transação</h2>
+      <input type="text" id="descricao" placeholder="Descrição" required />
+      <input type="number" id="valor" placeholder="Valor (R$)" required />
+      <select id="categoria">
+        <option>Alimentação</option>
+        <option>Transporte</option>
+        <option>Saúde</option>
+        <option>Salario</option>
+        <option>Outras</option>
+      </select>
+      <div>
+        <button type="button" onclick="setTipo('Receita')" class="botao-escolha">Receita</button>
+        <button type="button" onclick="setTipo('Despesa')" class="botao-escolha">Despesa</button>
+      </div>
+      <div>Sugestão automática baseada na descrição</div>
+      <input type="hidden" id="tipo" value="Despesa" />
+      <button type="submit" class="botao-escolha">Adicionar</button>
+      <button type="button" onclick="fecharModal()" class="botao-escolha">Cancelar</button>
+    </form>
+  </div>
+
+  <!-- Modal: Filtro por categoria -->
+  <div id="modal-filtro">
+    <form onsubmit="aplicarFiltro(event)" class="form-filtro">
+      <h2>Filtrar por Categoria</h2>
+      <select id="select-categoria" required>
+        <option value="">Selecione uma categoria</option>
+        <option value="Alimentação">Alimentação</option>
+        <option value="Transporte">Transporte</option>
+        <option value="Saúde">Saúde</option>
+        <option value="Salario">Salario</option>
+        <option value="Outras">Outras</option>
+      </select>
+      <div>
+        <button type="submit" class="botao-escolha">Filtrar</button>
+        <button type="button" onclick="fecharModalFiltro()" class="botao-escolha">Cancelar</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    let tipoSelecionado = 'Despesa';
+
+    function abrirModal() {
+      document.getElementById('modal').style.display = 'flex';
+    }
+
+    function fecharModal() {
+      document.getElementById('modal').style.display = 'none';
+    }
+
+    function abrirModalFiltro() {
+      document.getElementById('modal-filtro').style.display = 'flex';
+    }
+
+    function fecharModalFiltro() {
+      document.getElementById('modal-filtro').style.display = 'none';
+    }
+
+    function setTipo(tipo) {
+      tipoSelecionado = tipo;
+      document.getElementById('tipo').value = tipo;
+    }
+
+    async function enviarTransacao(e) {
+      e.preventDefault();
+      const dados = {
+        descricao: document.getElementById('descricao').value,
+        valor: document.getElementById('valor').value,
+        categoria: document.getElementById('categoria').value,
+        tipo: tipoSelecionado
+      };
+
+      const res = await fetch('/nova-transacao', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dados)
+      });
+
+      if (res.ok) {
+        fecharModal();
+        carregarHistorico();
+      }
+    }
+
+    async function carregarHistorico() {
+      const res = await fetch('/historico');
+      const data = await res.json();
+
+      const tabela = document.getElementById('tabela-historico');
+      tabela.innerHTML = '';
+      data.forEach((item) => {
+        tabela.innerHTML += `
+          <tr>
+            <td>${item.tipo}</td>
+            <td>${item.descricao} - R$ ${parseFloat(item.valor).toFixed(2)}</td>
+            <td>${item.categoria}</td> <!-- ADICIONADO -->
+            <td>${item.dataHora}</td>
+          </tr>
+        `;
+      });
+    }
+
+    async function aplicarFiltro(e) {
+      e.preventDefault();
+      const categoria = document.getElementById('select-categoria').value;
+
+      const res = await fetch(`/historico?categoria=${encodeURIComponent(categoria)}`);
+      const data = await res.json();
+
+      fecharModalFiltro();
+
+      const tabela = document.getElementById('tabela-historico');
+      tabela.innerHTML = '';
+      data.forEach((item) => {
+        tabela.innerHTML += `
+          <tr>
+            <td>${item.tipo}</td>
+            <td>${item.descricao} - R$ ${parseFloat(item.valor).toFixed(2)}</td>
+            <td>${item.categoria}</td> <!-- ADICIONADO -->
+            <td>${item.dataHora}</td>
+          </tr>
+        `;
+      });
+    }
+
+    async function limparHistorico() {
+      await fetch('/historico', { method: 'DELETE' });
+      carregarHistorico();
+    }
+
+    async function adicionarExemplo() {
+      await fetch('/nova-transacao', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          descricao: 'mercado',
+          valor: 100,
+          categoria: 'Alimentação',
+          tipo: 'Despesa'
+        })
+      });
+      carregarHistorico();
+    }
+
+    window.onload = carregarHistorico;
+  </script>
+</body>
+</html>
