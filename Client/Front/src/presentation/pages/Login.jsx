@@ -33,28 +33,29 @@ export default function LoginCard() {
           />
 
           <label>Senha</label>
-          <div className="password-wrapper">
-            <input
-              type={showPassword ? 'text' : 'password'}
-              placeholder="Sua senha"
-              required
-              value={senha}
-              onChange={e => setSenha(e.target.value)}
-            />
-            <button className="botao"
-              type="button"
-              tabIndex="-1"
-              onClick={() => setShowPassword(s => !s)}
-              //style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 0 }}
-            >
-              <img
-                src="https://cdn-icons-png.flaticon.com/512/565/565655.png"
-                alt="mostrar senha"
-                className='Teste'
-                //style={{ verticalAlign: 'middle' }}
-              />
-            </button>
-          </div>
+        <div className="password-wrapper">
+  <input
+    type={showPassword ? 'text' : 'password'}
+    placeholder="Sua senha"
+    required
+    value={senha}
+    onChange={e => setSenha(e.target.value)}
+    className="password-input"
+  />
+  <button
+    className="botao"
+    type="button"
+    tabIndex="-1"
+    onClick={() => setShowPassword(s => !s)}
+  >
+    <img
+      src="https://cdn-icons-png.flaticon.com/512/565/565655.png"
+      alt="mostrar senha"
+      className="icone-olho"
+    />
+  </button>
+</div>
+
 
           <button type="submit" className="login-btn">
             Entrar

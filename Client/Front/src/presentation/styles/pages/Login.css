@@ -52,19 +52,37 @@
   margin-bottom: 15px;
 }
 
+/* Campo de senha com botão interno */
 .password-wrapper {
   position: relative;
+  width: 100%;
+}
+/* Input de senha com espaço pro botão */
+.password-wrapper input {
+  width: 100%;
+  padding: 10px 40px 10px 10px; /* padding right maior para o botão */
+  border: none;
+  border-radius: 8px;
+  background: #f0f0f0;
+  margin-bottom: 15px;
+  box-sizing: border-box;
 }
 
-.botao{
+/* Botão de mostrar/ocultar senha */
+.botao {
   position: absolute;
-  bottom: 1.3vh;
-  left: 13%;
+  top: 15%;
+  right: 10px;
   background: transparent;
   border: none;
   cursor: pointer;
-  padding-left: 67%;
-
+  padding: 0;
+  margin: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .Teste  {
@@ -73,7 +91,14 @@
 
 }
 
+/* Ícone do olho */
 
+.icone-olho {
+  width: 18px;
+  height: 18px;
+  opacity: 0.7;
+  pointer-events: none; /* evita conflito de clique no ícone */
+}
 
 .login-btn {
   width: 100%;
