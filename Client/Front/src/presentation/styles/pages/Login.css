@@ -110,7 +110,7 @@
   border-radius: 10px;
   transition: 0.3s;
   cursor: pointer;
-}
+} 
 
 .login-btn:hover {
   background: #00d5a8;

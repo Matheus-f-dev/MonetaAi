@@ -10,6 +10,7 @@ header {
     animation: fadeIn 1.2s ease forwards;
     z-index: 9000;
     width:100%;
+    background-color: rgba(255, 255, 255, 0.645)
 }
 
 .header-container{
@@ -418,11 +419,6 @@ nav a:focus, .btn:focus {
 }
 
 
-
-
-
-
-
 /* ANIMAÇÕES */
 @keyframes fadeInUp {
   from {
@@ -491,6 +487,16 @@ h1 {
   display: flex;
   gap: 16px;
   margin-bottom: 20px;
+}
+
+.item{
+  color: var(--text-color);
+  background-color: var(--background-light);
+  padding: 10px;
+  border-radius: 13px;
+  box-shadow: var(--box-shadow);
+  border: 1px solid rgb(69 , 69, 69);
+  border-style: outset;
 }
 
 .icon-box {
@@ -619,7 +625,7 @@ h1 {
 }
 
 .botao-principal {
-  padding: 15px 25px;
+  padding: 10px;
   background-color: white;
   color: #32d183;
   border: none;
@@ -628,6 +634,7 @@ h1 {
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
   transition: all 0.3s ease-in-out;
+  width: 27%;
 }
 
 .botao-principal:hover {

@@ -29,3 +29,6 @@ body {
   z-index: 0;
 }
 
+input[type="email"] {
+    width: 100%;
+}

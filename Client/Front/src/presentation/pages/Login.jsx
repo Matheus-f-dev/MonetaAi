@@ -30,6 +30,7 @@ export default function LoginCard() {
             required
             value={email}
             onChange={e => setEmail(e.target.value)}
+            className='email-input'
           />
 
           <label>Senha</label>

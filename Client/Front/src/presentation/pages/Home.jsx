@@ -9,7 +9,7 @@ export default function LandingPage() {
       <header className="fade-in header-container">
         <div className="logo">Moneta</div>
 
-        <nav>
+        <nav> 
           <a href="#funcionalidades">Funcionalidades</a>
           <a href="#planos">Planos</a>
           <a href="#faq">FAQ</a>
