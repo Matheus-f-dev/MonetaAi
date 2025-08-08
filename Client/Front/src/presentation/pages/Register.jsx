@@ -44,7 +44,7 @@ export default function Cadastro() {
 
         <label>Email</label>
         <input
-          type="email"
+          type="text"
           id="email"
           placeholder="seuemail@exemplo.com"
           required

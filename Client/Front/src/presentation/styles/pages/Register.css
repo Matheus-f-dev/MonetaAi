@@ -1,4 +1,4 @@
-/* #mensagem {
+ #mensagem {
   margin-top: 15px;
   font-weight: bold;
   padding: 10px;
@@ -19,10 +19,6 @@
 }
 
 
-body, html {
-  height: 100%;
-  overflow: hidden;
-}
 
 .brand-name {
   color: #00ffc8;
@@ -40,7 +36,7 @@ body, html {
 }
 
 .login-card {
-  width: 400px;
+  width: 420px;           /* um pouquinho mais largo como no mock */
   margin: 80px auto;
   background: rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(15px);
@@ -50,6 +46,7 @@ body, html {
   color: #fff;
   text-align: center;
 }
+
 
 .login-card h2 {
   font-size: 26px;
@@ -73,37 +70,52 @@ body, html {
   font-size: 14px;
 }
 
+/* ===== Inputs: tamanho consistente ===== */
 .login-form input {
   width: 100%;
-  padding: 10px;
+  height: 48px;           /* altura fixa */
+  font-size: 16px;        /* texto maior e uniforme */
+  padding: 0 14px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   background: #f0f0f0;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
+  outline: none;
+}
+.login-form input:focus {
+  box-shadow: 0 0 0 2px rgba(0,255,200,.35);
 }
 
 .password-wrapper {
   position: relative;
 }
 
+
 .password-wrapper input {
-  padding-right: 35px;
+  padding-right: 44px;    /* espaço pro botão do olho */
 }
 
 .password-wrapper button {
   position: absolute;
-  top: 8px;
-  right: 10px;
+  top:15%;
+  right: 12px; /* centraliza no eixo Y */
+  width: 28px;
+  height: 28px;
+  display: grid;                /* centraliza o ícone no botão */
+  place-items: center;
   background: transparent;
   border: none;
+  padding: 0;
   cursor: pointer;
 }
 
+/* tamanho do ícone do olho */
 .password-wrapper img {
   width: 20px;
-  opacity: 0.7;
+  height: 20px;
+  opacity: 0.8;
+  pointer-events: none; /* evita pegar clique no ícone em vez do botão */
 }
-
 .login-btn {
   width: 100%;
   background: #00ffc8;
@@ -141,4 +153,4 @@ body, html {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
-} */
+} 
