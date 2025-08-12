@@ -1,0 +1,34 @@
+/* painel principal (roxo clarinho na borda) */
+.panel{
+  border: 1.5px solid var(--primary-200);
+  border-radius: var(--radius);
+  background: #ffffff;
+  box-shadow: var(--shadow);
+  padding: 16px;
+}
+
+/* KPIs */
+.kpis{
+  display: grid; grid-template-columns: 1.2fr .9fr .9fr; gap: 18px;
+  padding: 10px 10px 2px;
+}
+.kpi{ padding: 14px 18px; border-radius: 12px; background: #fff; position: relative; }
+.kpi.mid::before,
+.kpi.right::before{
+  content: ""; position: absolute; top: -12px; bottom: -12px; left: 0; width: 1px; background: var(--primary-200);
+}
+.kpi-title{ font-weight: 700; color: #0f172a; }
+.kpi-sub{ margin-top: 4px; }
+.kpi-value{ margin-top: 12px; font-weight: 800; font-size: 24px; color: #16a34a; }
+.kpi-value.danger{ color: var(--danger); }
+
+/* Grid principal */
+.grid-main{
+  margin-top: 10px;
+  display: grid; grid-template-columns: 1.5fr .9fr; gap: 18px;
+}
+
+/* Cards */
+.card{ background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 16px; box-shadow: 0 2px 6px rgba(15,23,42,.03); }
+.card.big{ padding: 0; overflow
+: hidden; }
