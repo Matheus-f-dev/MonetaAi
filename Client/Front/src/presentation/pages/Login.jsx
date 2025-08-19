@@ -1,17 +1,19 @@
 import { useState } from 'react';
 //import '../../../src/App.css'; 
 import '../styles/pages/Login.css';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function LoginCard() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
   function handleSubmit(e) {
     e.preventDefault();
-    alert('Login enviado!');
     // Aqui você pode adicionar a lógica real de autenticação.
+    // Por enquanto, vamos simular um login bem-sucedido
+    navigate('/system');
   }
 
   return (

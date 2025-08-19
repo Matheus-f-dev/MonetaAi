@@ -1,34 +1,193 @@
-/* painel principal (roxo clarinho na borda) */
-.panel{
+/* ===== Reset/tema local ===== */
+:root{
+  --sidebar-w: 200px;
+
+  --bg: #f8fafc;         /* slate-50 */
+  --card: #ffffff;
+  --line: #e2e8f0;       /* slate-200 */
+  --text: #0f172a;       /* slate-900 */
+  --muted: #64748b;      /* slate-500 */
+  --muted2:#94a3b8;      /* slate-400 */
+
+  --primary:#7c3aed;     /* roxo */
+  --primary-50:#f3e8ff;
+  --primary-100:#ede9fe;
+  --primary-200:#ddd6fe;
+
+  --success:#16a34a;
+  --danger:#ef4444;
+
+  --radius: 14px;
+  --shadow: 0 8px 24px rgba(15,23,42,.06);
+}
+
+.sys-layout{
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ===== Sidebar ===== */
+.sys-sidebar{
+  background: #fff;
+  border-right: 1px solid var(--line);
+  padding: 20px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.sys-brand{ font-weight: 800; font-size: 22px; color: #6d28d9; letter-spacing: .2px; }
+.sys-side-group{ display:flex; flex-direction:column; gap:8px; }
+.sys-side-title{ font-size:12px; color: var(--muted); margin:4px 8px 6px; }
+.sys-side-nav{ display:grid; gap:4px; }
+.sys-side-item{
+  display:flex; align-items:center; gap:10px;
+  padding: 10px 10px; border-radius:10px; text-decoration:none; color:var(--text);
+  border: 1px solid transparent;
+}
+.sys-side-item:hover{ background:#f8fafc; border-color: var(--line); }
+.sys-active{ background: var(--primary-100); border-color: var(--primary-200); color:#4c1d95; }
+.sys-ico{ width:18px; height:18px; color:#475569; }
+.sys-side-footer{
+  margin-top:auto; display:grid; gap:4px;
+  border-top:1px solid var(--line); padding-top:12px;
+}
+
+/* ===== Topbar (compacta e largura total) ===== */
+.sys-main{ display:flex; flex-direction:column; }
+.sys-topbar{
+  position: sticky; top: 0; z-index: 5;
+  background: linear-gradient(0deg, rgba(248,250,252,0) 0%, rgba(248,250,252,1) 55%);
+  border-bottom: 1px solid var(--line);
+  padding: 6px 16px;              /* reduz altura */
+  width: 86%;                    /* REMOVE o 50% que causava sobreposição */
+  box-sizing: border-box;
+  display:flex; align-items:center; justify-content:space-between;
+  backdrop-filter: blur(6px);
+}
+.sys-top-left{ display:flex; align-items:center; gap:12px; }
+.sys-topbar h2{ font-size:18px; font-weight:800; line-height:1.1; }
+.sys-wave{ filter: saturate(130%); }
+.sys-top-actions{ display:flex; gap:10px; }
+.sys-badge{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:6px 10px;               /* menor */
+  border-radius:999px; border:1px solid var(--line);
+  background:#f1f5f9; font-size:13px;
+}
+.sys-btn{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:8px 12px;               /* menor */
+  border-radius:8px; font-weight:600; cursor:pointer;
+  background:#fff; border:1px solid var(--line); transition:.15s ease;
+}
+.sys-btn:hover{ transform: translateY(-1px); box-shadow: var(--shadow); }
+.sys-btn-primary{ background: var(--primary); color:#fff; border-color: var(--primary); }
+
+/* ===== Tabs (coladas logo abaixo do header, sem sobrepor) ===== */
+.sys-tabs{
+
+  display:flex; gap:8px;
+  padding:6px 16px 8px;           /* menor */
+  border-bottom:1px solid var(--line);
+  margin-top: 0;
+  position: relative;
+  z-index: 0;
+}
+.sys-tab{
+  padding:6px 10px;               /* menor */
+  border-radius:8px; border:1px solid var(--line);
+  background:#fff; font-weight:600; cursor:pointer; font-size:14px;
+}
+.sys-tab-active{ background: var(--primary-50); border-color: var(--primary-200); color:#4c1d95; }
+
+/* ===== Painel principal ===== */
+.sys-panel{
+  margin: 16px 24px 24px;
+  background: var(--card);
   border: 1.5px solid var(--primary-200);
   border-radius: var(--radius);
-  background: #ffffff;
   box-shadow: var(--shadow);
   padding: 16px;
 }
 
 /* KPIs */
-.kpis{
-  display: grid; grid-template-columns: 1.2fr .9fr .9fr; gap: 18px;
+.sys-kpis{
+  display:grid; grid-template-columns: 1.2fr .9fr .9fr; gap:18px;
   padding: 10px 10px 2px;
 }
-.kpi{ padding: 14px 18px; border-radius: 12px; background: #fff; position: relative; }
-.kpi.mid::before,
-.kpi.right::before{
-  content: ""; position: absolute; top: -12px; bottom: -12px; left: 0; width: 1px; background: var(--primary-200);
+.sys-kpi{ padding:14px 18px; border-radius:12px; background:#fff; position:relative; }
+.sys-kpi-mid::before, .sys-kpi-right::before{
+  content:""; position:absolute; top:-12px; bottom:-12px; left:0; width:1px; background: var(--primary-200);
 }
-.kpi-title{ font-weight: 700; color: #0f172a; }
-.kpi-sub{ margin-top: 4px; }
-.kpi-value{ margin-top: 12px; font-weight: 800; font-size: 24px; color: #16a34a; }
-.kpi-value.danger{ color: var(--danger); }
+.sys-kpi-title{ font-weight:700; }
+.sys-kpi-value{ margin-top:12px; font-weight:800; font-size:24px; color: var(--success); }
+.sys-success{ color: var(--success); }
+.sys-danger{ color: var(--danger); }
+.sys-small{ font-size:12px; color: var(--muted); }
 
-/* Grid principal */
-.grid-main{
-  margin-top: 10px;
-  display: grid; grid-template-columns: 1.5fr .9fr; gap: 18px;
-}
+/* Grid */
+.sys-grid{ margin-top:10px; display:grid; grid-template-columns: 1.5fr .9fr; gap:18px; }
 
 /* Cards */
-.card{ background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 16px; box-shadow: 0 2px 6px rgba(15,23,42,.03); }
-.card.big{ padding: 0; overflow
-: hidden; }
+.sys-card{ background:#fff; border:1px solid var(--line); border-radius:12px; padding:16px; box-shadow:0 2px 6px rgba(15,23,42,.03); }
+.sys-card-big{ padding:0; overflow:hidden; }
+.sys-card-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; padding:16px; border-bottom:1px solid var(--line); }
+.sys-card-title{ font-weight:800; }
+
+/* Segmented */
+.sys-segmented{ display:flex; gap:8px; }
+.sys-seg{ padding:8px 12px; border-radius:10px; border:1px solid var(--line); background:#fff; cursor:pointer; font-weight:600; }
+.sys-active{ border-color: var(--primary-200); background: var(--primary-50); color:#4c1d95; }
+
+/* Gráfico (mock pra bater com a imagem) */
+.sys-chart{ position:relative; height:260px; padding: 10px 16px 28px; }
+.sys-hline{ position:absolute; left:16px; right:16px; height:1px; background: var(--line); }
+.sys-spark{ position:absolute; left:16px; right:16px; bottom:36px; height:200px; width: calc(100% - 32px); }
+.sys-xlabels{
+  position:absolute; left:16px; right:16px; bottom:8px;
+  display:grid; grid-auto-flow:column; justify-content:space-between; font-size:11px; color: var(--muted2);
+}
+
+/* Side */
+.sys-side{ display:grid; gap:18px; }
+
+.sys-progress{
+  position:relative; height:10px; background:#f1f5f9; border:1px solid var(--line);
+  border-radius:999px; margin-top:12px; overflow:hidden;
+}
+.sys-progress-bar{ position:absolute; left:0; top:0; bottom:0; background:#22c55e; }
+.sys-progress-label{ text-align:right; margin-top:6px; font-size:12px; color: var(--muted); }
+
+.sys-bills{ list-style:none; margin-top:10px; display:grid; gap:10px; }
+.sys-bills li{ display:flex; align-items:center; justify-content:space-between; }
+.sys-left{ display:flex; align-items:center; gap:8px; }
+.sys-cal{ opacity:.9; }
+.sys-right{ display:flex; align-items:center; gap:10px; }
+
+/* Tabela */
+.sys-table-wrap{ margin-top:14px; overflow:auto; }
+.sys-table table{ width:100%; border-collapse:collapse; }
+.sys-table th, .sys-table td{ padding:12px 10px; border-bottom:1px solid var(--line); text-align:left; }
+.sys-tipo{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:26px; height:26px; border-radius:50%;
+  background:#fee2e2; color:#991b1b; font-weight:800;
+}
+.sys-pos{ background:#dcfce7 !important; color:#14532d !important; }
+.sys-neg{ background:#fee2e2 !important; color:#991b1b !important; }
+.sys-pill{
+  display:inline-block; padding:4px 10px; border-radius:999px;
+  background:#f1f5f9; border:1px solid var(--line); font-size:12px;
+}
+.sys-value{ text-align:right; white-space:nowrap; }
+.sys-pos-t{ color:#16a34a; }
+.sys-neg-t{ color:#ef4444; }
+
+/* Responsivo */
+@media (max-width: 1100px){
+  .sys-kpis{ grid-template-columns: 1fr; }
+  .sys-grid{ grid-template-columns: 1fr; }
+}
