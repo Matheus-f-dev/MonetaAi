@@ -1,5 +1,26 @@
 
 import "../styles/pages/System.css";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 export default function System() {
   // -> estes dados serão trocados pelo seu backend depois
@@ -20,6 +41,47 @@ export default function System() {
     { type: "out", desc: "alimentacao", category: "Outras", date: "2025-08-12", amount: -2000.00 },
     // adicione mais linhas do backend aqui
   ];
+
+  // Dados para o gráfico
+  const chartData = {
+    labels: ["15/07","16/07","18/07","20/07","25/07","27/07","31/07","02/08","06/08","10/08","11/08","12/08"],
+    datasets: [
+      {
+        label: 'Receitas',
+        data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5000],
+        borderColor: '#16a34a',
+        backgroundColor: 'rgba(22, 163, 74, 0.1)',
+        tension: 0.4,
+      },
+      {
+        label: 'Despesas',
+        data: [200, 150, 300, 180, 850, 120, 400, 250, 180, 300, 200, 2000],
+        borderColor: '#ef4444',
+        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+        tension: 0.4,
+      }
+    ],
+  };
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          callback: function(value) {
+            return 'R$ ' + value.toLocaleString('pt-BR');
+          }
+        }
+      }
+    },
+  };
 
   const brl = (v) =>
     v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -75,12 +137,6 @@ export default function System() {
 
         {/* Painel principal (sem chatbot / sem lovable) */}
         <section className="sys-panel">
-            {/* Tabs */}
-        <div className="sys-tabs">
-          <button className="sys-tab sys-tab-active">Visão Geral</button>
-          <button className="sys-tab">Saldo Futuro</button>
-          <button className="sys-tab">Atividades</button>
-        </div>
           {/* KPIs */}
           <div className="sys-kpis">
             <div className="sys-kpi">
@@ -121,25 +177,8 @@ export default function System() {
               </div>
 
               <div className="sys-chart">
-                {[0,1,2,3,4].map(i=>(
-                  <div key={i} className="sys-hline" style={{top:`${i*25}%`}} />
-                ))}
-
-                <svg viewBox="0 0 1000 220" className="sys-spark" aria-hidden>
-                  <polyline
-                    fill="none"
-                    stroke="#ef4444"
-                    strokeWidth="3"
-                    points="0,180 80,178 160,178 240,179 320,178 400,179 480,178 560,178 640,178 720,178 800,176 880,175 960,40"
-                  />
-                  {[0,80,160,240,320,400,480,560,640,720,800,880,960].map((x,i)=>(
-                    <circle key={i} cx={x} cy={i<12?178:40} r="4" fill="#ef4444" />
-                  ))}
-                </svg>
-
-                <div className="sys-xlabels">
-                  {["15/07","16/07","18/07","20/07","25/07","27/07","31/07","02/08","06/08","10/08","11/08","12/08"]
-                    .map(d => <span key={d}>{d}</span>)}
+                <div className="chart-container">
+                  <Line data={chartData} options={chartOptions} />
                 </div>
               </div>
             </div>
