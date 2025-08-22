@@ -16,7 +16,7 @@ O sistema permite que usuários organizem suas finanças de maneira simples e ef
 
 ---
 
-## ✅ Checklist - Segunda Entrega
+## ✅ Checklist - Primeira Entrega
 
 ### Funcionalidades já implementadas
 - [x] Cadastro de usuários  
@@ -32,6 +32,25 @@ O sistema permite que usuários organizem suas finanças de maneira simples e ef
   
 - [ ] Personalização da interface  
 - [ ] Gráfico de gastos  
+
+
+
+ ## ✅ Checklist - Segunda Entrega
+
+### Funcionalidades já implementadas
+- [x] Detectar gastos por foto
+- [x] consulta de saldo e consumo no chatbot
+- [x] Registro de gastos por voz
+- [x] categorização automatica dos gastos
+- [x] o chatbot gera resumo dos relatorios
+
+
+### Funcionalidades em desenvolvimento
+- [ ] Previsão saldo futuro
+- [ ] Analise de impacto financeiro
+- [ ] exportar relatorios de acompanhamentos
+- [ ]  alertas personalizados
+- [ ]  Modo viagem
  
 
 ## 🚀 Tecnologias Utilizadas
