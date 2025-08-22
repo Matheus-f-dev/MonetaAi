@@ -25,21 +25,20 @@ O sistema permite que usuários organizem suas finanças de maneira simples e ef
 - [x] Cadastro da média salarial
 - [x] Visualizar histórico de atividades
 - [x] Filtro de gastos por categoria
-- [x] Integração com rede social  
+- [x] Integração com rede social
+- [x] Registros no WhatsApp através do chatbot 
 
 ### Funcionalidades em desenvolvimento
   
 - [ ] Personalização da interface  
 - [ ] Gráfico de gastos  
-- [ ] Registros no WhatsApp através do chatbot  
-
----
+ 
 
 ## 🚀 Tecnologias Utilizadas
 
 - **Frontend:** HTML, CSS, JavaScript,mas em breve tudo irá para react
 - **Backend:** Firebase Authentication, Firestore e node.js 
-- **Chatbot:** WhatsApp API *(em desenvolvimento)*  
+- **Chatbot:** Em python *(em desenvolvimento)*  
 - **Gráficos:** Chart.js *(planejado)*
 
 ---
