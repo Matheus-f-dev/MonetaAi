@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const bodyParser = require('body-parser');
 const admin = require('firebase-admin');
 const passport = require('passport');
+const cors = require('cors');
 require('dotenv').config();
 
 // inicialização do Firebase
@@ -30,6 +31,12 @@ app.locals.auth = auth;
 app.locals.db = db;
 
 // middlewares
+app.use(cors({
+  origin: true,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -52,6 +59,7 @@ const senha = require('./routes/esqueci-senha');
 const cadastroConcluido = require('./routes/cadastro-concluido');
 const transacoes = require('./routes/historico'); 
 const authRoutes = require('./routes/auth');
+const apiCadastro = require('./routes/api/cadastro');
 
 // usa as rotas
 app.use('/login', login);
@@ -60,6 +68,7 @@ app.use('/esqueci-senha', senha);
 app.use('/cadastro-concluido', cadastroConcluido);
 app.use('/', transacoes); 
 app.use('/auth', authRoutes);
+app.use('/api/cadastro', apiCadastro);
 
 // página histórico
 app.get('/historico-page', (req, res) => {

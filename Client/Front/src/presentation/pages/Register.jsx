@@ -1,25 +1,54 @@
 import { useState } from 'react';
-//import '../../../src/App.css'; 
 import '../styles/pages/Register.css';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function Cadastro() {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [confirmar, setConfirmar] = useState('');
+  const [salario, setSalario] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [mensagem, setMensagem] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    if (senha !== confirmar) {
-      setMensagem('As senhas não coincidem!');
-      return;
+    setLoading(true);
+    setMensagem('');
+
+    try {
+      const response = await fetch('http://localhost:3000/api/cadastro', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nome,
+          email,
+          senha,
+          confirmar,
+          salario: Number(salario)
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setMensagem('Cadastro realizado com sucesso!');
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
+      } else {
+        setMensagem(data.message);
+      }
+    } catch (error) {
+      setMensagem('Erro ao conectar com o servidor.');
+    } finally {
+      setLoading(false);
     }
-    setMensagem('Cadastro enviado!');
-    // Aqui você pode chamar a API de cadastro real depois
   }
 
 
@@ -102,8 +131,24 @@ export default function Cadastro() {
           </button>
         </div>
 
-        <button type="submit" className="login-btn">Cadastrar</button>
-        <p id="mensagem" style={{ textAlign: 'center', marginTop: 10 }}>{mensagem}</p>
+        <label>Salário</label>
+        <input
+          type="number"
+          id="salario"
+          placeholder="Seu salário mensal"
+          required
+          value={salario}
+          onChange={e => setSalario(e.target.value)}
+        />
+
+        <button type="submit" className="login-btn" disabled={loading}>
+          {loading ? 'Cadastrando...' : 'Cadastrar'}
+        </button>
+        <p id="mensagem" style={{ 
+          textAlign: 'center', 
+          marginTop: 10,
+          color: mensagem.includes('sucesso') ? 'green' : 'red'
+        }}>{mensagem}</p>
       </form>
 
       <div className="footer-links">
