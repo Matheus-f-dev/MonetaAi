@@ -55,8 +55,8 @@ O sistema permite que usuários organizem suas finanças de maneira simples e ef
 
 ## 🚀 Tecnologias Utilizadas
 
-- **Frontend:** HTML, CSS, JavaScript,mas em breve tudo irá para react
-- **Backend:** Firebase Authentication, Firestore e node.js 
+- **Frontend:** React Js
+- **Backend:** Firebase Authentication, Firestore e node.js e express
 - **Chatbot:** Em python *(em desenvolvimento)*  
 - **Gráficos:** Chart.js *(planejado)*
 
