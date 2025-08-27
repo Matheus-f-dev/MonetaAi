@@ -11,13 +11,41 @@ export default function Cadastro() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [mensagem, setMensagem] = useState('');
+  const [emailStatus, setEmailStatus] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  async function verificarEmail(email) {
+    if (!email || !email.includes('@')) return;
+    
+    try {
+      const response = await fetch('http://localhost:3000/api/verificar-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      
+      const data = await response.json();
+      setEmailStatus(data.exists ? 'exists' : 'available');
+    } catch (error) {
+      setEmailStatus('');
+    }
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
     setLoading(true);
     setMensagem('');
+
+    const dados = {
+      nome,
+      email,
+      senha,
+      confirmar,
+      salario: Number(salario)
+    };
+
+    console.log('Enviando dados:', dados);
 
     try {
       const response = await fetch('http://localhost:3000/api/cadastro', {
@@ -25,16 +53,12 @@ export default function Cadastro() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          nome,
-          email,
-          senha,
-          confirmar,
-          salario: Number(salario)
-        })
+        body: JSON.stringify(dados)
       });
 
+      console.log('Response status:', response.status);
       const data = await response.json();
+      console.log('Response data:', data);
 
       if (data.success) {
         setMensagem('Cadastro realizado com sucesso!');
@@ -42,9 +66,10 @@ export default function Cadastro() {
           navigate('/login');
         }, 2000);
       } else {
-        setMensagem(data.message);
+        setMensagem(data.message || 'Erro no cadastro');
       }
     } catch (error) {
+      console.error('Erro:', error);
       setMensagem('Erro ao conectar com o servidor.');
     } finally {
       setLoading(false);
@@ -78,8 +103,25 @@ export default function Cadastro() {
           placeholder="seuemail@exemplo.com"
           required
           value={email}
-          onChange={e => setEmail(e.target.value)}
+          onChange={e => {
+            setEmail(e.target.value);
+            setEmailStatus('');
+          }}
+          onBlur={e => verificarEmail(e.target.value)}
+          style={{
+            borderColor: emailStatus === 'exists' ? 'red' : 
+                        emailStatus === 'available' ? 'green' : ''
+          }}
         />
+        {emailStatus && (
+          <p style={{
+            fontSize: '12px',
+            margin: '5px 0 0 0',
+            color: emailStatus === 'exists' ? 'red' : 'green'
+          }}>
+            {emailStatus === 'exists' ? '✗ Este email já está em uso' : '✓ Email disponível'}
+          </p>
+        )}
 
         <label>Senha</label>
         <div className="password-wrapper">
@@ -115,6 +157,10 @@ export default function Cadastro() {
             required
             value={confirmar}
             onChange={e => setConfirmar(e.target.value)}
+            style={{
+              borderColor: confirmar && senha ? 
+                (senha === confirmar ? 'green' : 'red') : ''
+            }}
           />
           <button
             type="button"
@@ -130,6 +176,15 @@ export default function Cadastro() {
             />
           </button>
         </div>
+        {confirmar && senha && (
+          <p style={{
+            fontSize: '12px',
+            margin: '5px 0 0 0',
+            color: senha === confirmar ? 'green' : 'red'
+          }}>
+            {senha === confirmar ? '✓ Senhas coincidem' : '✗ Senhas não coincidem'}
+          </p>
+        )}
 
         <label>Salário</label>
         <input

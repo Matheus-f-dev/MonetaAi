@@ -60,6 +60,7 @@ const cadastroConcluido = require('./routes/cadastro-concluido');
 const transacoes = require('./routes/historico'); 
 const authRoutes = require('./routes/auth');
 const apiCadastro = require('./routes/api/cadastro');
+const apiVerificarEmail = require('./routes/api/verificar-email');
 
 // usa as rotas
 app.use('/login', login);
@@ -69,6 +70,7 @@ app.use('/cadastro-concluido', cadastroConcluido);
 app.use('/', transacoes); 
 app.use('/auth', authRoutes);
 app.use('/api/cadastro', apiCadastro);
+app.use('/api/verificar-email', apiVerificarEmail);
 
 // página histórico
 app.get('/historico-page', (req, res) => {

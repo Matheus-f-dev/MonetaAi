@@ -7,8 +7,8 @@ router.post('/', async (req, res) => {
   const auth = req.app.locals.auth;
   const db = req.app.locals.db;
 
-  if (!nome || !email || !senha || !confirmar || !salario) {
-    console.log('Campos faltando:', { nome: !!nome, email: !!email, senha: !!senha, confirmar: !!confirmar, salario: !!salario });
+  if (!nome || !email || !senha || !confirmar || salario === '' || salario === null || salario === undefined) {
+    console.log('Campos faltando:', { nome: !!nome, email: !!email, senha: !!senha, confirmar: !!confirmar, salario });
     return res.status(400).json({ 
       success: false, 
       message: 'Preencha todos os campos.' 
