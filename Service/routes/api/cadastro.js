@@ -1,4 +1,5 @@
 const express = require('express');
+const bcrypt = require('bcrypt');
 const router = express.Router();
 
 router.post('/', async (req, res) => {
@@ -39,11 +40,13 @@ router.post('/', async (req, res) => {
   }
 
   try {
+    console.log('Criando usuário com:', { email, senha: '***', nome });
     const user = await auth.createUser({
       email,
       password: senha,
       displayName: nome
     });
+    console.log('Usuário criado no Firebase Auth:', user.uid);
 
     await db.collection('usuarios').doc(user.uid).set({
       nome,

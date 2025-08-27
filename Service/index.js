@@ -61,6 +61,7 @@ const transacoes = require('./routes/historico');
 const authRoutes = require('./routes/auth');
 const apiCadastro = require('./routes/api/cadastro');
 const apiVerificarEmail = require('./routes/api/verificar-email');
+const apiLogin = require('./routes/api/login');
 
 // usa as rotas
 app.use('/login', login);
@@ -71,6 +72,7 @@ app.use('/', transacoes);
 app.use('/auth', authRoutes);
 app.use('/api/cadastro', apiCadastro);
 app.use('/api/verificar-email', apiVerificarEmail);
+app.use('/api/login', apiLogin);
 
 // página histórico
 app.get('/historico-page', (req, res) => {

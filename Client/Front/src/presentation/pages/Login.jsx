@@ -7,13 +7,41 @@ export default function LoginCard() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [mensagem, setMensagem] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    // Aqui você pode adicionar a lógica real de autenticação.
-    // Por enquanto, vamos simular um login bem-sucedido
-    navigate('/system');
+    setLoading(true);
+    setMensagem('');
+
+    try {
+      const response = await fetch('http://localhost:3000/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, senha })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('token', data.token);
+        setMensagem('Login realizado com sucesso!');
+        setTimeout(() => {
+          navigate('/system');
+        }, 1000);
+      } else {
+        setMensagem(data.message);
+      }
+    } catch (error) {
+      setMensagem('Erro ao conectar com o servidor.');
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -60,9 +88,14 @@ export default function LoginCard() {
 </div>
 
 
-          <button type="submit" className="login-btn">
-            Entrar
+          <button type="submit" className="login-btn" disabled={loading}>
+            {loading ? 'Entrando...' : 'Entrar'}
           </button>
+          <p style={{ 
+            textAlign: 'center', 
+            marginTop: 10,
+            color: mensagem.includes('sucesso') ? 'green' : 'red'
+          }}>{mensagem}</p>
         </form>
 
         <div className="footer-links">
