@@ -23,18 +23,21 @@
     </form> 
 
     <button onclick="location.href='/login'">Voltar</button>
+
+    <% if (link) { %>
+      <div class="link-redefinicao">
+        <p>Link de redefinição (apenas para teste):</p>
+        <a href="<%= link %>" target="_blank"><%= link %></a>
+      </div>
+    <% } %>
   </div>
 
-    <a href="<%= link %>" target="_blank"><%= link %></a>
-
   <script>
-    // Esconde a mensagem de erro ou sucesso após 3 segundos
+    // esconde a mensagem de erro ou sucesso após 5 segundos
     setTimeout(() => {
       const msg = document.getElementById('mensagem');
-      if (msg) {
-        msg.style.display = 'none';
-      }
-    }, 3000);
+      if (msg) msg.style.display = 'none';
+    }, 5000);
   </script>
 </body>
 </html>
