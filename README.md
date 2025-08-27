@@ -21,7 +21,7 @@ O sistema permite que usuários organizem suas finanças de maneira simples e ef
 ### Funcionalidades já implementadas
 - [x] Cadastro de usuários  
 - [x] Login com autenticação  
-- [x] Redefinição de senha (em andamento)
+- [x] Redefinição de senha 
 - [x] Cadastro da média salarial
 - [x] Visualizar histórico de atividades
 - [x] Filtro de gastos por categoria
@@ -41,7 +41,7 @@ O sistema permite que usuários organizem suas finanças de maneira simples e ef
 - [x] Detectar gastos por foto
 - [x] consulta de saldo e consumo no chatbot
 - [x] Registro de gastos por voz
-- [x] categorização automatica dos gastos
+- [x] categorização automatica dos gastos-feita somente no bot ainda
 - [x] o chatbot gera resumo dos relatorios
 
 
