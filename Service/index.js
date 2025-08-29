@@ -3,7 +3,7 @@ const passport = require('passport');
 const { auth, db } = require('./src/config/firebase');
 
 // Inicializa passport com configurações antigas para compatibilidade
-const initializePassport = require('./routes/passport-google-config');
+const initializePassport = require('./src/config/passport-google-config');
 initializePassport(passport, auth, db);
 
 // Define variáveis globais para compatibilidade com rotas antigas

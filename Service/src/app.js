@@ -7,14 +7,8 @@ require('dotenv').config();
 
 const corsMiddleware = require('./middleware/cors');
 const apiRoutes = require('./routes/api');
-
-// Importa rotas de views para compatibilidade
-const login = require('../routes/login');
-const cadastro = require('../routes/cadastro');
-const senha = require('../routes/esqueci-senha');
-const cadastroConcluido = require('../routes/cadastro-concluido');
-const transacoes = require('../routes/historico');
-const authRoutes = require('../routes/auth');
+const viewRoutes = require('./routes/views');
+const authRoutes = require('./routes/auth');
 
 const app = express();
 
@@ -38,23 +32,11 @@ app.use(passport.session());
 // Rotas da API (MVC)
 app.use('/api', apiRoutes);
 
-// Rotas de views (compatibilidade)
-app.use('/login', login);
-app.use('/cadastro', cadastro);
-app.use('/esqueci-senha', senha);
-app.use('/cadastro-concluido', cadastroConcluido);
-app.use('/', transacoes);
+// Rotas de views (MVC)
+app.use('/', viewRoutes);
+
+// Rotas de autenticação OAuth
 app.use('/auth', authRoutes);
-
-// Página histórico
-app.get('/historico-page', (req, res) => {
-  res.render('historico');
-});
-
-// Página inicial
-app.get('/', (req, res) => {
-  res.redirect('/login');
-});
 
 // Página 404
 app.use((req, res) => {
