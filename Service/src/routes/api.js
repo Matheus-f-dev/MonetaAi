@@ -1,0 +1,20 @@
+const express = require('express');
+const AuthController = require('../controllers/AuthController');
+const TransactionController = require('../controllers/TransactionController');
+const EmailController = require('../controllers/EmailController');
+
+const router = express.Router();
+
+// Rotas de autenticação
+router.post('/cadastro', AuthController.register);
+router.post('/login', AuthController.login);
+router.post('/verificar-email', EmailController.verificarEmail);
+
+// Rotas de transações
+router.post('/transactions', TransactionController.create);
+router.get('/transactions/:userId', TransactionController.getUserTransactions);
+router.get('/balance/:userId', TransactionController.getUserBalance);
+router.put('/transactions/:id', TransactionController.update);
+router.delete('/transactions/:id', TransactionController.delete);
+
+module.exports = router;
