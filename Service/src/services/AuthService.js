@@ -23,6 +23,8 @@ class AuthService {
   }
 
   static async login(email, senha) {
+    console.log('FIREBASE_API_KEY:', process.env.FIREBASE_API_KEY ? 'Definida' : 'Não definida');
+    
     const response = await axios.post(
       `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.FIREBASE_API_KEY}`,
       {

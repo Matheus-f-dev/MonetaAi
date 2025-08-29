@@ -99,7 +99,7 @@ export default function LoginCard() {
         </form>
 
         <div className="footer-links">
-          <Link to="/EsqueciSenha">Esqueci minha senha</Link>
+          <Link to="/esqueci-senha">Esqueci minha senha</Link>
           <Link to="/cadastro">Criar conta</Link>
         </div>
       </div>

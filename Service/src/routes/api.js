@@ -9,6 +9,7 @@ const router = express.Router();
 router.post('/cadastro', AuthController.register);
 router.post('/login', AuthController.login);
 router.post('/verificar-email', EmailController.verificarEmail);
+router.post('/esqueci-senha', EmailController.enviarLinkRedefinicao);
 
 // Rotas de transações
 router.post('/transactions', TransactionController.create);

@@ -14,7 +14,7 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginCard />} />
         <Route path="/cadastro" element={<Cadastro />} />
-        <Route path="/EsqueciSenha" element={<RedefinirSenha />} />
+        <Route path="/esqueci-senha" element={<RedefinirSenha />} />
         <Route path="/system" element={<System />} />
       </Routes>
     </>
