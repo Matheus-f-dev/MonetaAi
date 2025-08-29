@@ -3,6 +3,74 @@
 **MonetaAi** é uma plataforma de gestão financeira pessoal com foco em acessibilidade, automação e integração via inteligência artificial.  
 O sistema permite que usuários organizem suas finanças de maneira simples e eficiente, com recursos como chatbot via WhatsApp, categorização de gastos, gráficos e mais.
 
+## 📁 Estrutura do Projeto
+
+```
+MonetaAi/
+├── Client/
+│   └── Front/                    # Frontend React
+│       ├── src/
+│       │   ├── presentation/
+│       │   │   ├── components/   # Componentes React
+│       │   │   ├── pages/        # Páginas da aplicação
+│       │   │   └── styles/       # Estilos CSS
+│       │   └── App.js
+│       └── package.json
+└── Service/                      # Backend Node.js (Padrão MVC)
+    ├── src/
+    │   ├── controllers/          # Controllers da API e Views
+    │   │   └── views/            # Controllers para páginas
+    │   ├── models/               # Modelos de dados
+    │   ├── routes/               # Rotas organizadas
+    │   ├── services/             # Lógica de negócio
+    │   ├── middleware/           # Middlewares
+    │   └── config/               # Configurações
+    ├── views/                    # Templates EJS
+    ├── public/                   # Arquivos estáticos
+    └── package.json
+```
+
+## 🚀 Como Executar o Projeto
+
+### Pré-requisitos
+- Node.js (versão 16 ou superior)
+- npm ou yarn
+- Conta Firebase configurada
+
+### 1. Backend (Service)
+```bash
+# Navegar para a pasta do backend
+cd MonetaAi/Service
+
+# Instalar dependências
+npm install
+
+# Configurar variáveis de ambiente
+# Criar arquivo .env com as configurações do Firebase
+
+# Executar o servidor
+npm start
+# Servidor rodará em http://localhost:3000
+```
+
+### 2. Frontend (Client)
+```bash
+# Navegar para a pasta do frontend
+cd MonetaAi/Client/Front
+
+# Instalar dependências
+npm install
+
+# Executar a aplicação
+npm start
+# Aplicação rodará em http://localhost:3001
+```
+
+### 3. Acessar a Aplicação
+- **Frontend React:** http://localhost:5173
+- **Backend API:** http://localhost:3000/api
+- **Páginas Web:** http://localhost:3000
+
 ---
 
 ## 👥 Integrantes do Grupo - 3C2
@@ -55,9 +123,12 @@ O sistema permite que usuários organizem suas finanças de maneira simples e ef
 
 ## 🚀 Tecnologias Utilizadas
 
-- **Frontend:** React Js
-- **Backend:** Firebase Authentication, Firestore e node.js e express
-- **Chatbot:** Em python *(em desenvolvimento)*  
+- **Frontend:** React.js com React Router
+- **Backend:** Node.js, Express.js (Padrão MVC)
+- **Banco de Dados:** Firebase Firestore
+- **Autenticação:** Firebase Authentication
+- **Templates:** EJS para páginas web
+- **Chatbot:** Python *(em desenvolvimento)*  
 - **Gráficos:** Chart.js *(planejado)*
 
 ---
