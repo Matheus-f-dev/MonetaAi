@@ -78,6 +78,7 @@ class AuthViewController {
         nome,
         email,
         salario: Number(salario),
+        perfilCompleto: true,
         criadoEm: new Date()
       });
 
@@ -102,6 +103,37 @@ class AuthViewController {
 
   static renderEsqueciSenha(req, res) {
     res.render('esqueci-senha');
+  }
+
+  static renderCompletarPerfil(req, res) {
+    res.render('completar-perfil', { erro: null });
+  }
+
+  static async completarPerfil(req, res) {
+    const { salario } = req.body;
+    const userId = req.session.userId;
+    const db = req.app.locals.db;
+
+    if (!userId) {
+      return res.redirect('/login');
+    }
+
+    if (!salario || isNaN(salario) || Number(salario) <= 0) {
+      return res.render('completar-perfil', { erro: '❌ Informe um salário válido e positivo.' });
+    }
+
+    try {
+      await db.collection('usuarios').doc(userId).update({
+        salario: Number(salario),
+        perfilCompleto: true,
+        atualizadoEm: new Date()
+      });
+
+      res.redirect('/historico-page');
+    } catch (err) {
+      console.error('Erro ao atualizar perfil:', err);
+      res.render('completar-perfil', { erro: 'Erro ao salvar dados. Tente novamente.' });
+    }
   }
 }
 

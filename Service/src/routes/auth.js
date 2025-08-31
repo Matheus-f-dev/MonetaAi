@@ -9,6 +9,15 @@ router.get('/google/callback',
   async (req, res) => {
     try {
       req.session.userId = req.user.uid;
+      const db = req.app.locals.db;
+      
+      // Verificar se o perfil está completo
+      const userDoc = await db.collection('usuarios').doc(req.user.uid).get();
+      const userData = userDoc.data();
+      
+      if (!userData.perfilCompleto || !userData.salario) {
+        return res.redirect('/completar-perfil');
+      }
       
       // Criar token JWT para o usuário
       const jwt = require('jsonwebtoken');

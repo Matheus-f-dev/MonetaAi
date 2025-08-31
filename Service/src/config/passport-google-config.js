@@ -20,6 +20,7 @@ function initializePassport(passport, auth, db) {
         await db.collection('usuarios').doc(user.uid).set({
           nome: profile.displayName,
           email: profile.emails[0].value,
+          perfilCompleto: false,
           criadoEm: new Date()
         });
       }

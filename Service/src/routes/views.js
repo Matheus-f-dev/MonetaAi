@@ -13,6 +13,8 @@ router.post('/cadastro', AuthViewController.cadastro);
 
 router.get('/cadastro-concluido', AuthViewController.renderCadastroConcluido);
 router.get('/esqueci-senha', AuthViewController.renderEsqueciSenha);
+router.get('/completar-perfil', AuthViewController.renderCompletarPerfil);
+router.post('/completar-perfil', AuthViewController.completarPerfil);
 
 // Rotas de transações
 router.get('/historico-page', TransactionViewController.renderHistorico);
