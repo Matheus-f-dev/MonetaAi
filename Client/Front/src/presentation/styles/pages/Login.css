@@ -131,3 +131,58 @@
 .footer-links a:hover {
   text-decoration: underline;
 }
+
+/* Divisor "ou" */
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+  color: #cfcfcf;
+  font-size: 14px;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #cfcfcf;
+  opacity: 0.3;
+}
+
+.divider span {
+  padding: 0 15px;
+}
+
+/* Botão do Google */
+.google-login-btn {
+  width: 100%;
+  background: #fff;
+  color: #333;
+  font-weight: 500;
+  padding: 12px;
+  border: 1px solid #dadce0;
+  border-radius: 10px;
+  transition: 0.3s;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.google-login-btn:hover {
+  background: #f8f9fa;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.google-login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.google-icon {
+  width: 18px;
+  height: 18px;
+}

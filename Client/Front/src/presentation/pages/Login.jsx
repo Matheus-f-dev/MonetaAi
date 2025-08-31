@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 //import '../../../src/App.css'; 
 import '../styles/pages/Login.css';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 
 export default function LoginCard() {
   const [email, setEmail] = useState('');
@@ -10,6 +10,18 @@ export default function LoginCard() {
   const [mensagem, setMensagem] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const error = searchParams.get('error');
+    if (error) {
+      setMensagem(error);
+    }
+  }, [searchParams]);
+
+  function handleGoogleLogin() {
+    window.location.href = 'http://localhost:3000/auth/google';
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -91,6 +103,25 @@ export default function LoginCard() {
           <button type="submit" className="login-btn" disabled={loading}>
             {loading ? 'Entrando...' : 'Entrar'}
           </button>
+          
+          <div className="divider">
+            <span>ou</span>
+          </div>
+          
+          <button 
+            type="button" 
+            className="google-login-btn"
+            onClick={handleGoogleLogin}
+            disabled={loading}
+          >
+            <img 
+              src="https://developers.google.com/identity/images/g-logo.png" 
+              alt="Google" 
+              className="google-icon"
+            />
+            Entrar com Google
+          </button>
+          
           <p style={{ 
             textAlign: 'center', 
             marginTop: 10,
