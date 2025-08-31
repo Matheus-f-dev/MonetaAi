@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import "../styles/pages/System.css";
+import "../styles/components/TransactionModal.css";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -19,6 +21,7 @@ import {
   SidePanel, 
   TransactionsTable 
 } from '../components/system';
+import { TransactionModal } from '../components/system/TransactionModal';
 
 ChartJS.register(
   CategoryScale,
@@ -31,6 +34,8 @@ ChartJS.register(
 );
 
 export default function System() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
   // -> estes dados serão trocados pelo seu backend depois
   const userName   = "Usuário";
   const balance    = -2000;
@@ -91,12 +96,52 @@ export default function System() {
     },
   };
 
+  const handleNewTransaction = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleSubmitTransaction = async (transactionData) => {
+    try {
+      // Pegar userId do localStorage ou sessão
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const userId = user.uid || 'user-temp'; // fallback temporário
+      
+      const payload = {
+        userId,
+        tipo: transactionData.tipo,
+        valor: parseFloat(transactionData.valor),
+        descricao: transactionData.descricao,
+        categoria: transactionData.categoria,
+        data: new Date().toISOString()
+      };
+      
+      const response = await fetch('http://localhost:3000/api/transactions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        alert('Transação adicionada com sucesso!');
+      } else {
+        alert('Erro: ' + result.message);
+      }
+    } catch (error) {
+      console.error('Erro ao adicionar transação:', error);
+      alert('Erro ao conectar com o servidor');
+    }
+  };
+
   return (
     <div className="sys-layout">
       <Sidebar />
       
       <main className="sys-main">
-        <Topbar userName={userName} />
+        <Topbar userName={userName} onNewTransaction={handleNewTransaction} />
         <Tabs />
         
         <section className="sys-panel">
@@ -110,6 +155,12 @@ export default function System() {
           <TransactionsTable transactions={transactions} />
         </section>
       </main>
+      
+      <TransactionModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleSubmitTransaction}
+      />
     </div>
   );
 }

@@ -129,7 +129,7 @@ class AuthViewController {
         atualizadoEm: new Date()
       });
 
-      res.redirect('/historico-page');
+      res.redirect('http://localhost:5173/system');
     } catch (err) {
       console.error('Erro ao atualizar perfil:', err);
       res.render('completar-perfil', { erro: 'Erro ao salvar dados. Tente novamente.' });

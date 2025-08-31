@@ -1,4 +1,5 @@
 const { db } = require('../config/firebase');
+console.log('Firebase db conectado:', !!db);
 
 class Transaction {
   constructor(data) {
@@ -13,22 +14,30 @@ class Transaction {
   }
 
   static async create(transactionData) {
-    const transactionRef = db.collection('historico').doc();
-    await transactionRef.set({
-      ...transactionData,
-      criadoEm: new Date()
-    });
-    return new Transaction({ id: transactionRef.id, ...transactionData });
+    const dataToSave = {
+      descricao: transactionData.descricao,
+      valor: Number(transactionData.valor),
+      categoria: transactionData.categoria,
+      tipo: transactionData.tipo,
+      dataHora: new Date().toLocaleString('pt-BR')
+    };
+    
+    const docRef = await db
+      .collection('usuarios')
+      .doc(transactionData.userId)
+      .collection('historico')
+      .add(dataToSave);
+    
+    return new Transaction({ id: docRef.id, userId: transactionData.userId, ...dataToSave });
   }
 
   static async findByUserId(userId) {
-    const snapshot = await db.collection('historico')
-      .where('userId', '==', userId)
-      .orderBy('data', 'desc')
+    const snapshot = await db.collection('usuarios').doc(userId).collection('historico')
+      .orderBy('dataHora', 'desc')
       .get();
     
     return snapshot.docs.map(doc => 
-      new Transaction({ id: doc.id, ...doc.data() })
+      new Transaction({ id: doc.id, userId, ...doc.data() })
     );
   }
 
