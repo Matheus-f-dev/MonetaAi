@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import "../styles/pages/System.css";
 import "../styles/components/TransactionModal.css";
 import "../styles/components/ActivityHistory.css";
@@ -38,14 +38,105 @@ ChartJS.register(
 export default function System() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
+  const [transactions, setTransactions] = useState([]);
+  const [chartData, setChartData] = useState(null);
   
-  // -> estes dados serão trocados pelo seu backend depois
-  const userName   = "Usuário";
-  const balance    = -2000;
-  const income     = 0;
-  const expenses   = 2000;
-  const salary     = 5000;
-  const progress   = 40; // %
+  const userName = "Usuário";
+  const salary = 5000;
+  const progress = 40;
+  
+  // Função para buscar transações
+  const fetchTransactions = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const userId = user.uid || 'default-user';
+      
+      const response = await fetch(`http://localhost:3000/api/transactions/${userId}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setTransactions(data.transactions);
+        generateChartData(data.transactions);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar transações:', error);
+    }
+  };
+  
+  // Buscar transações na inicialização
+  useEffect(() => {
+    fetchTransactions();
+  }, []);
+  
+  // Gerar dados do gráfico baseado nas transações
+  const generateChartData = (transactionsList) => {
+    // Agrupar por data
+    const groupedByDate = {};
+    
+    transactionsList.forEach(transaction => {
+      const dateField = transaction.dataHora || transaction.data || transaction.criadoEm;
+      let date;
+      
+      if (dateField && typeof dateField === 'string' && dateField.includes('/')) {
+        const [datePart] = dateField.split(', ');
+        date = datePart;
+      } else {
+        date = new Date().toLocaleDateString('pt-BR');
+      }
+      
+      if (!groupedByDate[date]) {
+        groupedByDate[date] = { receitas: 0, despesas: 0 };
+      }
+      
+      const valor = Math.abs(transaction.valor || 0);
+      if (transaction.tipo?.toLowerCase() === 'receita') {
+        groupedByDate[date].receitas += valor;
+      } else {
+        groupedByDate[date].despesas += valor;
+      }
+    });
+    
+    // Ordenar datas e pegar últimos 12 pontos
+    const sortedDates = Object.keys(groupedByDate).sort((a, b) => {
+      const [dayA, monthA, yearA] = a.split('/');
+      const [dayB, monthB, yearB] = b.split('/');
+      return new Date(yearA, monthA - 1, dayA) - new Date(yearB, monthB - 1, dayB);
+    }).slice(-12);
+    
+    const receitasData = sortedDates.map(date => groupedByDate[date].receitas);
+    const despesasData = sortedDates.map(date => groupedByDate[date].despesas);
+    
+    setChartData({
+      labels: sortedDates,
+      datasets: [
+        {
+          label: 'Receitas',
+          data: receitasData,
+          borderColor: '#16a34a',
+          backgroundColor: 'rgba(22, 163, 74, 0.1)',
+          tension: 0.4,
+        },
+        {
+          label: 'Despesas',
+          data: despesasData,
+          borderColor: '#ef4444',
+          backgroundColor: 'rgba(239, 68, 68, 0.1)',
+          tension: 0.4,
+        }
+      ],
+    });
+  };
+  
+  // Calcular totais
+  const income = transactions
+    .filter(t => t.tipo?.toLowerCase() === 'receita')
+    .reduce((sum, t) => sum + Math.abs(t.valor || 0), 0);
+    
+  const expenses = transactions
+    .filter(t => t.tipo?.toLowerCase() === 'despesa')
+    .reduce((sum, t) => sum + Math.abs(t.valor || 0), 0);
+    
+  const balance = income - expenses;
 
   const bills = [
     { name: "Netflix",  due: "25/07", amount: 39.90 },
@@ -53,31 +144,32 @@ export default function System() {
     { name: "Internet", due: "15/07", amount: 119.90 },
   ];
 
-  const transactions = [
-    { type: "out", desc: "alimentacao", category: "Outras", date: "2025-08-12", amount: -2000.00 },
-    // adicione mais linhas do backend aqui
-  ];
-
-  // Dados para o gráfico
-  const chartData = {
-    labels: ["15/07","16/07","18/07","20/07","25/07","27/07","31/07","02/08","06/08","10/08","11/08","12/08"],
-    datasets: [
-      {
-        label: 'Receitas',
-        data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5000],
-        borderColor: '#16a34a',
-        backgroundColor: 'rgba(22, 163, 74, 0.1)',
-        tension: 0.4,
-      },
-      {
-        label: 'Despesas',
-        data: [200, 150, 300, 180, 850, 120, 400, 250, 180, 300, 200, 2000],
-        borderColor: '#ef4444',
-        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-        tension: 0.4,
+  // Processar transações recentes para a tabela
+  const recentTransactions = transactions
+    .map(transaction => {
+      const dateField = transaction.dataHora || transaction.data || transaction.criadoEm;
+      let processedDate = dateField;
+      
+      if (dateField && typeof dateField === 'string' && dateField.includes('/')) {
+        const [datePart] = dateField.split(', ');
+        const [day, month, year] = datePart.split('/');
+        processedDate = new Date(year, month - 1, day);
       }
-    ],
-  };
+      
+      return {
+        type: transaction.tipo?.toLowerCase() === 'receita' ? 'in' : 'out',
+        desc: transaction.descricao || 'Sem descrição',
+        category: transaction.categoria || 'Outros',
+        date: processedDate ? 
+          processedDate.toLocaleDateString('pt-BR') : 
+          new Date().toLocaleDateString('pt-BR'),
+        amount: transaction.tipo?.toLowerCase() === 'receita' ? 
+          Math.abs(transaction.valor || 0) : 
+          -Math.abs(transaction.valor || 0)
+      };
+    })
+    .sort((a, b) => new Date(b.date) - new Date(a.date)) // Ordenar por data mais recente
+    .slice(0, 5); // Pegar apenas as 5 mais recentes
 
   const chartOptions = {
     responsive: true,
@@ -138,6 +230,8 @@ export default function System() {
       
       if (result.success) {
         alert('Transação adicionada com sucesso!');
+        // Recarregar dados automaticamente
+        await fetchTransactions();
       } else {
         alert('Erro: ' + result.message);
       }
@@ -161,11 +255,11 @@ export default function System() {
               <KPICards balance={balance} income={income} expenses={expenses} />
               
               <div className="sys-grid">
-                <ChartCard chartData={chartData} chartOptions={chartOptions} />
+                {chartData && <ChartCard chartData={chartData} chartOptions={chartOptions} />}
                 <SidePanel progress={progress} salary={salary} bills={bills} />
               </div>
               
-              <TransactionsTable transactions={transactions} />
+              <TransactionsTable transactions={recentTransactions} />
             </>
           )}
           
@@ -177,7 +271,7 @@ export default function System() {
           )}
           
           {activeTab === 'activities' && (
-            <ActivityHistory />
+            <ActivityHistory key={transactions.length} />
           )}
         </section>
       </main>

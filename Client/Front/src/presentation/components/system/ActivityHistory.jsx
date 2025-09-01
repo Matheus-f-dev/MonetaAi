@@ -1,52 +1,32 @@
-import { useState, useEffect } from 'react';
+import { useTransactions } from '../../hooks/useTransactions';
 
 export function ActivityHistory() {
-  const [transactions, setTransactions] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { transactions: rawTransactions, loading } = useTransactions();
 
-  useEffect(() => {
-    const fetchTransactions = async () => {
-      try {
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        const userId = user.uid || 'default-user';
-        
-        const response = await fetch(`http://localhost:3000/api/transactions/${userId}`);
-        const data = await response.json();
-        
-        if (data.success) {
-          const processedTransactions = data.transactions
-            .map(transaction => {
-              const dateField = transaction.dataHora || transaction.data || transaction.criadoEm;
-              let processedDate = dateField;
-              
-              if (dateField && typeof dateField === 'string' && dateField.includes('/')) {
-                const [datePart] = dateField.split(', ');
-                const [day, month, year] = datePart.split('/');
-                processedDate = new Date(year, month - 1, day);
-              }
-              
-              return {
-                id: transaction.id || Math.random(),
-                date: processedDate,
-                description: transaction.descricao || 'Sem descrição',
-                category: transaction.categoria || 'Outros',
-                value: transaction.valor || 0,
-                type: (transaction.tipo || 'despesa').toLowerCase()
-              };
-            })
-            .sort((a, b) => new Date(b.date) - new Date(a.date)); // Ordenar por data mais recente
-          
-          setTransactions(processedTransactions);
-        }
-      } catch (error) {
-        console.error('Erro ao buscar transações:', error);
-      } finally {
-        setLoading(false);
+  const transactions = rawTransactions
+    .map(transaction => {
+      const dateField = transaction.dataHora || transaction.data || transaction.criadoEm;
+      let processedDate = dateField;
+      
+      if (dateField && typeof dateField === 'string' && dateField.includes('/')) {
+        const [datePart] = dateField.split(', ');
+        const [day, month, year] = datePart.split('/');
+        processedDate = new Date(year, month - 1, day);
       }
-    };
-    
-    fetchTransactions();
-  }, []);
+      
+      return {
+        id: transaction.id || Math.random(),
+        date: processedDate,
+        description: transaction.descricao || 'Sem descrição',
+        category: transaction.categoria || 'Outros',
+        value: transaction.valor || 0,
+        type: (transaction.tipo || 'despesa').toLowerCase()
+      };
+    })
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  const processedTransactions = transactions
+
 
   if (loading) {
     return <div className="activity-loading">Carregando histórico...</div>;
@@ -60,8 +40,8 @@ export function ActivityHistory() {
       </div>
 
       <div className="activity-list">
-        {transactions.length > 0 ? (
-          transactions.map(transaction => (
+        {processedTransactions.length > 0 ? (
+          processedTransactions.map(transaction => (
             <div key={transaction.id} className={`activity-item ${transaction.type}`}>
               <div className="activity-info">
                 <div className="activity-description">{transaction.description}</div>
