@@ -151,11 +151,7 @@ npm start
 - **Dependency Injection** - Baixo acoplamento entre camadas
 - **Orientação a Objetos** - Encapsulamento, Herança, Polimorfismo
 
-### Frontend - Arquitetura Componentizada
-- **Presentation Layer** - Componentes React
-- **Domain Layer** - Classes de negócio
-- **Service Layer** - Comunicação com API
-- **Custom Hooks** - Lógica reutilizável
+
 
 ## 🚀 Tecnologias Utilizadas
 
