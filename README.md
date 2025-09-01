@@ -117,7 +117,6 @@ npm start
 - [x] Detectar gastos por foto
 - [x] consulta de saldo e consumo no chatbot
 - [x] Registro de gastos por voz
-- [x] categorização automatica dos gastos-feita somente no bot ainda
 - [x] o chatbot gera resumo dos relatorios
 
 
@@ -127,6 +126,7 @@ npm start
 - [ ] exportar relatorios de acompanhamentos
 - [ ]  alertas personalizados
 - [ ]  Modo viagem
+- [ ]  categorização automatica dos gastos-feita somente no bot ainda
  
 
 ## 🏗️ Arquitetura do Sistema
