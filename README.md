@@ -94,12 +94,13 @@ npm start
 - [x] Visualizar histórico de atividades
 - [x] Filtro de gastos por categoria
 - [x] Integração com rede social
-- [x] Registros no WhatsApp através do chatbot 
+- [x] Registros no WhatsApp através do chatbot
+- [x] Gráfico de gastos 
 
 ### Funcionalidades em desenvolvimento
   
 - [ ] Personalização da interface  
-- [ ] Gráfico de gastos  
+ 
 
 
 
@@ -143,5 +144,6 @@ Oferecer uma alternativa gratuita e inteligente para controle financeiro pessoal
 ## 📲 Contato
 
 Caso queira contribuir, sugerir melhorias ou relatar bugs, fique à vontade para abrir uma *issue* ou entrar em contato com algum membro da equipe.
+31 988494168
 
 ---
