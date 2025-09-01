@@ -1,8 +1,11 @@
-export function SideItem({ icon, label, active = false }) {
+export function SideItem({ icon, label, active = false, onClick }) {
   return (
-    <a href="#" className={`sys-side-item ${active ? "sys-active" : ""}`}>
+    <button 
+      className={`sys-side-item ${active ? "sys-active" : ""}`}
+      onClick={onClick}
+    >
       <span className="sys-ico">{icon}</span>
       <span>{label}</span>
-    </a>
+    </button>
   );
 }

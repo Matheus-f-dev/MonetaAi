@@ -4,7 +4,7 @@ class TransactionController {
   static async create(req, res) {
     try {
       console.log('Dados recebidos:', req.body);
-      const { userId, tipo, valor, descricao, categoria, data } = req.body;
+      const { userId, tipo, valor, descricao, categoria, dataHora } = req.body;
 
       if (!userId || !tipo || !valor || !descricao) {
         console.log('Campos obrigatórios faltando');
@@ -20,7 +20,7 @@ class TransactionController {
         valor: Number(valor),
         descricao,
         categoria: categoria || 'Outros',
-        data: data ? new Date(data) : new Date()
+        dataHora: dataHora || new Date().toLocaleString('pt-BR')
       };
       
       console.log('Salvando transação:', transactionData);

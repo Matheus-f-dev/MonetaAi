@@ -5,7 +5,8 @@ export function TransactionModal({ isOpen, onClose, onSubmit }) {
     descricao: '',
     valor: '',
     categoria: '',
-    tipo: 'Despesa'
+    tipo: 'Despesa',
+    data: new Date().toISOString().split('T')[0]
   });
 
   const categorias = [
@@ -19,7 +20,7 @@ export function TransactionModal({ isOpen, onClose, onSubmit }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     onSubmit(formData);
-    setFormData({ descricao: '', valor: '', categoria: '', tipo: 'Despesa' });
+    setFormData({ descricao: '', valor: '', categoria: '', tipo: 'Despesa', data: new Date().toISOString().split('T')[0] });
     onClose();
   };
 
@@ -77,6 +78,17 @@ export function TransactionModal({ isOpen, onClose, onSubmit }) {
                 <option key={cat} value={cat}>{cat}</option>
               ))}
             </select>
+          </div>
+
+          <div className="form-group">
+            <label>Data</label>
+            <input
+              type="date"
+              name="data"
+              value={formData.data}
+              onChange={handleChange}
+              required
+            />
           </div>
 
           <div className="form-group">

@@ -11,6 +11,7 @@ class Transaction {
     this.categoria = data.categoria;
     this.data = data.data;
     this.criadoEm = data.criadoEm;
+    this.dataHora = data.dataHora;
   }
 
   static async create(transactionData) {
@@ -19,7 +20,8 @@ class Transaction {
       valor: Number(transactionData.valor),
       categoria: transactionData.categoria,
       tipo: transactionData.tipo,
-      dataHora: new Date().toLocaleString('pt-BR')
+      dataHora: transactionData.dataHora,
+      criadoEm: new Date().toISOString()
     };
     
     const docRef = await db
@@ -28,17 +30,22 @@ class Transaction {
       .collection('historico')
       .add(dataToSave);
     
-    return new Transaction({ id: docRef.id, userId: transactionData.userId, ...dataToSave });
+    return { id: docRef.id, ...dataToSave };
   }
 
   static async findByUserId(userId) {
     const snapshot = await db.collection('usuarios').doc(userId).collection('historico')
-      .orderBy('dataHora', 'desc')
       .get();
     
-    return snapshot.docs.map(doc => 
-      new Transaction({ id: doc.id, userId, ...doc.data() })
-    );
+    return snapshot.docs.map(doc => {
+      const data = doc.data();
+      console.log('Documento do Firebase:', data);
+      return {
+        id: doc.id,
+        userId,
+        ...data
+      };
+    });
   }
 
   static async findById(id) {

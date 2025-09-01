@@ -4,8 +4,11 @@ import {
   PlanIcon, BellIcon, PlaneIcon, BotIcon, GearIcon, 
   UserIcon, ExitIcon 
 } from './Icons';
+import { useNavigate } from 'react-router-dom';
 
 export function Sidebar() {
+  const navigate = useNavigate();
+  
   return (
     <aside className="sys-sidebar">
       <div className="sys-brand">MonetaAi</div>
@@ -13,8 +16,8 @@ export function Sidebar() {
       <div className="sys-side-group">
         <div className="sys-side-title">Menu Principal</div>
         <nav className="sys-side-nav">
-          <SideItem label="Início" active icon={<HomeIcon />} />
-          <SideItem label="Gastos" icon={<BagIcon />} />
+          <SideItem label="Início" icon={<HomeIcon />} onClick={() => navigate('/system')} />
+          <SideItem label="Gastos" icon={<BagIcon />} onClick={() => navigate('/expenses')} />
           <SideItem label="Receitas" icon={<WalletIcon />} />
           <SideItem label="Análises" icon={<ChartIcon />} />
           <SideItem label="Relatórios" icon={<DocIcon />} />

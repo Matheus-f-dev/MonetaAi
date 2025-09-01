@@ -46,6 +46,8 @@
   display:flex; align-items:center; gap:10px;
   padding: 10px 10px; border-radius:10px; text-decoration:none; color:var(--text);
   border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
 }
 .sys-side-item:hover{ background:#f8fafc; border-color: var(--line); }
 .sys-active{ background: var(--primary-100); border-color: var(--primary-200); color:#4c1d95; }

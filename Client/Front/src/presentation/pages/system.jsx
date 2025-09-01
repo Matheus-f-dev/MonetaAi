@@ -102,9 +102,17 @@ export default function System() {
 
   const handleSubmitTransaction = async (transactionData) => {
     try {
-      // Pegar userId do localStorage ou sessão
       const user = JSON.parse(localStorage.getItem('user') || '{}');
-      const userId = user.uid || 'user-temp'; // fallback temporário
+      const userId = user.uid || 'user-temp';
+      
+      let formattedDate;
+      if (transactionData.data) {
+        const [year, month, day] = transactionData.data.split('-');
+        const time = new Date().toLocaleTimeString('pt-BR');
+        formattedDate = `${day}/${month}/${year}, ${time}`;
+      } else {
+        formattedDate = new Date().toLocaleString('pt-BR');
+      }
       
       const payload = {
         userId,
@@ -112,7 +120,7 @@ export default function System() {
         valor: parseFloat(transactionData.valor),
         descricao: transactionData.descricao,
         categoria: transactionData.categoria,
-        data: new Date().toISOString()
+        dataHora: formattedDate
       };
       
       const response = await fetch('http://localhost:3000/api/transactions', {
