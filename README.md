@@ -127,7 +127,6 @@ npm start
 - **Backend:** Node.js, Express.js (Padrão MVC)
 - **Banco de Dados:** Firebase Firestore
 - **Autenticação:** Firebase Authentication
-- **Templates:** EJS para páginas web
 - **Chatbot:** Python *(em desenvolvimento)*  
 - **Gráficos:** Chart.js *(planejado)*
 
