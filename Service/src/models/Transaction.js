@@ -67,64 +67,20 @@ class Transaction {
     };
   }
 
-  static async create(transactionData) {
-    const transaction = new Transaction(transactionData);
-    
-    const dataToSave = {
-      tipo: transaction.tipo,
-      valor: transaction.valor,
-      descricao: transaction.descricao,
-      categoria: transaction.categoria,
-      dataHora: transaction.dataHora,
-      criadoEm: new Date().toISOString()
-    };
-    
-    const docRef = await db
-      .collection('usuarios')
-      .doc(transaction.userId)
-      .collection('historico')
-      .add(dataToSave);
-    
-    return new Transaction({ id: docRef.id, userId: transaction.userId, ...dataToSave });
-  }
-
-  static async findByUserId(userId) {
-    const snapshot = await db.collection('usuarios').doc(userId).collection('historico')
-      .get();
-    
-    return snapshot.docs.map(doc => {
-      const data = doc.data();
-      console.log('Documento do Firebase:', data);
-      return new Transaction({
-        id: doc.id,
-        userId,
-        ...data
-      });
-    });
-  }
-
-  static async findById(id) {
-    const doc = await db.collection('historico').doc(id).get();
-    if (!doc.exists) return null;
-    return new Transaction({ id: doc.id, ...doc.data() });
-  }
-
-  async update(updateData) {
-    const updatedTransaction = new Transaction({ ...this.toJSON(), ...updateData });
-    await db.collection('usuarios').doc(this._userId).collection('historico').doc(this._id).update(updatedTransaction.toJSON());
-    return updatedTransaction;
-  }
-
-  async delete() {
-    await db.collection('usuarios').doc(this._userId).collection('historico').doc(this._id).delete();
+  // Método factory para criar instância a partir de dados do repository
+  static fromRepository(data) {
+    return new Transaction(data);
   }
   
-  async save() {
-    if (this._id) {
-      return await this.update(this.toJSON());
-    } else {
-      return await Transaction.create(this.toJSON());
-    }
+  // Método para preparar dados para persistência
+  toPersistence() {
+    return {
+      tipo: this._tipo,
+      valor: this._valor,
+      descricao: this._descricao,
+      categoria: this._categoria,
+      dataHora: this._dataHora
+    };
   }
 }
 

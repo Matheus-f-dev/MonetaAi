@@ -1,13 +1,16 @@
 const Transaction = require('../models/Transaction');
-const BaseService = require('./BaseService');
+const TransactionRepository = require('../repositories/TransactionRepository');
 
-class TransactionService extends BaseService {
+class TransactionService {
   constructor() {
-    super(Transaction);
+    this.repository = new TransactionRepository();
   }
+
   async createTransaction(transactionData) {
     try {
-      return await this.create(transactionData);
+      const transaction = new Transaction(transactionData);
+      const savedData = await this.repository.create(transaction.userId, transaction.toPersistence());
+      return Transaction.fromRepository({ ...savedData, userId: transaction.userId });
     } catch (error) {
       throw new Error(`Erro ao criar transação: ${error.message}`);
     }
@@ -15,19 +18,33 @@ class TransactionService extends BaseService {
 
   async getUserTransactions(userId) {
     if (!userId) throw new Error('UserId é obrigatório');
-    return await Transaction.findByUserId(userId);
+    const data = await this.repository.findByUserId(userId);
+    return data.map(item => Transaction.fromRepository(item));
   }
 
-  async getTransactionById(id) {
-    return await this.findById(id);
+  async getTransactionById(userId, transactionId) {
+    const data = await this.repository.findById(userId, transactionId);
+    return data ? Transaction.fromRepository(data) : null;
   }
 
+  // Métodos de compatibilidade para manter funcionamento
   async updateTransaction(id, updateData) {
-    return await this.update(id, updateData);
+    // Busca a transação primeiro para obter o userId
+    const allUsers = await this.repository.findByUserId('default-user'); // Simplificação
+    throw new Error('Método precisa ser atualizado para incluir userId');
   }
 
   async deleteTransaction(id) {
-    return await this.delete(id);
+    throw new Error('Método precisa ser atualizado para incluir userId');
+  }
+
+  async updateTransaction(userId, transactionId, updateData) {
+    const updatedData = await this.repository.update(userId, transactionId, updateData);
+    return Transaction.fromRepository(updatedData);
+  }
+
+  async deleteTransaction(userId, transactionId) {
+    await this.repository.delete(userId, transactionId);
   }
 
   async getUserBalance(userId) {

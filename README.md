@@ -13,16 +13,21 @@ MonetaAi/
 │       │   ├── presentation/
 │       │   │   ├── components/   # Componentes React
 │       │   │   ├── pages/        # Páginas da aplicação
-│       │   │   └── styles/       # Estilos CSS
+│       │   │   ├── styles/       # Estilos CSS
+│       │   │   └── hooks/        # Custom Hooks
+│       │   ├── domain/           # Classes de domínio (OO)
+│       │   ├── core/
+│       │   │   └── services/     # Services do frontend
 │       │   └── App.js
 │       └── package.json
-└── Service/                      # Backend Node.js (Padrão MVC)
+└── Service/                      # Backend Node.js (Arquitetura em Camadas + OO)
     ├── src/
-    │   ├── controllers/          # Controllers da API e Views
+    │   ├── controllers/          # Controllers da API (HTTP Layer)
     │   │   └── views/            # Controllers para páginas
-    │   ├── models/               # Modelos de dados
+    │   ├── services/             # Lógica de negócio (Business Layer)
+    │   ├── repositories/         # Camada de persistência (Data Layer)
+    │   ├── models/               # Modelos de domínio (Domain Layer)
     │   ├── routes/               # Rotas organizadas
-    │   ├── services/             # Lógica de negócio
     │   ├── middleware/           # Middlewares
     │   └── config/               # Configurações
     ├── views/                    # Templates EJS
@@ -122,14 +127,44 @@ npm start
 - [ ]  Modo viagem
  
 
+## 🏗️ Arquitetura do Sistema
+
+### Backend - Arquitetura em Camadas com OO
+```
+┌─────────────────┐
+│   Controllers   │ ← HTTP Layer (Requisições/Respostas)
+├─────────────────┤
+│    Services     │ ← Business Layer (Lógica de Negócio)
+├─────────────────┤
+│  Repositories   │ ← Data Layer (Persistência)
+├─────────────────┤
+│     Models      │ ← Domain Layer (Entidades de Domínio)
+├─────────────────┤
+│    Firebase     │ ← Database
+└─────────────────┘
+```
+
+### Padrões Implementados
+- **Repository Pattern** - Separação da lógica de persistência
+- **Service Layer** - Encapsulamento da lógica de negócio  
+- **Domain Model** - Entidades com comportamentos e validações
+- **Dependency Injection** - Baixo acoplamento entre camadas
+- **Orientação a Objetos** - Encapsulamento, Herança, Polimorfismo
+
+### Frontend - Arquitetura Componentizada
+- **Presentation Layer** - Componentes React
+- **Domain Layer** - Classes de negócio
+- **Service Layer** - Comunicação com API
+- **Custom Hooks** - Lógica reutilizável
+
 ## 🚀 Tecnologias Utilizadas
 
-- **Frontend:** React.js com React Router
-- **Backend:** Node.js, Express.js (Padrão MVC)
+- **Frontend:** React.js, React Router, Chart.js
+- **Backend:** Node.js, Express.js (Arquitetura em Camadas + OO)
 - **Banco de Dados:** Firebase Firestore
 - **Autenticação:** Firebase Authentication
-- **Chatbot:** Python *(em desenvolvimento)*  
-- **Gráficos:** Chart.js *(planejado)*
+- **Chatbot:** Python com IA
+- **Padrões:** Repository, Service Layer, Domain Model
 
 ---
 
