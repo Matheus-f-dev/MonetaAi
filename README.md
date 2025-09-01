@@ -53,6 +53,8 @@ npm install
 # Configurar variáveis de ambiente
 # Criar arquivo .env com as configurações do Firebase
 
+
+
 # Executar o servidor
 npm start
 # Servidor rodará em http://localhost:3000
@@ -68,13 +70,13 @@ npm install
 
 # Executar a aplicação
 npm start
-# Aplicação rodará em http://localhost:3001
+# Aplicação rodará em http://localhost:5173
 ```
 
 ### 3. Acessar a Aplicação
 - **Frontend React:** http://localhost:5173
-- **Backend API:** http://localhost:3000/api
-- **Páginas Web:** http://localhost:3000
+- **Backend API:** http://localhost:3000
+
 
 ---
 
@@ -160,7 +162,7 @@ npm start
 - **Banco de Dados:** Firebase Firestore
 - **Autenticação:** Firebase Authentication
 - **Chatbot:** Python com IA
-- **Padrões:** Repository, Service Layer, Domain Model
+
 
 ---
 
