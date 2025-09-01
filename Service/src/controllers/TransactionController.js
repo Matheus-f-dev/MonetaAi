@@ -3,8 +3,9 @@ const TransactionService = require('../services/TransactionService');
 class TransactionController {
   static async create(req, res) {
     try {
+      const transactionService = new TransactionService();
       const transactionData = req.body;
-      const transaction = await TransactionService.createTransaction(transactionData);
+      const transaction = await transactionService.createTransaction(transactionData);
 
       res.status(201).json({
         success: true,
@@ -22,8 +23,9 @@ class TransactionController {
 
   static async getUserTransactions(req, res) {
     try {
+      const transactionService = new TransactionService();
       const { userId } = req.params;
-      const transactions = await TransactionService.getUserTransactions(userId);
+      const transactions = await transactionService.getUserTransactions(userId);
 
       res.json({
         success: true,
@@ -40,8 +42,9 @@ class TransactionController {
 
   static async getUserBalance(req, res) {
     try {
+      const transactionService = new TransactionService();
       const { userId } = req.params;
-      const balance = await TransactionService.getUserBalance(userId);
+      const balance = await transactionService.getUserBalance(userId);
 
       res.json({
         success: true,
@@ -58,10 +61,11 @@ class TransactionController {
 
   static async update(req, res) {
     try {
+      const transactionService = new TransactionService();
       const { id } = req.params;
       const updateData = req.body;
 
-      const transaction = await TransactionService.updateTransaction(id, updateData);
+      const transaction = await transactionService.updateTransaction(id, updateData);
 
       res.json({
         success: true,
@@ -79,8 +83,9 @@ class TransactionController {
 
   static async delete(req, res) {
     try {
+      const transactionService = new TransactionService();
       const { id } = req.params;
-      await TransactionService.deleteTransaction(id);
+      await transactionService.deleteTransaction(id);
 
       res.json({
         success: true,
