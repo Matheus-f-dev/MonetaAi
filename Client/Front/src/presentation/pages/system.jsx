@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import "../styles/pages/System.css";
 import "../styles/components/TransactionModal.css";
+import "../styles/components/ActivityHistory.css";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -21,6 +22,7 @@ import {
   SidePanel, 
   TransactionsTable 
 } from '../components/system';
+import { ActivityHistory } from '../components/system/ActivityHistory';
 import { TransactionModal } from '../components/system/TransactionModal';
 
 ChartJS.register(
@@ -35,6 +37,7 @@ ChartJS.register(
 
 export default function System() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
   
   // -> estes dados serão trocados pelo seu backend depois
   const userName   = "Usuário";
@@ -150,17 +153,32 @@ export default function System() {
       
       <main className="sys-main">
         <Topbar userName={userName} onNewTransaction={handleNewTransaction} />
-        <Tabs />
+        <Tabs activeTab={activeTab} onTabChange={setActiveTab} />
         
         <section className="sys-panel">
-          <KPICards balance={balance} income={income} expenses={expenses} />
+          {activeTab === 'overview' && (
+            <>
+              <KPICards balance={balance} income={income} expenses={expenses} />
+              
+              <div className="sys-grid">
+                <ChartCard chartData={chartData} chartOptions={chartOptions} />
+                <SidePanel progress={progress} salary={salary} bills={bills} />
+              </div>
+              
+              <TransactionsTable transactions={transactions} />
+            </>
+          )}
           
-          <div className="sys-grid">
-            <ChartCard chartData={chartData} chartOptions={chartOptions} />
-            <SidePanel progress={progress} salary={salary} bills={bills} />
-          </div>
+          {activeTab === 'future' && (
+            <div className="future-balance">
+              <h2>Saldo Futuro</h2>
+              <p>Funcionalidade em desenvolvimento...</p>
+            </div>
+          )}
           
-          <TransactionsTable transactions={transactions} />
+          {activeTab === 'activities' && (
+            <ActivityHistory />
+          )}
         </section>
       </main>
       

@@ -2,7 +2,33 @@ const Transaction = require('../models/Transaction');
 
 class TransactionService {
   static async createTransaction(transactionData) {
-    return await Transaction.create(transactionData);
+    // Validações
+    const { userId, tipo, valor, descricao, categoria, dataHora } = transactionData;
+    
+    if (!userId || !tipo || !valor || !descricao) {
+      throw new Error('Campos obrigatórios: userId, tipo, valor, descricao');
+    }
+
+    // Lógica de negócio
+    const processedData = {
+      userId,
+      tipo: tipo.toLowerCase(),
+      valor: Number(valor),
+      descricao: descricao.trim(),
+      categoria: categoria || 'Outros',
+      dataHora: dataHora || new Date().toLocaleString('pt-BR')
+    };
+
+    // Validações de negócio
+    if (processedData.valor <= 0) {
+      throw new Error('Valor deve ser maior que zero');
+    }
+
+    if (!['receita', 'despesa'].includes(processedData.tipo)) {
+      throw new Error('Tipo deve ser "receita" ou "despesa"');
+    }
+
+    return await Transaction.create(processedData);
   }
 
   static async getUserTransactions(userId) {

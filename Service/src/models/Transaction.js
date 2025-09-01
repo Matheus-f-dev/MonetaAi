@@ -16,13 +16,11 @@ class Transaction {
 
   static async create(transactionData) {
     const dataToSave = {
-      descricao: transactionData.descricao,
-      valor: Number(transactionData.valor),
-      categoria: transactionData.categoria,
-      tipo: transactionData.tipo,
-      dataHora: transactionData.dataHora,
+      ...transactionData,
       criadoEm: new Date().toISOString()
     };
+    
+    delete dataToSave.userId; // Remove userId dos dados salvos
     
     const docRef = await db
       .collection('usuarios')

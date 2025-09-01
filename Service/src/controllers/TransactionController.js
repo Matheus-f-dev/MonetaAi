@@ -3,29 +3,8 @@ const TransactionService = require('../services/TransactionService');
 class TransactionController {
   static async create(req, res) {
     try {
-      console.log('Dados recebidos:', req.body);
-      const { userId, tipo, valor, descricao, categoria, dataHora } = req.body;
-
-      if (!userId || !tipo || !valor || !descricao) {
-        console.log('Campos obrigatórios faltando');
-        return res.status(400).json({
-          success: false,
-          message: 'Campos obrigatórios: userId, tipo, valor, descricao'
-        });
-      }
-
-      const transactionData = {
-        userId,
-        tipo,
-        valor: Number(valor),
-        descricao,
-        categoria: categoria || 'Outros',
-        dataHora: dataHora || new Date().toLocaleString('pt-BR')
-      };
-      
-      console.log('Salvando transação:', transactionData);
+      const transactionData = req.body;
       const transaction = await TransactionService.createTransaction(transactionData);
-      console.log('Transação salva com sucesso:', transaction);
 
       res.status(201).json({
         success: true,
@@ -34,10 +13,9 @@ class TransactionController {
       });
 
     } catch (err) {
-      console.error('Erro ao criar transação:', err);
       res.status(500).json({
         success: false,
-        message: 'Erro ao criar transação: ' + err.message
+        message: err.message
       });
     }
   }

@@ -1,0 +1,112 @@
+.activity-history {
+  padding: 20px;
+}
+
+.activity-header {
+  margin-bottom: 24px;
+}
+
+.activity-header h2 {
+  margin: 0 0 8px 0;
+  color: #1f2937;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.activity-header p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.activity-loading {
+  text-align: center;
+  padding: 40px;
+  color: #6b7280;
+}
+
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.activity-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.activity-item:hover {
+  border-color: #d1d5db;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.activity-info {
+  flex: 1;
+}
+
+.activity-description {
+  font-weight: 500;
+  color: #1f2937;
+  margin-bottom: 4px;
+}
+
+.activity-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.activity-category {
+  background: #f3f4f6;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.activity-value {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.activity-value.receita {
+  color: #16a34a;
+}
+
+.activity-value.despesa {
+  color: #dc2626;
+}
+
+.no-activities {
+  text-align: center;
+  padding: 40px;
+  color: #6b7280;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.future-balance {
+  padding: 40px;
+  text-align: center;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.future-balance h2 {
+  margin: 0 0 8px 0;
+  color: #1f2937;
+}
+
+.future-balance p {
+  margin: 0;
+  color: #6b7280;
+}
