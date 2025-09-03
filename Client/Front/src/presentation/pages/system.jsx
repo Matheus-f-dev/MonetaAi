@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import "../styles/pages/System.css";
 import "../styles/components/TransactionModal.css";
 import "../styles/components/ActivityHistory.css";
+import { useMonthlyProgress } from '../hooks/useMonthlyProgress';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -41,9 +42,13 @@ export default function System() {
   const [transactions, setTransactions] = useState([]);
   const [chartData, setChartData] = useState(null);
   
-  const userName = "Usuário";
-  const salary = 5000;
-  const progress = 40;
+  // Puxar dados do usuário logado
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const userName = user.nome || "Usuário";
+  const salary = user.salario || 0;
+  
+  // Usar hook para calcular progresso mensal
+  const { progress, monthlyExpenses, isOverBudget, remainingBudget } = useMonthlyProgress(transactions, salary);
   
   // Função para buscar transações
   const fetchTransactions = async () => {
@@ -256,7 +261,7 @@ export default function System() {
               
               <div className="sys-grid">
                 {chartData && <ChartCard chartData={chartData} chartOptions={chartOptions} />}
-                <SidePanel progress={progress} salary={salary} bills={bills} />
+                <SidePanel progress={progress} salary={salary} monthlyExpenses={monthlyExpenses} bills={bills} />
               </div>
               
               <TransactionsTable transactions={recentTransactions} />
