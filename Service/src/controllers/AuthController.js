@@ -100,6 +100,37 @@ class AuthController {
       });
     }
   }
+
+  static async getUserById(req, res) {
+    try {
+      const { userId } = req.params;
+      
+      const user = await AuthService.getUserById(userId);
+      
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: 'Usuário não encontrado.'
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        user: {
+          uid: user.uid,
+          nome: user.nome,
+          email: user.email,
+          salario: user.salario
+        }
+      });
+
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        message: 'Erro interno do servidor.'
+      });
+    }
+  }
 }
 
 module.exports = AuthController;

@@ -41,15 +41,44 @@ export default function System() {
   const [activeTab, setActiveTab] = useState('overview');
   const [transactions, setTransactions] = useState([]);
   const [chartData, setChartData] = useState(null);
+  const [userSalary, setUserSalary] = useState(0);
   
   // Puxar dados do usuário logado
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const userName = user.nome || "Usuário";
-  const salary = user.salario || 0;
+  const salary = userSalary;
   
   // Usar hook para calcular progresso mensal
   const { progress, monthlyExpenses, isOverBudget, remainingBudget } = useMonthlyProgress(transactions, salary);
   
+  // Função para buscar dados do usuário
+  const fetchUserData = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const userId = user.uid || 'default-user';
+      
+      const response = await fetch(`http://localhost:3000/api/user/${userId}`);
+      
+      if (!response.ok) {
+        console.warn('Rota de usuário não encontrada, usando salário do localStorage');
+        setUserSalary(user.salario || 0);
+        return;
+      }
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setUserSalary(data.user.salario || 0);
+      } else {
+        setUserSalary(user.salario || 0);
+      }
+    } catch (error) {
+      console.warn('Erro ao buscar dados do usuário, usando localStorage:', error);
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      setUserSalary(user.salario || 0);
+    }
+  };
+
   // Função para buscar transações
   const fetchTransactions = async () => {
     try {
@@ -68,8 +97,9 @@ export default function System() {
     }
   };
   
-  // Buscar transações na inicialização
+  // Buscar dados na inicialização
   useEffect(() => {
+    fetchUserData();
     fetchTransactions();
   }, []);
   

@@ -8,6 +8,7 @@ const router = express.Router();
 // Rotas de autenticação
 router.post('/cadastro', AuthController.register);
 router.post('/login', AuthController.login);
+router.get('/user/:userId', AuthController.getUserById);
 router.post('/verificar-email', EmailController.verificarEmail);
 router.post('/esqueci-senha', EmailController.enviarLinkRedefinicao);
 
