@@ -1,6 +1,11 @@
+import { useState } from 'react';
 import { Line } from 'react-chartjs-2';
 
-export function ChartCard({ chartData, chartOptions }) {
+export function ChartCard({ chartData, chartOptions, onFilterChange, activeFilter = 'month' }) {
+  const handleFilterClick = (filter) => {
+    onFilterChange(filter);
+  };
+
   return (
     <div className="sys-card sys-card-big">
       <div className="sys-card-head">
@@ -9,9 +14,24 @@ export function ChartCard({ chartData, chartOptions }) {
           <div className="sys-small">Acompanhe suas receitas e despesas</div>
         </div>
         <div className="sys-segmented">
-          <button className="sys-seg sys-active">Semana</button>
-          <button className="sys-seg">Mês</button>
-          <button className="sys-seg">Ano</button>
+          <button 
+            className={`sys-seg ${activeFilter === 'week' ? 'sys-active' : ''}`}
+            onClick={() => handleFilterClick('week')}
+          >
+            Semana
+          </button>
+          <button 
+            className={`sys-seg ${activeFilter === 'month' ? 'sys-active' : ''}`}
+            onClick={() => handleFilterClick('month')}
+          >
+            Mês
+          </button>
+          <button 
+            className={`sys-seg ${activeFilter === 'year' ? 'sys-active' : ''}`}
+            onClick={() => handleFilterClick('year')}
+          >
+            Ano
+          </button>
         </div>
       </div>
 

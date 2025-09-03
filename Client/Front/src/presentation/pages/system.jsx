@@ -42,6 +42,7 @@ export default function System() {
   const [transactions, setTransactions] = useState([]);
   const [chartData, setChartData] = useState(null);
   const [userSalary, setUserSalary] = useState(0);
+  const [chartFilter, setChartFilter] = useState('month');
   
   // Puxar dados do usuário logado
   const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -90,7 +91,7 @@ export default function System() {
       
       if (data.success) {
         setTransactions(data.transactions);
-        generateChartData(data.transactions);
+        generateChartData(data.transactions, chartFilter);
       }
     } catch (error) {
       console.error('Erro ao buscar transações:', error);
@@ -103,12 +104,78 @@ export default function System() {
     fetchTransactions();
   }, []);
   
-  // Gerar dados do gráfico baseado nas transações
-  const generateChartData = (transactionsList) => {
+  // Atualizar gráfico quando filtro mudar
+  useEffect(() => {
+    if (transactions.length > 0) {
+      generateChartData(transactions, chartFilter);
+    }
+  }, [chartFilter, transactions]);
+  
+  // Gerar dados do gráfico baseado nas transações e filtro
+  const generateChartData = (transactionsList, filter = 'month') => {
+    const now = new Date();
+    let filteredTransactions = [];
+    
+    // Filtrar transações baseado no período
+    switch (filter) {
+      case 'week':
+        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        filteredTransactions = transactionsList.filter(transaction => {
+          const dateField = transaction.dataHora || transaction.data || transaction.criadoEm;
+          if (!dateField) return false;
+          
+          let transactionDate;
+          if (typeof dateField === 'string' && dateField.includes('/')) {
+            const [datePart] = dateField.split(', ');
+            const [day, month, year] = datePart.split('/');
+            transactionDate = new Date(year, month - 1, day);
+          } else {
+            transactionDate = new Date(dateField);
+          }
+          
+          return transactionDate >= weekAgo;
+        });
+        break;
+      case 'year':
+        filteredTransactions = transactionsList.filter(transaction => {
+          const dateField = transaction.dataHora || transaction.data || transaction.criadoEm;
+          if (!dateField) return false;
+          
+          let transactionDate;
+          if (typeof dateField === 'string' && dateField.includes('/')) {
+            const [datePart] = dateField.split(', ');
+            const [day, month, year] = datePart.split('/');
+            transactionDate = new Date(year, month - 1, day);
+          } else {
+            transactionDate = new Date(dateField);
+          }
+          
+          return transactionDate.getFullYear() === now.getFullYear();
+        });
+        break;
+      default: // month
+        const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 3, 1);
+        filteredTransactions = transactionsList.filter(transaction => {
+          const dateField = transaction.dataHora || transaction.data || transaction.criadoEm;
+          if (!dateField) return false;
+          
+          let transactionDate;
+          if (typeof dateField === 'string' && dateField.includes('/')) {
+            const [datePart] = dateField.split(', ');
+            const [day, month, year] = datePart.split('/');
+            transactionDate = new Date(year, month - 1, day);
+          } else {
+            transactionDate = new Date(dateField);
+          }
+          
+          return transactionDate >= threeMonthsAgo;
+        });
+    }
+    
     // Agrupar por data
     const groupedByDate = {};
     
-    transactionsList.forEach(transaction => {
+    filteredTransactions.forEach(transaction => {
       const dateField = transaction.dataHora || transaction.data || transaction.criadoEm;
       let date;
       
@@ -131,12 +198,12 @@ export default function System() {
       }
     });
     
-    // Ordenar datas e pegar últimos 12 pontos
+    // Ordenar datas
     const sortedDates = Object.keys(groupedByDate).sort((a, b) => {
       const [dayA, monthA, yearA] = a.split('/');
       const [dayB, monthB, yearB] = b.split('/');
       return new Date(yearA, monthA - 1, dayA) - new Date(yearB, monthB - 1, dayB);
-    }).slice(-12);
+    });
     
     const receitasData = sortedDates.map(date => groupedByDate[date].receitas);
     const despesasData = sortedDates.map(date => groupedByDate[date].despesas);
@@ -290,7 +357,17 @@ export default function System() {
               <KPICards balance={balance} income={income} expenses={expenses} />
               
               <div className="sys-grid">
-                {chartData && <ChartCard chartData={chartData} chartOptions={chartOptions} />}
+                {chartData && (
+                  <ChartCard 
+                    chartData={chartData} 
+                    chartOptions={chartOptions} 
+                    activeFilter={chartFilter}
+                    onFilterChange={(filter) => {
+                      setChartFilter(filter);
+                      generateChartData(transactions, filter);
+                    }}
+                  />
+                )}
                 <SidePanel progress={progress} salary={salary} monthlyExpenses={monthlyExpenses} bills={bills} />
               </div>
               
