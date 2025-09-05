@@ -31,7 +31,7 @@ router.get('/google/callback',
       res.redirect(`http://localhost:5173/auth/callback?token=${token}&user=${encodeURIComponent(JSON.stringify({
         uid: req.user.uid,
         email: req.user.email,
-        displayName: req.user.displayName
+        nome: req.user.displayName
       }))}`);
     } catch (error) {
       console.error('Erro no callback do Google:', error);

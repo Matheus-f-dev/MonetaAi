@@ -46,8 +46,10 @@ export default function System() {
   
   // Puxar dados do usuário logado
   const user = JSON.parse(localStorage.getItem('user') || '{}');
-  const userName = user.nome || "Usuário";
+  const userName = user.nome || user.displayName || "Usuário";
   const salary = userSalary;
+  
+  console.log('Dados do usuário no localStorage:', user);
   
   // Usar hook para calcular progresso mensal
   const { progress, monthlyExpenses, isOverBudget, remainingBudget } = useMonthlyProgress(transactions, salary);
