@@ -6,6 +6,7 @@ import Cadastro from './presentation/pages/Register';
 import RedefinirSenha from './presentation/pages/ChangePassword';
 import System from './presentation/pages/system';
 import Expenses from './presentation/pages/Expenses';
+import Incomes from './presentation/pages/Incomes';
 import AuthCallback from './presentation/pages/AuthCallback';
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
         <Route path="/esqueci-senha" element={<RedefinirSenha />} />
         <Route path="/system" element={<System />} />
         <Route path="/expenses" element={<Expenses />} />
+        <Route path="/incomes" element={<Incomes />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
       </Routes>
     </>

@@ -18,7 +18,7 @@ export function Sidebar() {
         <nav className="sys-side-nav">
           <SideItem label="Início" icon={<HomeIcon />} onClick={() => navigate('/system')} />
           <SideItem label="Gastos" icon={<BagIcon />} onClick={() => navigate('/expenses')} />
-          <SideItem label="Receitas" icon={<WalletIcon />} />
+          <SideItem label="Receitas" icon={<WalletIcon />} onClick={() => navigate('/incomes')} />
           <SideItem label="Análises" icon={<ChartIcon />} />
           <SideItem label="Relatórios" icon={<DocIcon />} />
           <SideItem label="Planejamento" icon={<PlanIcon />} />

@@ -1,24 +1,22 @@
-.expenses-container {
+.incomes-container {
   padding: 20px;
   height: 100vh;
   overflow-y: auto;
   margin-top: 0;
 }
 
-.expenses-header {
+.incomes-header {
   margin-bottom: 30px;
 }
 
-.expenses-header h1 {
+.incomes-header h1 {
   font-size: 24px;
   font-weight: 600;
   color: #1f2937;
   margin: 0;
 }
 
-
-
-.expenses-filters {
+.incomes-filters {
   background: white;
   border-radius: 12px;
   padding: 20px;
@@ -43,7 +41,7 @@
 }
 
 .tabs button.active {
-  background: #3b82f6;
+  background: #10b981;
   color: white;
 }
 
@@ -72,8 +70,8 @@
 
 .search-box input:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
 .category-filter {
@@ -85,7 +83,7 @@
   cursor: pointer;
 }
 
-.expenses-content {
+.incomes-content {
   background: white;
   border-radius: 12px;
   overflow: hidden;
@@ -95,25 +93,25 @@
   height: calc(100vh - 150px);
 }
 
-.expenses-summary {
+.incomes-summary {
   padding: 20px;
   border-bottom: 1px solid #e5e7eb;
 }
 
-.expenses-summary h2 {
+.incomes-summary h2 {
   font-size: 18px;
   font-weight: 600;
   color: #1f2937;
   margin: 0 0 8px 0;
 }
 
-.expenses-summary p {
+.incomes-summary p {
   color: #6b7280;
   margin: 0;
   font-size: 14px;
 }
 
-.expenses-table {
+.incomes-table {
   flex: 1;
   min-height: 500px;
 }
@@ -151,8 +149,8 @@
 }
 
 .category-tag {
-  background: #e0e7ff;
-  color: #3730a3;
+  background: #d1fae5;
+  color: #065f46;
   padding: 4px 8px;
   border-radius: 4px;
   font-size: 12px;
@@ -160,12 +158,12 @@
   width: fit-content;
 }
 
-.expenses-table .value {
+.value {
   font-weight: 600;
-  color: #ef4444 !important;
+  color: #10b981;
 }
 
-.no-expenses {
+.no-incomes {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -174,7 +172,7 @@
   font-size: 16px;
 }
 
-.expenses-footer {
+.incomes-footer {
   padding: 16px 20px;
   background: #f9fafb;
   border-top: 1px solid #e5e7eb;
