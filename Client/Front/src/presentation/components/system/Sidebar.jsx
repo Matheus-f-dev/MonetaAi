@@ -9,6 +9,12 @@ import { useNavigate } from 'react-router-dom';
 export function Sidebar() {
   const navigate = useNavigate();
   
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    navigate('/');
+  };
+  
   return (
     <aside className="sys-sidebar">
       <div className="sys-brand">MonetaAi</div>
@@ -30,8 +36,7 @@ export function Sidebar() {
       </div>
 
       <div className="sys-side-footer">
-        <SideItem label="Meu Perfil" icon={<UserIcon />} />
-        <SideItem label="Sair" icon={<ExitIcon />} />
+        <SideItem label="Sair" icon={<ExitIcon />} onClick={handleLogout} />
       </div>
     </aside>
   );
