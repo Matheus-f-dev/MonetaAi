@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import "../styles/pages/Incomes.css";
 import { Sidebar } from '../components/system';
+import { useTheme } from '../hooks/useTheme';
 
 export default function Incomes() {
+  useTheme();
   const [incomes, setIncomes] = useState([]);
   const [filteredIncomes, setFilteredIncomes] = useState([]);
   const [activeTab, setActiveTab] = useState('todas');

@@ -31,6 +31,7 @@ export function Sidebar() {
           <SideItem label="Alertas" icon={<BellIcon />} />
           <SideItem label="Modo Viagem" icon={<PlaneIcon />} />
           <SideItem label="Simulador Chatbot" icon={<BotIcon />} />
+          <SideItem label="Perfil" icon={<UserIcon />} onClick={() => navigate('/profile')} />
           <SideItem label="Configurações" icon={<GearIcon />} />
         </nav>
       </div>

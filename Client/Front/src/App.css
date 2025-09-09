@@ -1,9 +1,79 @@
 :root {
-    --primary-color: #00ff77;
-    --primary-hover: #25d36598;
+    --primary-color: #8b5cf6;
+    --primary-hover: #7c3aed;
+    --primary-light: rgba(139, 92, 246, 0.1);
     --background-light: #f5f3ff;
     --text-color: #333;
+    --text-secondary: #6b7280;
+    --bg-primary: #ffffff;
+    --bg-secondary: #f9fafb;
+    --border-color: #e5e7eb;
     --box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.sys-layout[data-theme="dark"] {
+    --text-color: #f9fafb !important;
+    --text-secondary: #9ca3af !important;
+    --bg-primary: #1f2937 !important;
+    --bg-secondary: #374151 !important;
+    --border-color: #4b5563 !important;
+    --background-light: #1f2937 !important;
+}
+
+[data-color-scheme="purple"] {
+    --primary-color: #8b5cf6;
+    --primary-hover: #7c3aed;
+    --primary-light: rgba(139, 92, 246, 0.1);
+}
+
+.sys-layout[data-color-scheme="blue"] {
+    --primary-color: #3b82f6 !important;
+    --primary-hover: #2563eb !important;
+    --primary-light: rgba(59, 130, 246, 0.1) !important;
+}
+
+.sys-layout[data-color-scheme="green"] {
+    --primary-color: #10b981 !important;
+    --primary-hover: #059669 !important;
+    --primary-light: rgba(16, 185, 129, 0.1) !important;
+}
+
+.sys-layout[data-color-scheme="pink"] {
+    --primary-color: #ec4899 !important;
+    --primary-hover: #db2777 !important;
+    --primary-light: rgba(236, 72, 153, 0.1) !important;
+}
+
+.sys-layout[data-font="Inter"],
+.sys-layout[data-font="Inter"] * {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+.sys-layout[data-font="Poppins"],
+.sys-layout[data-font="Poppins"] * {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+.sys-layout[data-font="Open Sans"],
+.sys-layout[data-font="Open Sans"] * {
+    font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+.sys-layout[data-font="Roboto"],
+.sys-layout[data-font="Roboto"] * {
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+.sys-layout[data-font-size="small"] * {
+    font-size: 0.85em !important;
+}
+
+.sys-layout[data-font-size="medium"] * {
+    font-size: 1em !important;
+}
+
+.sys-layout[data-font-size="large"] * {
+    font-size: 1.05em !important;
 }
 
 *{
@@ -14,9 +84,14 @@
 
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
-    background-color: #ffffff;
+    font-family: 'Roboto', Arial, sans-serif;
+    background-color: var(--bg-primary);
     color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
+* {
+    font-family: inherit !important;
 }
 
 

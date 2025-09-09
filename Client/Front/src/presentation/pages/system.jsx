@@ -3,6 +3,7 @@ import "../styles/pages/System.css";
 import "../styles/components/TransactionModal.css";
 import "../styles/components/ActivityHistory.css";
 import { useMonthlyProgress } from '../hooks/useMonthlyProgress';
+import { useTheme } from '../hooks/useTheme';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -37,6 +38,7 @@ ChartJS.register(
 );
 
 export default function System() {
+  useTheme();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [transactions, setTransactions] = useState([]);

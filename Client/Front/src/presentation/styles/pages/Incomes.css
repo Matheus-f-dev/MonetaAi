@@ -3,6 +3,7 @@
   height: 100vh;
   overflow-y: auto;
   margin-top: 0;
+  background: var(--bg) !important;
 }
 
 .incomes-header {
@@ -12,12 +13,12 @@
 .incomes-header h1 {
   font-size: 24px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-color) !important;
   margin: 0;
 }
 
 .incomes-filters {
-  background: white;
+  background: var(--card) !important;
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 20px;
@@ -33,20 +34,20 @@
 .tabs button {
   padding: 8px 16px;
   border: none;
-  background: #f3f4f6;
-  color: #6b7280;
+  background: var(--bg-secondary) !important;
+  color: var(--text-secondary) !important;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .tabs button.active {
-  background: #10b981;
-  color: white;
+  background: var(--primary-color) !important;
+  color: white !important;
 }
 
 .tabs button:hover:not(.active) {
-  background: #e5e7eb;
+  background: var(--border-color) !important;
 }
 
 .filters-row {
@@ -63,28 +64,31 @@
 .search-box input {
   width: 100%;
   padding: 10px 16px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   font-size: 14px;
+  background: var(--card) !important;
+  color: var(--text-color) !important;
 }
 
 .search-box input:focus {
   outline: none;
-  border-color: #10b981;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--primary-light);
 }
 
 .category-filter {
   padding: 10px 16px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
-  background: white;
+  background: var(--card) !important;
+  color: var(--text-color) !important;
   font-size: 14px;
   cursor: pointer;
 }
 
 .incomes-content {
-  background: white;
+  background: var(--card) !important;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -95,18 +99,18 @@
 
 .incomes-summary {
   padding: 20px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .incomes-summary h2 {
   font-size: 18px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-color) !important;
   margin: 0 0 8px 0;
 }
 
 .incomes-summary p {
-  color: #6b7280;
+  color: var(--text-secondary) !important;
   margin: 0;
   font-size: 14px;
 }
@@ -114,6 +118,7 @@
 .incomes-table {
   flex: 1;
   min-height: 500px;
+  background: var(--card) !important;
 }
 
 .table-header {
@@ -121,10 +126,10 @@
   grid-template-columns: 120px 1fr 150px 120px;
   gap: 16px;
   padding: 16px 20px;
-  background: #f9fafb;
-  border-bottom: 1px solid #e5e7eb;
+  background: var(--bg-secondary) !important;
+  border-bottom: 1px solid var(--border-color);
   font-weight: 600;
-  color: #374151;
+  color: var(--text-color) !important;
   font-size: 14px;
 }
 
@@ -132,6 +137,7 @@
   min-height: 300px;
   max-height: 400px;
   overflow-y: auto;
+  background: var(--card) !important;
 }
 
 .table-row {
@@ -139,13 +145,14 @@
   grid-template-columns: 120px 1fr 150px 120px;
   gap: 16px;
   padding: 16px 20px;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--border-color);
   align-items: center;
   transition: background-color 0.2s;
+  color: var(--text-color) !important;
 }
 
 .table-row:hover {
-  background: #f9fafb;
+  background: var(--bg-secondary) !important;
 }
 
 .category-tag {
@@ -168,15 +175,16 @@
   align-items: center;
   justify-content: center;
   height: 200px;
-  color: #9ca3af;
+  color: var(--text-secondary) !important;
   font-size: 16px;
+  background: var(--card) !important;
 }
 
 .incomes-footer {
   padding: 16px 20px;
-  background: #f9fafb;
-  border-top: 1px solid #e5e7eb;
-  color: #6b7280;
+  background: var(--bg-secondary) !important;
+  border-top: 1px solid var(--border-color);
+  color: var(--text-secondary) !important;
   font-size: 14px;
   text-align: right;
 }

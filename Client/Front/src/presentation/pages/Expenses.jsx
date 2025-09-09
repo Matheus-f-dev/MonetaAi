@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import "../styles/pages/Expenses.css";
 import { Sidebar } from '../components/system';
+import { useTheme } from '../hooks/useTheme';
 
 export default function Expenses() {
+  useTheme();
   const [expenses, setExpenses] = useState([]);
   const [filteredExpenses, setFilteredExpenses] = useState([]);
   const [activeTab, setActiveTab] = useState('todas');

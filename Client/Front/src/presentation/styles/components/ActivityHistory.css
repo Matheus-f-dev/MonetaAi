@@ -1,5 +1,7 @@
 .activity-history {
   padding: 20px;
+  background: var(--bg) !important;
+  min-height: 100vh;
 }
 
 .activity-header {
@@ -8,14 +10,14 @@
 
 .activity-header h2 {
   margin: 0 0 8px 0;
-  color: #1f2937;
+  color: var(--text-color) !important;
   font-size: 24px;
   font-weight: 600;
 }
 
 .activity-header p {
   margin: 0;
-  color: #6b7280;
+  color: var(--text-secondary) !important;
   font-size: 14px;
 }
 
@@ -28,29 +30,29 @@
 
 .filter-select {
   padding: 8px 12px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color);
   border-radius: 6px;
-  background: white;
-  color: #374151;
+  background: var(--card) !important;
+  color: var(--text-color) !important;
   font-size: 14px;
   cursor: pointer;
   transition: border-color 0.2s ease;
 }
 
 .filter-select:hover {
-  border-color: #9ca3af;
+  border-color: var(--text-secondary);
 }
 
 .filter-select:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--primary-light);
 }
 
 .activity-loading {
   text-align: center;
   padding: 40px;
-  color: #6b7280;
+  color: var(--text-secondary) !important;
 }
 
 .activity-list {
@@ -64,14 +66,14 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px;
-  background: white;
+  background: var(--card) !important;
   border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
   transition: all 0.2s ease;
 }
 
 .activity-item:hover {
-  border-color: #d1d5db;
+  border-color: var(--text-secondary);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
@@ -81,7 +83,7 @@
 
 .activity-description {
   font-weight: 500;
-  color: #1f2937;
+  color: var(--text-color) !important;
   margin-bottom: 4px;
 }
 
@@ -89,11 +91,12 @@
   display: flex;
   gap: 16px;
   font-size: 12px;
-  color: #6b7280;
+  color: var(--text-secondary) !important;
 }
 
 .activity-category {
-  background: #f3f4f6;
+  background: var(--bg-secondary) !important;
+  color: var(--text-color) !important;
   padding: 2px 8px;
   border-radius: 12px;
   font-weight: 500;
@@ -115,26 +118,26 @@
 .no-activities {
   text-align: center;
   padding: 40px;
-  color: #6b7280;
-  background: white;
+  color: var(--text-secondary) !important;
+  background: var(--card) !important;
   border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
 }
 
 .future-balance {
   padding: 40px;
   text-align: center;
-  background: white;
+  background: var(--card) !important;
   border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
 }
 
 .future-balance h2 {
   margin: 0 0 8px 0;
-  color: #1f2937;
+  color: var(--text-color) !important;
 }
 
 .future-balance p {
   margin: 0;
-  color: #6b7280;
+  color: var(--text-secondary) !important;
 }
