@@ -102,12 +102,10 @@ npm start
 - [x] Filtro de gastos por categoria
 - [x] Integração com rede social
 - [x] Registros no WhatsApp através do chatbot
-- [x] Gráfico de gastos 
+- [x] Gráfico de gastos
+- [x] Personalização da interface  
 
-### Funcionalidades em desenvolvimento
-  
-- [ ] Personalização da interface  
- 
+
 
 
 
