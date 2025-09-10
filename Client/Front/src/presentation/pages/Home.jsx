@@ -2,8 +2,29 @@
 import '../styles/pages/home.css'; // ajuste se necessário
 import landingImage from '../../assets/images/landing page.png'; // ajuste o nome conforme seu arquivo
 import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
 
 export default function LandingPage() {
+  useEffect(() => {
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animate-in');
+        }
+      });
+    }, observerOptions);
+
+    const animateElements = document.querySelectorAll('.feature-card, .texto-esquerda, .mockup, .card, .conteudo');
+    animateElements.forEach(el => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div>
       <header className="fade-in header-container">

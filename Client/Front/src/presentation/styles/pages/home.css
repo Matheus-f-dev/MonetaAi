@@ -1258,3 +1258,75 @@ hr {
 .texto-esquerda h1 {
   color: #000000 !important;
 }
+/* Animações suaves de entrada */
+.hero-content {
+  animation: slideInLeft 1.2s ease-out;
+}
+
+.hero-image-container {
+  animation: slideInRight 1.2s ease-out 0.3s both;
+}
+
+.features-grid .feature-card {
+  animation: fadeInUp 0.8s ease-out both;
+}
+
+.features-grid .feature-card:nth-child(1) { animation-delay: 0.1s; }
+.features-grid .feature-card:nth-child(2) { animation-delay: 0.2s; }
+.features-grid .feature-card:nth-child(3) { animation-delay: 0.3s; }
+.features-grid .feature-card:nth-child(4) { animation-delay: 0.4s; }
+.features-grid .feature-card:nth-child(5) { animation-delay: 0.5s; }
+.features-grid .feature-card:nth-child(6) { animation-delay: 0.6s; }
+
+/* Efeitos hover melhorados */
+.feature-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-primary:hover, .botao-acao:hover, .botao-assinar:hover, .botao-principal:hover {
+  transform: translateY(-3px);
+  transition: all 0.3s ease;
+}
+
+/* Animação de flutuação para imagem */
+.hero-image {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Animação de entrada para indicadores */
+.trust-indicators .indicator {
+  animation: fadeInUp 1s ease-out both;
+}
+
+.trust-indicators .indicator:nth-child(1) { animation-delay: 0.8s; }
+.trust-indicators .indicator:nth-child(2) { animation-delay: 1s; }
+.trust-indicators .indicator:nth-child(3) { animation-delay: 1.2s; }
+
+/* Scroll suave */
+html {
+  scroll-behavior: smooth;
+}
+/* Elementos inicialmente invisíveis */
+.features-grid .feature-card,
+.whatsapp-financas .texto-esquerda,
+.whatsapp-financas .mockup,
+.plano-moneta .card,
+.secao-moneta .conteudo {
+  opacity: 0;
+  transform: translateY(50px);
+  transition: all 0.8s ease-out;
+}
+
+/* Classe para elementos visíveis */
+.animate-in {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+/* JavaScript para scroll animations */
