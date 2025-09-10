@@ -151,9 +151,13 @@
   content:""; position:absolute; top:-12px; bottom:-12px; left:0; width:1px; background: var(--primary-200);
 }
 .sys-kpi-title{ font-weight:700; }
-.sys-kpi-value{ margin-top:12px; font-weight:800; font-size:24px; color: var(--success); }
-.sys-success{ color: var(--success); }
-.sys-danger{ color: var(--danger); }
+.sys-kpi-value{ margin-top:12px; font-weight:800; font-size:24px; }
+.sys-success{ color: #16a34a !important; }
+.sys-danger{ color: #ef4444 !important; }
+.sys-kpi-receita{ color: #16a34a !important; }
+.sys-kpi-despesa{ color: #ef4444 !important; }
+.sys-kpi-saldo{ color: #16a34a !important; }
+.sys-kpi-saldo.negativo{ color: #ef4444 !important; }
 .sys-small{ font-size:12px; color: var(--muted); }
 
 /* Grid */
@@ -213,8 +217,12 @@
   color: var(--text);
 }
 .sys-value{ text-align:right; white-space:nowrap; }
-.sys-pos-t{ color:#16a34a; }
-.sys-neg-t{ color:#ef4444; }
+.sys-pos-t{ color:#16a34a !important; }
+.sys-neg-t{ color:#ef4444 !important; }
+
+/* Cores específicas para receitas e despesas */
+.receita-value { color: #16a34a !important; }
+.despesa-value { color: #ef4444 !important; }
 
 /* Responsivo */
 @media (max-width: 1200px){

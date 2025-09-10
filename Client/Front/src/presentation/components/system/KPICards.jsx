@@ -14,7 +14,7 @@ export function KPICards({ balance, income, expenses }) {
 
       <div className="sys-kpi sys-kpi-mid">
         <div className="sys-kpi-title">Receitas</div>
-        <div className="sys-kpi-value">{brl(income)}</div>
+        <div className="sys-kpi-value sys-success">{brl(income)}</div>
         <div className="sys-small">Total acumulado</div>
       </div>
 
