@@ -28,7 +28,7 @@ export function Sidebar() {
           <SideItem label="Análises" icon={<ChartIcon />} />
           <SideItem label="Relatórios" icon={<DocIcon />} />
           <SideItem label="Planejamento" icon={<PlanIcon />} />
-          <SideItem label="Alertas" icon={<BellIcon />} />
+          <SideItem label="Alertas" icon={<BellIcon />} onClick={() => navigate('/alerts')} />
           <SideItem label="Modo Viagem" icon={<PlaneIcon />} />
           <SideItem label="Simulador Chatbot" icon={<BotIcon />} />
           <SideItem label="Perfil" icon={<UserIcon />} onClick={() => navigate('/profile')} />

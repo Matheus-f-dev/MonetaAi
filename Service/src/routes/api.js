@@ -2,6 +2,7 @@ const express = require('express');
 const AuthController = require('../controllers/AuthController');
 const TransactionController = require('../controllers/TransactionController');
 const EmailController = require('../controllers/EmailController');
+const AlertController = require('../controllers/AlertController');
 
 const router = express.Router();
 
@@ -18,5 +19,9 @@ router.get('/transactions/:userId', TransactionController.getUserTransactions);
 router.get('/balance/:userId', TransactionController.getUserBalance);
 router.put('/transactions/:id', TransactionController.update);
 router.delete('/transactions/:id', TransactionController.delete);
+
+// Rotas de alertas
+router.post('/alerts', AlertController.create);
+router.get('/alerts/:userId', AlertController.getUserAlerts);
 
 module.exports = router;

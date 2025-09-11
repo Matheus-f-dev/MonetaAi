@@ -11,6 +11,7 @@ import System from './presentation/pages/system';
 import Expenses from './presentation/pages/Expenses';
 import Incomes from './presentation/pages/Incomes';
 import Profile from './presentation/pages/Profile';
+import Alerts from './presentation/pages/Alerts';
 import AuthCallback from './presentation/pages/AuthCallback';
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
         <Route path="/expenses" element={<Expenses />} />
         <Route path="/incomes" element={<Incomes />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/alerts" element={<Alerts />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
       </Routes>
     </>
