@@ -122,7 +122,7 @@ npm start
 - [ ] Previsão saldo futuro
 - [ ] Analise de impacto financeiro
 - [ ] exportar relatorios de acompanhamentos
-- [ ]  alertas personalizados
+- [ ]  alertas personalizados-feito o cadastro
 - [ ]  Modo viagem
 - [ ]  categorização automatica dos gastos-feita somente no bot ainda
  
