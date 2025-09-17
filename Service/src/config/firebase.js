@@ -1,12 +1,8 @@
-const admin = require('firebase-admin');
-const serviceAccount = require('../../serviceAccountKey.json');
+const DatabaseConnection = require('./DatabaseConnection');
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://moneta-19f70.firebaseio.com"
-});
+const dbConnection = new DatabaseConnection();
 
-const auth = admin.auth();
-const db = admin.firestore();
-
-module.exports = { auth, db };
+module.exports = {
+  auth: dbConnection.getAuth(),
+  db: dbConnection.getFirestore()
+};

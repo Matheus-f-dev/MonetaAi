@@ -149,6 +149,7 @@ npm start
 - **Service Layer** - Encapsulamento da lógica de negócio  
 - **Domain Model** - Entidades com comportamentos e validações
 - **Dependency Injection** - Baixo acoplamento entre camadas
+- **Singleton Pattern** - Conexão única com banco de dados (Firebase)
 - **Orientação a Objetos** - Encapsulamento, Herança, Polimorfismo
 
 
