@@ -116,12 +116,12 @@ npm start
 - [x] consulta de saldo e consumo no chatbot
 - [x] Registro de gastos por voz
 - [x] o chatbot gera resumo dos relatorios
+- [x] exportar relatorios de acompanhamentos
 
 
 ### Funcionalidades em desenvolvimento
 - [ ] Previsão saldo futuro
 - [ ] Analise de impacto financeiro
-- [ ] exportar relatorios de acompanhamentos
 - [ ]  alertas personalizados-feito o cadastro-so adicionar a funçao para vers os alertas criados e poder excluir eles
 - [ ]  Modo viagem
 - [ ]  categorização automatica dos gastos-feita somente no bot ainda
