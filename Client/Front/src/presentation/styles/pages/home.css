@@ -135,7 +135,7 @@ nav a:focus, .btn:focus {
     justify-content: space-between;
     align-items: flex-start;
     padding: 80px 60px;
-    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    background: linear-gradient(135deg, var(--neutral-50) 0%, var(--neutral-100) 100%);
     gap: 60px;
     min-height: 90vh;
     position: relative;
@@ -158,18 +158,17 @@ nav a:focus, .btn:focus {
     animation: fadeInLeft 1.5s ease forwards;
     position: relative;
     z-index: 2;
-    color: white;
+    color: var(--neutral-800);
   }
   
   .badge {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
+    background: var(--primary-light);
+    color: var(--primary-color);
     padding: 8px 16px;
     border-radius: 999px;
     font-size: 14px;
     font-weight: 600;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid var(--neutral-200);
     display: inline-block;
     margin-bottom: 20px;
   }
@@ -179,10 +178,11 @@ nav a:focus, .btn:focus {
     margin: 20px 0;
     font-weight: bold;
     line-height: 1.2;
+    color: var(--neutral-800) !important;
   }
   
   .gradient-text {
-    background: linear-gradient(45deg, #fbbf24, #f59e0b, #d97706);
+    background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -199,7 +199,7 @@ nav a:focus, .btn:focus {
   
   .subtitle {
     font-size: 18px;
-    color: #000000;
+    color: var(--neutral-600);
     margin-bottom: 30px;
   }
   
@@ -210,13 +210,13 @@ nav a:focus, .btn:focus {
   }
   
   .btn-primary {
-    background: #10b981;
+    background: var(--primary-color);
     color: white;
     padding: 14px 28px;
-    border-radius: 50px;
+    border-radius: 12px;
     font-weight: 600;
     text-decoration: none;
-    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
     transition: all 0.3s ease;
     border: none;
     cursor: pointer;
@@ -224,23 +224,25 @@ nav a:focus, .btn:focus {
   
   .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 35px rgba(16, 185, 129, 0.6);
-    background: #059669;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+    background: var(--primary-hover);
   }
   
   .btn-outline {
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    color: white;
+    border: 2px solid var(--neutral-300);
+    color: var(--neutral-700);
     padding: 12px 24px;
-    border-radius: 50px;
+    border-radius: 12px;
     font-weight: 600;
     text-decoration: none;
-    backdrop-filter: blur(10px);
+    background: white;
     transition: all 0.3s ease;
   }
   
   .btn-outline:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--neutral-50);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
     transform: translateY(-2px);
   }
   
@@ -354,30 +356,30 @@ nav a:focus, .btn:focus {
 .features {
   padding: 80px 20px;
   text-align: center;
-  background: #ffffff;
+  background: var(--bg-primary);
   position: relative;
 }
 
 .features-header .badge {
-  background: #1e40af;
-  color: white;
+  background: var(--primary-light);
+  color: var(--primary-color);
   padding: 8px 16px;
   border-radius: 25px;
   font-weight: bold;
   font-size: 14px;
-  box-shadow: 0 4px 15px rgba(30, 64, 175, 0.3);
+  border: 1px solid var(--neutral-200);
 }
 
 .features-header h2 {
   font-size: 32px;
   font-weight: bold;
-  color: #111827;
+  color: var(--neutral-800);
   margin: 16px 0 12px;
 }
 
 
 .features-header p {
-  color: #6b7280;
+  color: var(--neutral-600);
   font-size: 16px;
 }
 
@@ -391,21 +393,20 @@ nav a:focus, .btn:focus {
 }
 .feature-card {
   background: white;
-  border-radius: 20px;
+  border-radius: 16px;
   padding: 30px;
   text-align: left;
   position: relative;
   overflow: hidden;
   transition: all 0.4s ease;
-  border: 1px solid rgba(30, 64, 175, 0.1);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
+  border: 1px solid var(--neutral-200);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .feature-card:hover {
-  transform: translateY(-10px) scale(1.02);
-  box-shadow: 0 25px 50px rgba(5, 150, 105, 0.3);
-  border: 1px solid rgba(5, 150, 105, 0.3);
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.1);
+  border: 1px solid var(--primary-color);
 }
 
 /* Efeito de brilho suave ao redor no hover */
@@ -426,18 +427,17 @@ nav a:focus, .btn:focus {
 /* Iluminação ao passar nos ícones */
 .feature-card .icon {
   font-size: 32px;
-  background: #1e40af;
-  color: white;
+  background: var(--primary-light);
+  color: var(--primary-color);
   width: 60px;
   height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 16px;
+  border-radius: 12px;
   margin-bottom: 20px;
   position: relative;
   z-index: 1;
-  box-shadow: 0 8px 25px rgba(30, 64, 175, 0.4);
   transition: all 0.3s ease;
 }
 
@@ -499,8 +499,8 @@ nav a:focus, .btn:focus {
   gap: 60px;
   flex-wrap: wrap;
   perspective: 1000px;
-  background: #f8fafc;
-  color: #000000;
+  background: var(--neutral-50);
+  color: var(--neutral-800);
   position: relative;
   overflow: hidden;
 }
@@ -518,12 +518,12 @@ nav a:focus, .btn:focus {
 .texto-esquerda {
   flex: 1;
   max-width: 600px;
-  color: #000000;
+  color: var(--neutral-800);
 }
 
 .tag {
-  background: #dff9fb;
-  color: #22a6b3;
+  background: var(--primary-light);
+  color: var(--primary-color);
   padding: 6px 12px;
   border-radius: 20px;
   font-weight: bold;
@@ -533,17 +533,17 @@ nav a:focus, .btn:focus {
 h1 {
   font-size: 36px;
   margin: 20px 0 10px;
-  color: #000000;
+  color: var(--neutral-800);
 }
 
 .whatsapp {
-  color: #25d366;
+  color: var(--accent-color);
   font-weight: bold;
 }
 
 .descricao {
   font-size: 18px;
-  color: #000000;
+  color: var(--neutral-600);
   margin-bottom: 40px;
 }
 
@@ -554,13 +554,12 @@ h1 {
 }
 
 .item{
-  color: #000000;
-  background-color: var(--background-light);
-  padding: 10px;
-  border-radius: 13px;
-  box-shadow: var(--box-shadow);
-  border: 1px solid rgb(69 , 69, 69);
-  border-style: outset;
+  color: var(--neutral-700);
+  background-color: white;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--neutral-200);
 }
 
 .icon-box {
@@ -569,17 +568,20 @@ h1 {
 
 .botao-acao {
   padding: 12px 24px;
-  background-color: #25d366;
+  background-color: var(--accent-color);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 16px;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
 }
 
 .botao-acao:hover {
-  background-color: #1da851;
+  background-color: var(--accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
 }
 
 /* Mockup de conversa */
@@ -659,10 +661,10 @@ h1 {
 }
 
 .secao-moneta {
-  background: #1e40af;
+  background: var(--neutral-100);
   padding: 100px 20px;
   text-align: center;
-  color: white;
+  color: var(--neutral-800) !important;
   position: relative;
   overflow: hidden;
 }
@@ -682,6 +684,7 @@ h1 {
   font-size: 2.5rem;
   font-weight: bold;
   margin-bottom: 20px;
+  color: var(--neutral-800) !important;
 }
 
 .secao-moneta p {
@@ -689,6 +692,7 @@ h1 {
   max-width: 800px;
   margin: 0 auto 40px auto;
   line-height: 1.5;
+  color: var(--neutral-600) !important;
 }
 
 .chamada-acao {
@@ -701,13 +705,13 @@ h1 {
 
 .botao-principal {
   padding: 16px 32px;
-  background-color: white;
-  color: #1e40af;
+  background-color: var(--primary-color);
+  color: white;
   border: none;
-  border-radius: 50px;
+  border-radius: 12px;
   font-weight: bold;
   cursor: pointer;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
   transition: all 0.3s ease;
   font-size: 16px;
   min-width: 200px;
@@ -857,11 +861,11 @@ h1 {
   .plano-moneta {
   position: relative;
   padding: 100px 20px;
-  background: #1e40af;
+  background: var(--neutral-50);
   overflow: hidden;
   z-index: 1;
   text-align: center;
-  color: white;
+  color: var(--neutral-800);
 }
 
 .plano-moneta::before {
@@ -1053,12 +1057,13 @@ h1 {
 }
 
 .footer {
-  background: linear-gradient(135deg, #0f172a 0%, #1e40af 50%, #059669 100%);
-  color: #ffffff;
+  background: var(--neutral-50);
+  color: var(--neutral-700);
   padding: 60px 20px 20px;
   font-family: Arial, sans-serif;
   position: relative;
   overflow: hidden;
+  border-top: 1px solid var(--neutral-200);
 }
 
 .footer::before {
@@ -1102,17 +1107,17 @@ h1 {
 }
 
 .footer-section ul li a {
-  color: #ffffff;
+  color: var(--neutral-600);
   text-decoration: none;
   transition: color 0.3s;
 }
 
 .footer-section ul li a:hover {
-  color: #00aaff;
+  color: var(--primary-color);
 }
 
 .social-icons a {
-  color: white;
+  color: var(--neutral-600);
   margin-right: 15px;
   font-size: 18px;
   text-decoration: none;
@@ -1120,7 +1125,7 @@ h1 {
 }
 
 .social-icons a:hover {
-  color: #00aaff;
+  color: var(--primary-color);
 }
 
 hr {
@@ -1138,14 +1143,14 @@ hr {
 }
 
 .footer-links a {
-  color: #ffffff;
+  color: var(--neutral-600);
   margin-left: 20px;
   text-decoration: none;
   transition: color 0.3s;
 }
 
 .footer-links a:hover {
-  color: #00aaff;
+  color: var(--primary-color);
 }
 
 @keyframes pulse-card {
