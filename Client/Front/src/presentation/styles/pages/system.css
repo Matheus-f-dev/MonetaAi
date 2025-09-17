@@ -176,7 +176,7 @@
 
 /* Gráfico (mock pra bater com a imagem) */
 .sys-chart{ position:relative; height:260px; padding: 10px 16px 28px; }
-.chart-container{ position: relative; height: 200px; width: 100%; }
+.chart-container{ position: relative; height: 100%; width: 100%; }
 .sys-hline{ position:absolute; left:16px; right:16px; height:1px; background: var(--line); }
 .sys-spark{ position:absolute; left:16px; right:16px; bottom:36px; height:200px; width: calc(100% - 32px); }
 .sys-xlabels{

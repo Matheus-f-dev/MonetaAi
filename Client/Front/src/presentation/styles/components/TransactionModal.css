@@ -13,7 +13,7 @@
 }
 
 .modal-content {
-  background: white;
+  background: white !important;
   padding: 1.5rem;
   border-radius: 12px;
   width: 90%;
@@ -24,7 +24,7 @@
 
 .modal-content h2 {
   margin: 0 0 1.5rem 0;
-  color: #1f2937;
+  color: #1f2937 !important;
   font-size: 1.5rem;
 }
 
@@ -36,7 +36,7 @@
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: #374151;
+  color: #374151 !important;
 }
 
 .form-group input,
@@ -47,6 +47,8 @@
   border-radius: 8px;
   font-size: 1rem;
   transition: border-color 0.2s;
+  background: white !important;
+  color: #1f2937 !important;
 }
 
 .form-group input:focus,
@@ -65,11 +67,12 @@
   flex: 1;
   padding: 0.75rem;
   border: 2px solid #e5e7eb;
-  background: white;
+  background: white !important;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
   font-weight: 500;
+  color: #1f2937 !important;
 }
 
 .tipo-btn:hover {
@@ -100,8 +103,8 @@
 }
 
 .btn-cancelar {
-  background: #f3f4f6;
-  color: #374151;
+  background: #f3f4f6 !important;
+  color: #374151 !important;
 }
 
 .btn-cancelar:hover {
@@ -109,8 +112,8 @@
 }
 
 .btn-adicionar {
-  background: #3b82f6;
-  color: white;
+  background: #3b82f6 !important;
+  color: white !important;
 }
 
 .btn-adicionar:hover {

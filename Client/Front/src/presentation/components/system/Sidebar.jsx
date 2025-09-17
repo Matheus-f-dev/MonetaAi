@@ -26,7 +26,7 @@ export function Sidebar() {
           <SideItem label="Gastos" icon={<BagIcon />} onClick={() => navigate('/expenses')} />
           <SideItem label="Receitas" icon={<WalletIcon />} onClick={() => navigate('/incomes')} />
           <SideItem label="Análises" icon={<ChartIcon />} />
-          <SideItem label="Relatórios" icon={<DocIcon />} />
+          <SideItem label="Relatórios" icon={<DocIcon />} onClick={() => navigate('/reports')} />
           <SideItem label="Planejamento" icon={<PlanIcon />} />
           <SideItem label="Alertas" icon={<BellIcon />} onClick={() => navigate('/alerts')} />
           <SideItem label="Modo Viagem" icon={<PlaneIcon />} />
