@@ -1,69 +1,43 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import "../styles/pages/Expenses.css";
 import { Sidebar } from '../components/system';
 import { useTheme } from '../hooks/useTheme';
+import { useTransactionData } from '../hooks/useTransactionData';
 
 export default function Expenses() {
   useTheme();
-  const [expenses, setExpenses] = useState([]);
-  const [filteredExpenses, setFilteredExpenses] = useState([]);
   const [activeTab, setActiveTab] = useState('todas');
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
 
-  const userName = "Usuário";
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const userId = user.uid || 'default-user';
+  const { transactions } = useTransactionData(userId);
 
-  // Buscar despesas do banco de dados
-  useEffect(() => {
-    const fetchExpenses = async () => {
-      try {
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        const userId = user.uid || 'default-user';
+  const expenses = useMemo(() => {
+    return transactions
+      .filter(transaction => transaction.tipo && transaction.tipo.toLowerCase() === 'despesa')
+      .map(transaction => {
+        const dateField = transaction.dataHora || transaction.data || transaction.criadoEm;
+        let processedDate = dateField;
         
-        const response = await fetch(`http://localhost:3000/api/transactions/${userId}`);
-        const data = await response.json();
-        
-        if (data.success) {
-          // Filtrar apenas despesas
-          const expensesData = data.transactions
-            .filter(transaction => transaction.tipo && transaction.tipo.toLowerCase() === 'despesa')
-            .map(transaction => {
-
-              const dateField = transaction.dataHora || transaction.data || transaction.criadoEm;
-              let processedDate = dateField;
-              
-              // Tratar formato brasileiro "01/09/2025, 14:02:47"
-              if (dateField && typeof dateField === 'string' && dateField.includes('/')) {
-                const [datePart] = dateField.split(', ');
-                const [day, month, year] = datePart.split('/');
-                processedDate = new Date(year, month - 1, day);
-              }
-              
-              return {
-                id: transaction.id || Math.random(),
-                date: processedDate,
-                description: transaction.descricao || 'Sem descrição',
-                category: transaction.categoria || 'Outros',
-                value: Math.abs(transaction.valor || 0)
-              };
-            });
-          
-          console.log('Total de despesas encontradas:', expensesData.length);
-          setExpenses(expensesData);
-          setFilteredExpenses(expensesData);
-        } else {
-          console.log('Erro na resposta:', data);
+        if (dateField && typeof dateField === 'string' && dateField.includes('/')) {
+          const [datePart] = dateField.split(', ');
+          const [day, month, year] = datePart.split('/');
+          processedDate = new Date(year, month - 1, day);
         }
-      } catch (error) {
-        console.error('Erro ao buscar despesas:', error);
-      }
-    };
-    
-    fetchExpenses();
-  }, []);
+        
+        return {
+          id: transaction.id || Math.random(),
+          date: processedDate,
+          description: transaction.descricao || 'Sem descrição',
+          category: transaction.categoria || 'Outros',
+          value: Math.abs(transaction.valor || 0)
+        };
+      });
+  }, [transactions]);
 
-  // Filtrar despesas
-  useEffect(() => {
+  const filteredExpenses = useMemo(() => {
     let filtered = expenses;
 
     // Filtro por período
@@ -98,10 +72,10 @@ export default function Expenses() {
       filtered = filtered.filter(expense => expense.category === categoryFilter);
     }
 
-    setFilteredExpenses(filtered);
+    return filtered;
   }, [expenses, activeTab, searchTerm, categoryFilter]);
 
-  const categories = [...new Set(expenses.map(expense => expense.category))];
+  const categories = useMemo(() => [...new Set(expenses.map(expense => expense.category))], [expenses]);
 
   return (
     <div className="sys-layout">

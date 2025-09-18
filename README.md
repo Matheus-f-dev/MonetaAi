@@ -3,36 +3,43 @@
 **MonetaAi** é uma plataforma de gestão financeira pessoal com foco em acessibilidade, automação e integração via inteligência artificial.  
 O sistema permite que usuários organizem suas finanças de maneira simples e eficiente, com recursos como chatbot via WhatsApp, categorização de gastos, gráficos e mais.
 
-## 📁 Estrutura do Projeto
+## 📁 Estrutura do Projeto - Padrão MVC
 
 ```
 MonetaAi/
-├── Client/
-│   └── Front/                    # Frontend React
-│       ├── src/
-│       │   ├── presentation/
-│       │   │   ├── components/   # Componentes React
-│       │   │   ├── pages/        # Páginas da aplicação
-│       │   │   ├── styles/       # Estilos CSS
-│       │   │   └── hooks/        # Custom Hooks
-│       │   ├── domain/           # Classes de domínio (OO)
-│       │   ├── core/
-│       │   │   └── services/     # Services do frontend
-│       │   └── App.js
-│       └── package.json
-└── Service/                      # Backend Node.js (Arquitetura em Camadas + OO)
-    ├── src/
-    │   ├── controllers/          # Controllers da API (HTTP Layer)
-    │   │   └── views/            # Controllers para páginas
-    │   ├── services/             # Lógica de negócio (Business Layer)
-    │   ├── repositories/         # Camada de persistência (Data Layer)
-    │   ├── models/               # Modelos de domínio (Domain Layer)
-    │   ├── routes/               # Rotas organizadas
-    │   ├── middleware/           # Middlewares
-    │   └── config/               # Configurações
-    ├── views/                    # Templates EJS
-    ├── public/                   # Arquivos estáticos
-    └── package.json
+├── Client/Front/                 # Frontend React (MVC Adaptado)
+│   ├── src/
+│   │   ├── presentation/
+│   │   │   ├── pages/            # Views (Páginas React)
+│   │   │   ├── components/       # Componentes reutilizáveis
+│   │   │   ├── hooks/            # Controllers (Custom Hooks)
+│   │   │   └── styles/           # Estilos CSS
+│   │   ├── core/
+│   │   │   ├── entities/         # Models (Entidades)
+│   │   │   ├── services/         # Services (API calls)
+│   │   │   ├── usecases/         # Use Cases
+│   │   │   └── validators/       # Validadores
+│   │   ├── domain/               # Domain Models
+│   │   ├── infrastructure/       # Infraestrutura
+│   │   └── shared/               # Utilitários compartilhados
+│   └── package.json
+├── Service/                      # Backend Node.js (MVC Completo)
+│   ├── src/
+│   │   ├── controllers/          # Controllers (Lógica de controle)
+│   │   │   └── views/            # View Controllers
+│   │   ├── services/             # Services (Lógica de negócio)
+│   │   ├── models/               # Models (Entidades de dados)
+│   │   ├── repositories/         # Data Access Layer
+│   │   ├── routes/               # Rotas da API
+│   │   ├── middleware/           # Middlewares
+│   │   └── config/               # Configurações
+│   ├── views/                    # Views (Templates EJS)
+│   ├── public/                   # Arquivos estáticos
+│   └── package.json
+└── bot_moneta_ai/                # Chatbot Python
+    ├── services/                 # Services do bot
+    ├── utils/                    # Utilitários
+    └── app.py                    # Aplicação principal
 ```
 
 ## 🚀 Como Executar o Projeto
@@ -121,46 +128,109 @@ npm start
 
 ### Funcionalidades em desenvolvimento
 - [ ] Previsão saldo futuro
-- [ ] Analise de impacto financeiro
-- [ ]  alertas personalizados-feito o cadastro-so adicionar a funçao para vers os alertas criados e poder excluir eles
-- [ ]  Modo viagem
-- [ ]  categorização automatica dos gastos-feita somente no bot ainda
+- [ ] Análise de impacto financeiro
+- [ ] Alertas personalizados (visualização e exclusão)
+- [ ] Modo viagem
+- [ ] Categorização automática dos gastos
+
+## 🎯 Arquitetura MVC - Benefícios Alcançados
+
+### ✅ Separação de Responsabilidades
+- **Models:** Gerenciam dados e regras de negócio
+- **Views:** Focam apenas na apresentação
+- **Controllers:** Coordenam interações entre Model e View
+
+### ✅ Manutenibilidade
+- Código organizado e fácil de localizar
+- Mudanças isoladas em cada camada
+- Reutilização de componentes e lógica
+
+### ✅ Testabilidade
+- Cada camada pode ser testada independentemente
+- Hooks customizados facilitam testes unitários
+- Mocks simples para services e APIs
+
+### ✅ Escalabilidade
+- Estrutura preparada para crescimento
+- Fácil adição de novas funcionalidades
+- Padrões consistentes em todo o projeto
  
 
-## 🏗️ Arquitetura do Sistema
+## 🏗️ Arquitetura MVC
 
-### Backend - Arquitetura em Camadas com OO
+### Backend - MVC Tradicional
 ```
 ┌─────────────────┐
-│   Controllers   │ ← HTTP Layer (Requisições/Respostas)
+│      Views      │ ← Templates EJS (Apresentação)
 ├─────────────────┤
-│    Services     │ ← Business Layer (Lógica de Negócio)
+│   Controllers   │ ← Lógica de controle e rotas
 ├─────────────────┤
-│  Repositories   │ ← Data Layer (Persistência)
+│     Models      │ ← Entidades e regras de negócio
 ├─────────────────┤
-│     Models      │ ← Domain Layer (Entidades de Domínio)
+│    Services     │ ← Lógica de negócio complexa
 ├─────────────────┤
-│    Firebase     │ ← Database
+│    Firebase     │ ← Persistência de dados
 └─────────────────┘
 ```
 
-### Padrões Implementados
-- **Repository Pattern** - Separação da lógica de persistência
-- **Service Layer** - Encapsulamento da lógica de negócio  
-- **Domain Model** - Entidades com comportamentos e validações
-- **Dependency Injection** - Baixo acoplamento entre camadas
-- **Singleton Pattern** - Conexão única com banco de dados (Firebase)
-- **Orientação a Objetos** - Encapsulamento, Herança, Polimorfismo
+### Frontend - MVC Adaptado com Hooks
+```
+┌─────────────────┐
+│   Pages (JSX)   │ ← Views (Componentes React)
+├─────────────────┤
+│ Custom Hooks    │ ← Controllers (Lógica de estado)
+├─────────────────┤
+│   Entities      │ ← Models (Estruturas de dados)
+├─────────────────┤
+│    Services     │ ← Comunicação com API
+├─────────────────┤
+│   Backend API   │ ← Fonte de dados
+└─────────────────┘
+```
+
+### Padrões MVC Implementados
+- **✅ Model-View-Controller** - Separação clara de responsabilidades
+- **✅ Custom Hooks como Controllers** - Gerenciamento de estado e lógica
+- **✅ Service Layer** - Encapsulamento de chamadas API
+- **✅ Repository Pattern** - Abstração da persistência
+- **✅ Domain Models** - Entidades com validações
+- **✅ Separation of Concerns** - Cada camada com responsabilidade única
+
+### Hooks Customizados (Controllers Frontend)
+- `useAuth.js` - Controle de autenticação
+- `useTransactionData.js` - Gerenciamento de transações
+- `useReports.js` - Lógica de relatórios
+- `useAlerts.js` - Controle de alertas
+- `useSystemSimple.js` - Dados do sistema principal
 
 
 
 ## 🚀 Tecnologias Utilizadas
 
-- **Frontend:** React.js, React Router, Chart.js
-- **Backend:** Node.js, Express.js (Arquitetura em Camadas + OO)
-- **Banco de Dados:** Firebase Firestore
-- **Autenticação:** Firebase Authentication
-- **Chatbot:** Python com IA
+### Frontend (MVC com React)
+- **React.js** - Biblioteca para interfaces
+- **React Router** - Roteamento SPA
+- **Chart.js** - Gráficos interativos
+- **Custom Hooks** - Controllers do frontend
+- **CSS Modules** - Estilização componentizada
+
+### Backend (MVC Tradicional)
+- **Node.js** - Runtime JavaScript
+- **Express.js** - Framework web MVC
+- **EJS** - Template engine para Views
+- **Firebase Firestore** - Banco de dados NoSQL
+- **Firebase Auth** - Autenticação
+
+### Chatbot & IA
+- **Python** - Linguagem do bot
+- **OpenAI API** - Inteligência artificial
+- **WhatsApp API** - Integração messaging
+
+### Arquitetura
+- **Padrão MVC** - Organização do código
+- **RESTful API** - Comunicação cliente-servidor
+- **SPA (Single Page Application)** - Frontend React
+- **Microserviços** - Bot separado do backend principal
 
 
 ---

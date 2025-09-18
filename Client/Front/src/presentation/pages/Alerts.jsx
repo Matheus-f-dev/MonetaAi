@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTheme } from '../hooks/useTheme';
+import { useAlerts } from '../hooks/useAlerts';
 import { Sidebar } from '../components/system';
 import '../styles/pages/Alerts.css';
 
@@ -9,6 +10,7 @@ export default function Alerts() {
   const [alertName, setAlertName] = useState('');
   const [condition, setCondition] = useState('Maior que');
   const [value, setValue] = useState('');
+  const { loading, message, createAlert } = useAlerts();
 
   const handleCreateAlert = async () => {
     if (!alertName || !value) {
@@ -16,36 +18,22 @@ export default function Alerts() {
       return;
     }
     
-    try {
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      const userId = user.uid || 'default-user';
-      
-      const response = await fetch('http://localhost:3000/api/alerts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId,
-          nome: alertName,
-          condicao: condition,
-          valor: value
-        })
-      });
-      
-      const result = await response.json();
-      
-      if (result.success) {
-        alert('Alerta criado com sucesso!');
-        setAlertName('');
-        setValue('');
-      } else {
-        alert('Erro: ' + result.message);
-      }
-    } catch (error) {
-      console.error('Erro ao criar alerta:', error);
-      alert('Erro ao conectar com o servidor');
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const userId = user.uid || 'default-user';
+    
+    const result = await createAlert({
+      userId,
+      nome: alertName,
+      condicao: condition,
+      valor: value
+    });
+    
+    if (result.success) {
+      setAlertName('');
+      setValue('');
     }
+    
+    alert(message);
   };
 
   return (
@@ -95,8 +83,8 @@ export default function Alerts() {
               />
             </div>
             
-            <button className="create-alert-btn" onClick={handleCreateAlert}>
-              + Criar Alerta
+            <button className="create-alert-btn" onClick={handleCreateAlert} disabled={loading}>
+              {loading ? 'Criando...' : '+ Criar Alerta'}
             </button>
           </div>
         </div>

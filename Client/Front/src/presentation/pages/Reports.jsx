@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTheme } from '../hooks/useTheme';
+import { useTransactionData } from '../hooks/useTransactionData';
+import { useReports } from '../hooks/useReports';
 import { ReportsChart } from '../components/ReportsChart';
 import { Sidebar } from '../components/system/Sidebar';
 import '../styles/pages/Reports.css';
@@ -8,150 +10,13 @@ export default function Reports() {
   useTheme();
   const [activeTab, setActiveTab] = useState('resumo');
   const [selectedPeriod, setSelectedPeriod] = useState('Este Mês');
-  const [transactions, setTransactions] = useState([]);
-  const [filteredTransactions, setFilteredTransactions] = useState([]);
-  const [chartData, setChartData] = useState(null);
 
-  useEffect(() => {
-    fetchTransactions();
-  }, []);
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const userId = user.uid || 'default-user';
+  const { transactions } = useTransactionData(userId);
+  const { filteredTransactions, chartData, totals, getCategoriesData } = useReports(transactions, selectedPeriod);
 
-  useEffect(() => {
-    if (transactions.length > 0) {
-      const filtered = filterTransactionsByPeriod(transactions, selectedPeriod);
-      setFilteredTransactions(filtered);
-      generateChartData(filtered);
-    }
-  }, [transactions, selectedPeriod]);
-
-  const fetchTransactions = async () => {
-    try {
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      const userId = user.uid || 'default-user';
-      
-      const response = await fetch(`http://localhost:3000/api/transactions/${userId}`);
-      const data = await response.json();
-      
-      if (data.success) {
-        setTransactions(data.transactions);
-      }
-    } catch (error) {
-      console.error('Erro ao buscar transações:', error);
-    }
-  };
-
-  const filterTransactionsByPeriod = (transactionsList, period) => {
-    const now = new Date();
-    let startDate;
-
-    switch (period) {
-      case 'Este Mês':
-        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-        break;
-      case 'Últimos 3 Meses':
-        startDate = new Date(now.getFullYear(), now.getMonth() - 2, 1);
-        break;
-      case 'Este Ano':
-        startDate = new Date(now.getFullYear(), 0, 1);
-        break;
-      default:
-        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-    }
-
-    return transactionsList.filter(transaction => {
-      const dateField = transaction.dataHora || transaction.data || transaction.criadoEm;
-      if (!dateField) return false;
-
-      let transactionDate;
-      if (typeof dateField === 'string' && dateField.includes('/')) {
-        const [datePart] = dateField.split(', ');
-        const [day, month, year] = datePart.split('/');
-        transactionDate = new Date(year, month - 1, day);
-      } else {
-        transactionDate = new Date(dateField);
-      }
-
-      return transactionDate >= startDate;
-    });
-  };
-
-  const generateChartData = (transactionsList) => {
-    const monthlyData = {};
-    const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-    
-    // Determinar período baseado no filtro
-    const now = new Date();
-    let monthsToShow = 6;
-    let startMonth = 5;
-    
-    if (selectedPeriod === 'Este Mês') {
-      monthsToShow = 1;
-      startMonth = 0;
-    } else if (selectedPeriod === 'Últimos 3 Meses') {
-      monthsToShow = 3;
-      startMonth = 2;
-    } else if (selectedPeriod === 'Este Ano') {
-      monthsToShow = 12;
-      startMonth = 11;
-    }
-    
-    // Inicializar dados
-    for (let i = startMonth; i >= 0; i--) {
-      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
-      const monthName = months[date.getMonth()];
-      monthlyData[monthKey] = {
-        name: monthName,
-        receitas: 0,
-        despesas: 0,
-        saldo: 0
-      };
-    }
-
-    // Processar transações
-    transactionsList.forEach(transaction => {
-      const dateField = transaction.dataHora || transaction.data || transaction.criadoEm;
-      if (!dateField) return;
-
-      let transactionDate;
-      if (typeof dateField === 'string' && dateField.includes('/')) {
-        const [datePart] = dateField.split(', ');
-        const [day, month, year] = datePart.split('/');
-        transactionDate = new Date(year, month - 1, day);
-      } else {
-        transactionDate = new Date(dateField);
-      }
-
-      const monthKey = `${transactionDate.getFullYear()}-${transactionDate.getMonth()}`;
-      if (monthlyData[monthKey]) {
-        const valor = Math.abs(transaction.valor || 0);
-        if (transaction.tipo?.toLowerCase() === 'receita') {
-          monthlyData[monthKey].receitas += valor;
-        } else {
-          monthlyData[monthKey].despesas += valor;
-        }
-        monthlyData[monthKey].saldo = monthlyData[monthKey].receitas - monthlyData[monthKey].despesas;
-      }
-    });
-
-    const sortedData = Object.values(monthlyData);
-    setChartData({
-      labels: sortedData.map(d => d.name),
-      receitas: sortedData.map(d => d.receitas),
-      despesas: sortedData.map(d => d.despesas),
-      saldo: sortedData.map(d => d.saldo)
-    });
-  };
-
-  const income = filteredTransactions
-    .filter(t => t.tipo?.toLowerCase() === 'receita')
-    .reduce((sum, t) => sum + Math.abs(t.valor || 0), 0);
-    
-  const expenses = filteredTransactions
-    .filter(t => t.tipo?.toLowerCase() === 'despesa')
-    .reduce((sum, t) => sum + Math.abs(t.valor || 0), 0);
-    
-  const balance = income - expenses;
+  const { income, expenses, balance } = totals;
 
   const getPercentageChange = () => {
     const now = new Date();
@@ -218,36 +83,7 @@ export default function Reports() {
 
   const percentageChange = getPercentageChange();
 
-  const getCategoriesData = () => {
-    const categories = {};
-    const totalReceitas = filteredTransactions
-      .filter(t => t.tipo?.toLowerCase() === 'receita')
-      .reduce((sum, t) => sum + Math.abs(t.valor || 0), 0);
-    const totalDespesas = filteredTransactions
-      .filter(t => t.tipo?.toLowerCase() === 'despesa')
-      .reduce((sum, t) => sum + Math.abs(t.valor || 0), 0);
-    
-    filteredTransactions.forEach(transaction => {
-      const category = transaction.categoria || 'Outros';
-      const amount = Math.abs(transaction.valor || 0);
-      const type = transaction.tipo?.toLowerCase() === 'receita' ? 'positive' : 'negative';
-      
-      if (!categories[category]) {
-        categories[category] = { total: 0, type };
-      }
-      categories[category].total += amount;
-    });
-    
-    return Object.entries(categories).map(([name, data]) => {
-      const baseTotal = data.type === 'positive' ? totalReceitas : totalDespesas;
-      return {
-        name,
-        total: data.total,
-        type: data.type,
-        percentage: baseTotal > 0 ? ((data.total / baseTotal) * 100).toFixed(1) : 0
-      };
-    }).sort((a, b) => b.total - a.total);
-  };
+
 
   const exportToExcel = async () => {
     const XLSX = await import('xlsx');

@@ -1,69 +1,43 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import "../styles/pages/Incomes.css";
 import { Sidebar } from '../components/system';
 import { useTheme } from '../hooks/useTheme';
+import { useTransactionData } from '../hooks/useTransactionData';
 
 export default function Incomes() {
   useTheme();
-  const [incomes, setIncomes] = useState([]);
-  const [filteredIncomes, setFilteredIncomes] = useState([]);
   const [activeTab, setActiveTab] = useState('todas');
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
 
-  const userName = "Usuário";
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const userId = user.uid || 'default-user';
+  const { transactions } = useTransactionData(userId);
 
-  // Buscar receitas do banco de dados
-  useEffect(() => {
-    const fetchIncomes = async () => {
-      try {
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        const userId = user.uid || 'default-user';
+  const incomes = useMemo(() => {
+    return transactions
+      .filter(transaction => transaction.tipo && transaction.tipo.toLowerCase() === 'receita')
+      .map(transaction => {
+        const dateField = transaction.dataHora || transaction.data || transaction.criadoEm;
+        let processedDate = dateField;
         
-        const response = await fetch(`http://localhost:3000/api/transactions/${userId}`);
-        const data = await response.json();
-        
-        if (data.success) {
-          // Filtrar apenas receitas
-          const incomesData = data.transactions
-            .filter(transaction => transaction.tipo && transaction.tipo.toLowerCase() === 'receita')
-            .map(transaction => {
-
-              const dateField = transaction.dataHora || transaction.data || transaction.criadoEm;
-              let processedDate = dateField;
-              
-              // Tratar formato brasileiro "01/09/2025, 14:02:47"
-              if (dateField && typeof dateField === 'string' && dateField.includes('/')) {
-                const [datePart] = dateField.split(', ');
-                const [day, month, year] = datePart.split('/');
-                processedDate = new Date(year, month - 1, day);
-              }
-              
-              return {
-                id: transaction.id || Math.random(),
-                date: processedDate,
-                description: transaction.descricao || 'Sem descrição',
-                category: transaction.categoria || 'Outros',
-                value: Math.abs(transaction.valor || 0)
-              };
-            });
-          
-          console.log('Total de receitas encontradas:', incomesData.length);
-          setIncomes(incomesData);
-          setFilteredIncomes(incomesData);
-        } else {
-          console.log('Erro na resposta:', data);
+        if (dateField && typeof dateField === 'string' && dateField.includes('/')) {
+          const [datePart] = dateField.split(', ');
+          const [day, month, year] = datePart.split('/');
+          processedDate = new Date(year, month - 1, day);
         }
-      } catch (error) {
-        console.error('Erro ao buscar receitas:', error);
-      }
-    };
-    
-    fetchIncomes();
-  }, []);
+        
+        return {
+          id: transaction.id || Math.random(),
+          date: processedDate,
+          description: transaction.descricao || 'Sem descrição',
+          category: transaction.categoria || 'Outros',
+          value: Math.abs(transaction.valor || 0)
+        };
+      });
+  }, [transactions]);
 
-  // Filtrar receitas
-  useEffect(() => {
+  const filteredIncomes = useMemo(() => {
     let filtered = incomes;
 
     // Filtro por período
@@ -98,10 +72,10 @@ export default function Incomes() {
       filtered = filtered.filter(income => income.category === categoryFilter);
     }
 
-    setFilteredIncomes(filtered);
+    return filtered;
   }, [incomes, activeTab, searchTerm, categoryFilter]);
 
-  const categories = [...new Set(incomes.map(income => income.category))];
+  const categories = useMemo(() => [...new Set(incomes.map(income => income.category))], [incomes]);
 
   return (
     <div className="sys-layout">

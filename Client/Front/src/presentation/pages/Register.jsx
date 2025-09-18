@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import '../styles/pages/Register.css';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 
 export default function Cadastro() {
   const [nome, setNome] = useState('');
@@ -10,32 +11,19 @@ export default function Cadastro() {
   const [salario, setSalario] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [mensagem, setMensagem] = useState('');
   const [emailStatus, setEmailStatus] = useState('');
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { loading, message, register, verifyEmail } = useAuth();
 
   async function verificarEmail(email) {
     if (!email || !email.includes('@')) return;
     
-    try {
-      const response = await fetch('http://localhost:3000/api/verificar-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-      });
-      
-      const data = await response.json();
-      setEmailStatus(data.exists ? 'exists' : 'available');
-    } catch (error) {
-      setEmailStatus('');
-    }
+    const data = await verifyEmail(email);
+    setEmailStatus(data.exists ? 'exists' : 'available');
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setLoading(true);
-    setMensagem('');
 
     const dados = {
       nome,
@@ -45,34 +33,12 @@ export default function Cadastro() {
       salario: Number(salario)
     };
 
-    console.log('Enviando dados:', dados);
-
-    try {
-      const response = await fetch('http://localhost:3000/api/cadastro', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(dados)
-      });
-
-      console.log('Response status:', response.status);
-      const data = await response.json();
-      console.log('Response data:', data);
-
-      if (data.success) {
-        setMensagem('Cadastro realizado com sucesso!');
-        setTimeout(() => {
-          navigate('/login');
-        }, 2000);
-      } else {
-        setMensagem(data.message || 'Erro no cadastro');
-      }
-    } catch (error) {
-      console.error('Erro:', error);
-      setMensagem('Erro ao conectar com o servidor.');
-    } finally {
-      setLoading(false);
+    const result = await register(dados);
+    
+    if (result.success) {
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
     }
   }
 
@@ -202,8 +168,8 @@ export default function Cadastro() {
         <p id="mensagem" style={{ 
           textAlign: 'center', 
           marginTop: 10,
-          color: mensagem.includes('sucesso') ? 'green' : 'red'
-        }}>{mensagem}</p>
+          color: message.includes('sucesso') ? 'green' : 'red'
+        }}>{message}</p>
       </form>
 
       <div className="footer-links">
