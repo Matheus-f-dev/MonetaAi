@@ -1,7 +1,7 @@
 import { SideItem } from './SideItem';
 import { 
   HomeIcon, BagIcon, WalletIcon, ChartIcon, DocIcon, 
-  PlanIcon, BellIcon, PlaneIcon, BotIcon, GearIcon, 
+  PlanIcon, BellIcon, BotIcon, GearIcon, 
   UserIcon, ExitIcon 
 } from './Icons';
 import { useNavigate } from 'react-router-dom';
@@ -29,7 +29,6 @@ export function Sidebar() {
           <SideItem label="Relatórios" icon={<DocIcon />} onClick={() => navigate('/reports')} />
           <SideItem label="Planejamento" icon={<PlanIcon />} />
           <SideItem label="Alertas" icon={<BellIcon />} onClick={() => navigate('/alerts')} />
-          <SideItem label="Modo Viagem" icon={<PlaneIcon />} />
           <SideItem label="Simulador Chatbot" icon={<BotIcon />} />
           <SideItem label="Perfil" icon={<UserIcon />} onClick={() => navigate('/profile')} />
           <SideItem label="Configurações" icon={<GearIcon />} />
