@@ -1,88 +1,118 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from "react";
 import "../styles/pages/Expenses.css";
-import { Sidebar } from '../components/system';
-import { useTheme } from '../hooks/useTheme';
-import { useTransactionData } from '../hooks/useTransactionData';
+import { Sidebar } from "../components/system";
+import { useTheme } from "../hooks/useTheme";
+import { useTransactionData } from "../hooks/useTransactionData";
 
 export default function Expenses() {
   useTheme();
-  const [activeTab, setActiveTab] = useState('todas');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('');
+  const [activeTab, setActiveTab] = useState("todas");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
 
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
-  const userId = user.uid || 'default-user';
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
+  const userId = user.uid || "default-user";
   const { transactions } = useTransactionData(userId);
 
   const expenses = useMemo(() => {
     return transactions
-      .filter(transaction => transaction.tipo && transaction.tipo.toLowerCase() === 'despesa')
-      .map(transaction => {
-        const dateField = transaction.dataHora || transaction.data || transaction.criadoEm;
+      .filter(
+        (transaction) =>
+          transaction.tipo && transaction.tipo.toLowerCase() === "despesa"
+      )
+      .map((transaction) => {
+        const dateField =
+          transaction.dataHora || transaction.data || transaction.criadoEm;
         let processedDate = dateField;
-        
-        if (dateField && typeof dateField === 'string' && dateField.includes('/')) {
-          const [datePart] = dateField.split(', ');
-          const [day, month, year] = datePart.split('/');
+
+        if (
+          dateField &&
+          typeof dateField === "string" &&
+          dateField.includes("/")
+        ) {
+          const [datePart] = dateField.split(", ");
+          const [day, month, year] = datePart.split("/");
           processedDate = new Date(year, month - 1, day);
         }
-        
+
         return {
           id: transaction.id || Math.random(),
           date: processedDate,
-          description: transaction.descricao || 'Sem descrição',
-          category: transaction.categoria || 'Outros',
-          value: Math.abs(transaction.valor || 0)
+          description: transaction.descricao || "Sem descrição",
+          category: transaction.categoria || "Outros",
+          value: Math.abs(transaction.valor || 0),
         };
       });
   }, [transactions]);
 
+  //Atualização do Gleison
+  const filterByCurrentMonth = (expenses) => {
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    return expenses.filter((expense) => {
+      if (!expense.date) return false;
+      const expenseDate = new Date(expense.date);
+      return (
+        expenseDate.getMonth() === currentMonth &&
+        expenseDate.getFullYear() === currentYear
+      );
+    });
+  };
+
+  const filterByLastMonth = (expenses) => {
+    const lastMonth = new Date().getMonth() - 1;
+    const year =
+      lastMonth < 0 ? new Date().getFullYear() - 1 : new Date().getFullYear();
+    const month = lastMonth < 0 ? 11 : lastMonth;
+    return expenses.filter((expense) => {
+      if (!expense.date) return false;
+      const expenseDate = new Date(expense.date);
+      return (
+        expenseDate.getMonth() === month && expenseDate.getFullYear() === year
+      );
+    });
+  };
+
+  const filterBySearch = (expenses, term) => {
+    return expenses.filter((expense) =>
+      expense.description.toLowerCase().includes(term.toLowerCase())
+    );
+  };
+
+  const filterByCategory = (expenses, category) => {
+    return expenses.filter((expense) => expense.category === category);
+  };
+
   const filteredExpenses = useMemo(() => {
     let filtered = expenses;
 
-    // Filtro por período
-    if (activeTab === 'este-mes') {
-      const currentMonth = new Date().getMonth();
-      const currentYear = new Date().getFullYear();
-      filtered = filtered.filter(expense => {
-        if (!expense.date) return false;
-        const expenseDate = new Date(expense.date);
-        return expenseDate.getMonth() === currentMonth && expenseDate.getFullYear() === currentYear;
-      });
-    } else if (activeTab === 'mes-passado') {
-      const lastMonth = new Date().getMonth() - 1;
-      const year = lastMonth < 0 ? new Date().getFullYear() - 1 : new Date().getFullYear();
-      const month = lastMonth < 0 ? 11 : lastMonth;
-      filtered = filtered.filter(expense => {
-        if (!expense.date) return false;
-        const expenseDate = new Date(expense.date);
-        return expenseDate.getMonth() === month && expenseDate.getFullYear() === year;
-      });
+    if (activeTab === "este-mes") {
+      filtered = filterByCurrentMonth(filtered);
+    } else if (activeTab === "mes-passado") {
+      filtered = filterByLastMonth(filtered);
     }
 
-    // Filtro por busca
     if (searchTerm) {
-      filtered = filtered.filter(expense => 
-        expense.description.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      filtered = filterBySearch(filtered, searchTerm);
     }
 
-    // Filtro por categoria
     if (categoryFilter) {
-      filtered = filtered.filter(expense => expense.category === categoryFilter);
+      filtered = filterByCategory(filtered, categoryFilter);
     }
 
     return filtered;
   }, [expenses, activeTab, searchTerm, categoryFilter]);
 
-  const categories = useMemo(() => [...new Set(expenses.map(expense => expense.category))], [expenses]);
+  const categories = useMemo(
+    () => [...new Set(expenses.map((expense) => expense.category))],
+    [expenses]
+  );
 
   return (
     <div className="sys-layout">
       <Sidebar />
-      
+
       <main className="sys-main">
-        
         <div className="expenses-container">
           <div className="expenses-header">
             <h1>Gerenciar Despesas</h1>
@@ -90,21 +120,21 @@ export default function Expenses() {
 
           <div className="expenses-filters">
             <div className="tabs">
-              <button 
-                className={activeTab === 'todas' ? 'active' : ''}
-                onClick={() => setActiveTab('todas')}
+              <button
+                className={activeTab === "todas" ? "active" : ""}
+                onClick={() => setActiveTab("todas")}
               >
                 Todas
               </button>
-              <button 
-                className={activeTab === 'este-mes' ? 'active' : ''}
-                onClick={() => setActiveTab('este-mes')}
+              <button
+                className={activeTab === "este-mes" ? "active" : ""}
+                onClick={() => setActiveTab("este-mes")}
               >
                 Este Mês
               </button>
-              <button 
-                className={activeTab === 'mes-passado' ? 'active' : ''}
-                onClick={() => setActiveTab('mes-passado')}
+              <button
+                className={activeTab === "mes-passado" ? "active" : ""}
+                onClick={() => setActiveTab("mes-passado")}
               >
                 Mês Passado
               </button>
@@ -119,15 +149,17 @@ export default function Expenses() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              
-              <select 
-                value={categoryFilter} 
+
+              <select
+                value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
                 className="category-filter"
               >
                 <option value="">Filtrar por categoria</option>
-                {categories.map(category => (
-                  <option key={category} value={category}>{category}</option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
                 ))}
               </select>
             </div>
@@ -149,29 +181,32 @@ export default function Expenses() {
 
               <div className="table-body">
                 {filteredExpenses.length > 0 ? (
-                  filteredExpenses.map(expense => (
+                  filteredExpenses.map((expense) => (
                     <div key={expense.id} className="table-row">
                       <span>
                         {(() => {
-                          if (!expense.date) return new Date().toLocaleDateString('pt-BR');
-                          
+                          if (!expense.date)
+                            return new Date().toLocaleDateString("pt-BR");
+
                           try {
                             const date = new Date(expense.date);
-                            return isNaN(date.getTime()) ? 'Data inválida' : date.toLocaleDateString('pt-BR');
+                            return isNaN(date.getTime())
+                              ? "Data inválida"
+                              : date.toLocaleDateString("pt-BR");
                           } catch {
-                            return 'Data inválida';
+                            return "Data inválida";
                           }
                         })()}
                       </span>
                       <span>{expense.description}</span>
                       <span className="category-tag">{expense.category}</span>
-                      <span className="value">R$ {Number(expense.value).toFixed(2)}</span>
+                      <span className="value">
+                        R$ {Number(expense.value).toFixed(2)}
+                      </span>
                     </div>
                   ))
                 ) : (
-                  <div className="no-expenses">
-                    Nenhuma despesa encontrada.
-                  </div>
+                  <div className="no-expenses">Nenhuma despesa encontrada.</div>
                 )}
               </div>
             </div>
