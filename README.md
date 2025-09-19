@@ -130,7 +130,7 @@ npm start
 - [ ] Previsão saldo futuro
 - [ ] Análise de impacto financeiro
 - [ ] Alertas personalizados (visualização e exclusão)
-- [ ] Modo viagem
+- [ ] Distribuição acumulativa
 - [ ] Categorização automática dos gastos
 
 ## 🎯 Arquitetura MVC - Benefícios Alcançados
