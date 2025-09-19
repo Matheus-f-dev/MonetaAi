@@ -129,9 +129,9 @@ npm start
 ### Funcionalidades em desenvolvimento
 - [ ] Previsão saldo futuro
 - [ ] Análise de impacto financeiro
-- [ ] Alertas personalizados (visualização e exclusão)
+- [ ] Alertas personalizados (visualização e exclusão) fazer
 - [ ] Distribuição acumulativa
-- [ ] Categorização automática dos gastos
+- [ ] Categorização automática dos gastos-feita so no chatbot
 
 ## 🎯 Arquitetura MVC - Benefícios Alcançados
 
