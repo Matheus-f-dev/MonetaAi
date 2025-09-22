@@ -124,13 +124,12 @@ npm start
 - [x] Registro de gastos por voz
 - [x] o chatbot gera resumo dos relatorios
 - [x] exportar relatorios de acompanhamentos
-
+- [x] Distribuição acumulativa
 
 ### Funcionalidades em desenvolvimento
 - [ ] Previsão saldo futuro
 - [ ] Análise de impacto financeiro
-- [ ] Alertas personalizados (visualização e exclusão) fazer
-- [ ] Distribuição acumulativa
+- [ ] Alertas personalizados (visualização e exclusão) feito- falta somente a integração com chatbot
 - [ ] Categorização automática dos gastos-feita so no chatbot
 
 ## 🎯 Arquitetura MVC - Benefícios Alcançados
