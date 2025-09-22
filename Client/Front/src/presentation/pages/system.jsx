@@ -146,21 +146,32 @@ export default function System() {
           return new Date(yearA, monthA - 1, dayA) - new Date(yearB, monthB - 1, dayB);
         });
         
-        const receitasData = sortedDates.map(date => groupedByDate[date].receitas);
-        const despesasData = sortedDates.map(date => groupedByDate[date].despesas);
+        // Calcular distribuição acumulativa
+        let receitasAcumuladas = 0;
+        let despesasAcumuladas = 0;
+        
+        const receitasData = sortedDates.map(date => {
+          receitasAcumuladas += groupedByDate[date].receitas;
+          return receitasAcumuladas;
+        });
+        
+        const despesasData = sortedDates.map(date => {
+          despesasAcumuladas += groupedByDate[date].despesas;
+          return despesasAcumuladas;
+        });
         
         return {
           labels: sortedDates,
           datasets: [
             {
-              label: 'Receitas',
+              label: 'Receitas Acumuladas',
               data: receitasData,
               borderColor: '#16a34a',
               backgroundColor: 'rgba(22, 163, 74, 0.1)',
               tension: 0.4,
             },
             {
-              label: 'Despesas',
+              label: 'Despesas Acumuladas',
               data: despesasData,
               borderColor: '#ef4444',
               backgroundColor: 'rgba(239, 68, 68, 0.1)',

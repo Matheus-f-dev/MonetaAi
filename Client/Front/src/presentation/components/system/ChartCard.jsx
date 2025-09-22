@@ -10,8 +10,8 @@ export function ChartCard({ chartData, chartOptions, onFilterChange, activeFilte
     <div className="sys-card sys-card-big">
       <div className="sys-card-head">
         <div>
-          <div className="sys-card-title">Visão Geral</div>
-          <div className="sys-small">Acompanhe suas receitas e despesas</div>
+          <div className="sys-card-title">Distribuição Acumulativa</div>
+          <div className="sys-small">Acompanhe o acúmulo de receitas e despesas</div>
         </div>
         <div className="sys-segmented">
           <button 
