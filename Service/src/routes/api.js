@@ -23,5 +23,7 @@ router.delete('/transactions/:id', TransactionController.delete);
 // Rotas de alertas
 router.post('/alerts', AlertController.create);
 router.get('/alerts/:userId', AlertController.getUserAlerts);
+router.put('/alerts/:alertId', AlertController.update);
+router.delete('/alerts/:alertId', AlertController.delete);
 
 module.exports = router;
