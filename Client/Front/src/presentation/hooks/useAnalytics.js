@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTransactionData } from './useTransactionData';
 
-export function useAnalytics(selectedPeriod) {
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
-  const userId = user.uid || 'default-user';
+export function useAnalytics(selectedPeriod, userId) {
   const { transactions } = useTransactionData(userId);
   
   const [analyticsData, setAnalyticsData] = useState({
@@ -15,12 +13,12 @@ export function useAnalytics(selectedPeriod) {
   });
 
   useEffect(() => {
-    if (transactions.length > 0) {
+    if (userId && transactions.length > 0) {
       const filteredTransactions = filterTransactionsByPeriod(transactions, selectedPeriod);
       const processedData = processAnalyticsData(filteredTransactions, transactions, selectedPeriod);
       setAnalyticsData(processedData);
     }
-  }, [transactions, selectedPeriod]);
+  }, [transactions, selectedPeriod, userId]);
 
   const filterTransactionsByPeriod = (transactions, period) => {
     const now = new Date();
@@ -89,22 +87,25 @@ export function useAnalytics(selectedPeriod) {
 
     // Processar dados por categoria
     const categoryTotals = {};
-    currentTransactions
-      .filter(t => t.tipo?.toLowerCase() === 'despesa')
-      .forEach(t => {
-        const category = t.categoria || 'Outros';
-        categoryTotals[category] = (categoryTotals[category] || 0) + Math.abs(t.valor || 0);
-      });
+    const expenseTransactions = currentTransactions.filter(t => t.tipo?.toLowerCase() === 'despesa');
+    
+    expenseTransactions.forEach(t => {
+      const category = t.categoria || 'Outros';
+      categoryTotals[category] = (categoryTotals[category] || 0) + Math.abs(t.valor || 0);
+    });
 
     const totalExpenses = Object.values(categoryTotals).reduce((sum, val) => sum + val, 0);
     const categoryData = Object.entries(categoryTotals)
-      .map(([name, total]) => ({
-        name,
-        total,
-        percentage: Math.round((total / totalExpenses) * 100),
-        color: getCategoryColor(name)
-      }))
-      .sort((a, b) => b.percentage - a.percentage);
+      .map(([name, total]) => {
+        const exactPercentage = (total / totalExpenses) * 100;
+        return {
+          name,
+          total,
+          percentage: exactPercentage < 1 ? Math.max(1, Math.round(exactPercentage)) : Math.round(exactPercentage),
+          color: getCategoryColor(name)
+        };
+      })
+      .sort((a, b) => b.total - a.total);
 
     const topCategory = categoryData[0] || { name: 'Moradia', percentage: 35 };
 
@@ -114,6 +115,63 @@ export function useAnalytics(selectedPeriod) {
     // Calcular valor máximo para escala do gráfico
     const maxValue = Math.max(...evolutionData.map(d => d.value), 1000);
     const roundedMax = Math.ceil(maxValue / 1000) * 1000;
+
+    // Calcular dados específicos para tab de despesas
+    const previousCategoryTotals = {};
+    previousPeriodTransactions
+      .filter(t => t.tipo?.toLowerCase() === 'despesa')
+      .forEach(t => {
+        const category = t.categoria || 'Outros';
+        previousCategoryTotals[category] = (previousCategoryTotals[category] || 0) + Math.abs(t.valor || 0);
+      });
+
+    // Calcular crescimento por categoria
+    let fastestGrowingCategory = { name: 'Sem dados', growth: 0 };
+    let maxGrowth = -Infinity;
+    
+    Object.entries(categoryTotals).forEach(([category, currentTotal]) => {
+      const previousTotal = previousCategoryTotals[category] || 0;
+      if (previousTotal > 0) {
+        const growth = ((currentTotal - previousTotal) / previousTotal) * 100;
+        if (growth > maxGrowth) {
+          maxGrowth = growth;
+          fastestGrowingCategory = { name: category, growth: Math.round(growth) };
+        }
+      }
+    });
+    
+    // Se não encontrou crescimento, usar a segunda maior categoria
+    if (fastestGrowingCategory.name === 'Sem dados' && categoryData.length > 1) {
+      fastestGrowingCategory = { name: categoryData[1].name, growth: 0 };
+    }
+
+    // Calcular número de dias no período
+    const getDaysInPeriod = (period) => {
+      const now = new Date();
+      switch (period) {
+        case 'Este Mês':
+          return new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+        case 'Últimos 3 Meses':
+          return 90;
+        case 'Este Ano':
+          const startOfYear = new Date(now.getFullYear(), 0, 1);
+          return Math.floor((now - startOfYear) / (24 * 60 * 60 * 1000)) + 1;
+        default:
+          return 30;
+      }
+    };
+
+    const expensesTabData = {
+      topCategory: categoryData[0] || { name: 'Sem dados', total: 0 },
+      fastestGrowingCategory,
+      dailyAverage: expenses / getDaysInPeriod(period)
+    };
+
+    // Gerar dados de linha acumulativa
+    const cumulativeLineData = generateCumulativeLineData(allTransactions, period);
+    
+    // Gerar dados diários
+    const dailyData = generateDailyData(currentTransactions, period);
 
     return {
       totals: { expenses, income, savings },
@@ -134,7 +192,10 @@ export function useAnalytics(selectedPeriod) {
         { month: 'Jun', value: 0 },
         { month: 'Jul', value: 0 }
       ],
-      topCategory: topCategory.name !== 'Sem dados' ? topCategory : { name: 'Sem dados', percentage: 0 }
+      topCategory: topCategory.name !== 'Sem dados' ? topCategory : { name: 'Sem dados', percentage: 0 },
+      expensesTabData,
+      cumulativeLineData,
+      dailyData
     };
   };
 
@@ -235,6 +296,124 @@ export function useAnalytics(selectedPeriod) {
           month: monthNames[i],
           value: monthExpenses
         });
+      }
+    }
+    
+    return result;
+  };
+
+  const generateCumulativeLineData = (transactions, period) => {
+    const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    const now = new Date();
+    const result = [];
+    let cumulative = 0;
+    
+    if (period === 'Este Mês') {
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      
+      const monthExpenses = transactions
+        .filter(t => {
+          const date = getTransactionDate(t);
+          return date >= monthStart && date <= monthEnd && t.tipo?.toLowerCase() === 'despesa';
+        })
+        .reduce((sum, t) => sum + Math.abs(t.valor || 0), 0);
+      
+      result.push({ month: monthNames[now.getMonth()], value: monthExpenses });
+    } else if (period === 'Últimos 3 Meses') {
+      for (let i = 2; i >= 0; i--) {
+        const targetDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const monthStart = new Date(targetDate.getFullYear(), targetDate.getMonth(), 1);
+        const monthEnd = new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 0);
+        
+        const monthExpenses = transactions
+          .filter(t => {
+            const date = getTransactionDate(t);
+            return date >= monthStart && date <= monthEnd && t.tipo?.toLowerCase() === 'despesa';
+          })
+          .reduce((sum, t) => sum + Math.abs(t.valor || 0), 0);
+        
+        cumulative += monthExpenses;
+        result.push({ month: monthNames[targetDate.getMonth()], value: cumulative });
+      }
+    } else {
+      for (let i = 0; i < 12; i++) {
+        const monthStart = new Date(now.getFullYear(), i, 1);
+        const monthEnd = new Date(now.getFullYear(), i + 1, 0);
+        
+        const monthExpenses = transactions
+          .filter(t => {
+            const date = getTransactionDate(t);
+            return date >= monthStart && date <= monthEnd && t.tipo?.toLowerCase() === 'despesa';
+          })
+          .reduce((sum, t) => sum + Math.abs(t.valor || 0), 0);
+        
+        cumulative += monthExpenses;
+        result.push({ month: monthNames[i], value: cumulative });
+      }
+    }
+    
+    return result;
+  };
+
+  const generateDailyData = (transactions, period) => {
+    const now = new Date();
+    const result = [];
+    
+    if (period === 'Este Mês') {
+      const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dayStart = new Date(now.getFullYear(), now.getMonth(), day);
+        const dayEnd = new Date(now.getFullYear(), now.getMonth(), day, 23, 59, 59);
+        
+        const dayExpenses = transactions
+          .filter(t => {
+            const date = getTransactionDate(t);
+            return date >= dayStart && date <= dayEnd && t.tipo?.toLowerCase() === 'despesa';
+          })
+          .reduce((sum, t) => sum + Math.abs(t.valor || 0), 0);
+        
+        if (dayExpenses > 0) {
+          result.push({ day: day.toString(), value: dayExpenses });
+        }
+      }
+    } else if (period === 'Últimos 3 Meses') {
+      for (let i = 89; i >= 0; i--) {
+        const targetDate = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+        const dayStart = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
+        const dayEnd = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 23, 59, 59);
+        
+        const dayExpenses = transactions
+          .filter(t => {
+            const date = getTransactionDate(t);
+            return date >= dayStart && date <= dayEnd && t.tipo?.toLowerCase() === 'despesa';
+          })
+          .reduce((sum, t) => sum + Math.abs(t.valor || 0), 0);
+        
+        if (dayExpenses > 0) {
+          result.push({ day: `${targetDate.getDate()}/${targetDate.getMonth() + 1}`, value: dayExpenses });
+        }
+      }
+    } else {
+      const startOfYear = new Date(now.getFullYear(), 0, 1);
+      const daysDiff = Math.floor((now - startOfYear) / (24 * 60 * 60 * 1000)) + 1;
+      
+      for (let i = 0; i < daysDiff; i++) {
+        const targetDate = new Date(startOfYear.getTime() + i * 24 * 60 * 60 * 1000);
+        const dayStart = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
+        const dayEnd = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 23, 59, 59);
+        
+        const dayExpenses = transactions
+          .filter(t => {
+            const date = getTransactionDate(t);
+            return date >= dayStart && date <= dayEnd && t.tipo?.toLowerCase() === 'despesa';
+          })
+          .reduce((sum, t) => sum + Math.abs(t.valor || 0), 0);
+        
+        if (dayExpenses > 0) {
+          result.push({ day: `${targetDate.getDate()}/${targetDate.getMonth() + 1}`, value: dayExpenses });
+        }
       }
     }
     

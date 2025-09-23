@@ -405,6 +405,74 @@
   }
 }
 
+.expenses-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.expenses-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+@media (max-width: 1024px) {
+  .expenses-kpis {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .expenses-kpis {
+    grid-template-columns: 1fr;
+  }
+}
+
+.expense-kpi-card {
+  background: var(--bg-primary);
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.expenses-charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.pie-label-text {
+  pointer-events: none;
+  font-size: 8px;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.line-chart {
+  width: 100%;
+  height: 250px;
+}
+
+.line-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.line-point {
+  cursor: pointer;
+  transition: r 0.2s;
+}
+
+.line-point:hover {
+  r: 6;
+}
+
+@media (max-width: 1024px) {
+  .expenses-charts {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 768px) {
   .analytics-container {
     padding: 1rem;
@@ -421,6 +489,10 @@
   }
   
   .analytics-kpis {
+    grid-template-columns: 1fr;
+  }
+  
+  .expenses-kpis {
     grid-template-columns: 1fr;
   }
 }

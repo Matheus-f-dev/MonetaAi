@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useTheme } from '../hooks/useTheme';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { Sidebar } from '../components/system/Sidebar';
@@ -9,13 +9,21 @@ export default function Analytics() {
   const [selectedPeriod, setSelectedPeriod] = useState('Este Mês');
   const [activeTab, setActiveTab] = useState('visao-geral');
 
+  const userId = useMemo(() => {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    return user.uid || 'default-user';
+  }, []);
+
   const { 
     totals, 
     percentageChanges, 
     categoryData, 
     evolutionData,
-    topCategory 
-  } = useAnalytics(selectedPeriod);
+    topCategory,
+    expensesTabData,
+    cumulativeLineData,
+    dailyData
+  } = useAnalytics(selectedPeriod, userId);
 
   return (
     <div className="sys-layout">
@@ -68,41 +76,254 @@ export default function Analytics() {
             </button>
           </div>
 
-          <div className="analytics-kpis">
-            <div className="kpi-card">
-              <div className="kpi-label">Total de Despesas</div>
-              <div className="kpi-value">R$ {totals.expenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
-              <div className={`kpi-change ${percentageChanges.expenses >= 0 ? 'positive' : 'negative'}`}>
-                {percentageChanges.expenses >= 0 ? '+' : ''}{percentageChanges.expenses}% em relação ao período anterior
+          {activeTab === 'visao-geral' && (
+            <div className="analytics-kpis">
+              <div className="kpi-card">
+                <div className="kpi-label">Total de Despesas</div>
+                <div className="kpi-value">R$ {totals.expenses.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+                <div className={`kpi-change ${percentageChanges.expenses >= 0 ? 'positive' : 'negative'}`}>
+                  {percentageChanges.expenses >= 0 ? '+' : ''}{percentageChanges.expenses}% em relação ao período anterior
+                </div>
+              </div>
+
+              <div className="kpi-card">
+                <div className="kpi-label">Total de Receitas</div>
+                <div className="kpi-value">R$ {totals.income.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+                <div className={`kpi-change ${percentageChanges.income >= 0 ? 'positive' : 'negative'}`}>
+                  {percentageChanges.income >= 0 ? '+' : ''}{percentageChanges.income}% em relação ao período anterior
+                </div>
+              </div>
+
+              <div className="kpi-card">
+                <div className="kpi-label">Economias</div>
+                <div className="kpi-value">R$ {totals.savings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+                <div className={`kpi-change ${percentageChanges.savings >= 0 ? 'positive' : 'negative'}`}>
+                  {percentageChanges.savings}% na taxa de economia
+                </div>
+              </div>
+
+              <div className="kpi-card">
+                <div className="kpi-label">Maior Categoria</div>
+                <div className="kpi-value">{topCategory.name}</div>
+                <div className="kpi-change neutral">
+                  {topCategory.percentage}% dos seus gastos
+                </div>
               </div>
             </div>
+          )}
 
-            <div className="kpi-card">
-              <div className="kpi-label">Total de Receitas</div>
-              <div className="kpi-value">R$ {totals.income.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
-              <div className={`kpi-change ${percentageChanges.income >= 0 ? 'positive' : 'negative'}`}>
-                {percentageChanges.income >= 0 ? '+' : ''}{percentageChanges.income}% em relação ao período anterior
+          {activeTab === 'despesas' && (
+            <div className="expenses-tab">
+              <div className="expenses-kpis">
+                <div className="expense-kpi-card">
+                  <div className="kpi-label">Maior Categoria</div>
+                  <div className="kpi-value">{expensesTabData.topCategory.name}</div>
+                  <div className="kpi-change neutral">R$ {(expensesTabData.topCategory.total || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} no período</div>
+                </div>
+
+                <div className="expense-kpi-card">
+                  <div className="kpi-label">Categoria com Maior Crescimento</div>
+                  <div className="kpi-value">{expensesTabData.fastestGrowingCategory.name}</div>
+                  <div className={`kpi-change ${expensesTabData.fastestGrowingCategory.growth > 0 ? 'positive' : expensesTabData.fastestGrowingCategory.growth < 0 ? 'negative' : 'neutral'}`}>
+                    {expensesTabData.fastestGrowingCategory.growth !== 0 
+                      ? `${expensesTabData.fastestGrowingCategory.growth > 0 ? '+' : ''}${expensesTabData.fastestGrowingCategory.growth}% em relação ao período anterior`
+                      : 'Dados insuficientes para comparação'
+                    }
+                  </div>
+                </div>
+
+                <div className="expense-kpi-card">
+                  <div className="kpi-label">Gasto Médio Diário</div>
+                  <div className="kpi-value">R$ {expensesTabData.dailyAverage.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+                  <div className="kpi-change neutral">Baseado no período selecionado</div>
+                </div>
+              </div>
+
+              <div className="expenses-charts">
+                <div className="chart-container">
+                  <div className="chart-header">
+                    <h3>Despesas por Categoria - {selectedPeriod}</h3>
+                    <p>Análise detalhada dos seus gastos por categoria</p>
+                  </div>
+                  <div className="pie-chart">
+                    <div className="pie-container">
+                      <svg viewBox="0 0 200 200" className="pie-svg">
+                        {categoryData.map((category, index) => {
+                          const angle = (category.percentage / 100) * 360;
+                          const startAngle = categoryData.slice(0, index).reduce((sum, cat) => sum + (cat.percentage / 100) * 360, 0);
+                          const endAngle = startAngle + angle;
+                          
+                          const x1 = 100 + 80 * Math.cos((startAngle - 90) * Math.PI / 180);
+                          const y1 = 100 + 80 * Math.sin((startAngle - 90) * Math.PI / 180);
+                          const x2 = 100 + 80 * Math.cos((endAngle - 90) * Math.PI / 180);
+                          const y2 = 100 + 80 * Math.sin((endAngle - 90) * Math.PI / 180);
+                          
+                          const largeArcFlag = angle > 180 ? 1 : 0;
+                          
+                          return (
+                            <g key={category.name}>
+                              <path
+                                d={`M 100 100 L ${x1} ${y1} A 80 80 0 ${largeArcFlag} 1 ${x2} ${y2} Z`}
+                                fill={category.color}
+                                className="pie-slice"
+                                style={{ animationDelay: `${index * 0.1}s`, cursor: 'pointer' }}
+                                onMouseEnter={(e) => {
+                                  const tooltip = document.createElement('div');
+                                  tooltip.className = 'pie-tooltip';
+                                  tooltip.innerHTML = `
+                                    <div class="tooltip-category">${category.name}</div>
+                                    <div class="tooltip-percentage">${category.percentage}%</div>
+                                    <div class="tooltip-amount">R$ ${(category.total || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+                                  `;
+                                  document.body.appendChild(tooltip);
+                                  
+                                  const updatePosition = (event) => {
+                                    tooltip.style.left = event.pageX + 10 + 'px';
+                                    tooltip.style.top = event.pageY - 10 + 'px';
+                                  };
+                                  
+                                  updatePosition(e);
+                                  e.target.addEventListener('mousemove', updatePosition);
+                                  e.target.tooltip = tooltip;
+                                  e.target.updatePosition = updatePosition;
+                                }}
+                                onMouseLeave={(e) => {
+                                  if (e.target.tooltip) {
+                                    e.target.removeEventListener('mousemove', e.target.updatePosition);
+                                    document.body.removeChild(e.target.tooltip);
+                                    e.target.tooltip = null;
+                                  }
+                                }}
+                              />
+                            </g>
+                          );
+                        })}
+                      </svg>
+                    </div>
+                    <div className="pie-legend">
+                      {categoryData.map((category, index) => (
+                        <div key={category.name} className="legend-item" style={{ animationDelay: `${index * 0.1}s` }}>
+                          <div className="legend-color" style={{ backgroundColor: category.color }}></div>
+                          <span className="legend-label">{category.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="chart-container">
+                  <div className="chart-header">
+                    <h3>Evolução de Despesas - {selectedPeriod}</h3>
+                    <p>Tendência dos seus gastos ao longo do tempo</p>
+                  </div>
+                  <div className="line-chart">
+                    <svg viewBox="0 0 400 200" className="line-svg">
+                      <defs>
+                        <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                          <stop offset="0%" stopColor="#EF4444" stopOpacity="0.3"/>
+                          <stop offset="100%" stopColor="#EF4444" stopOpacity="0"/>
+                        </linearGradient>
+                      </defs>
+                      
+                      {/* Eixo Y */}
+                      {dailyData && dailyData.length > 0 && [0, 1, 2, 3, 4].map(i => {
+                        const maxValue = Math.max(...dailyData.map(d => d.value), 100);
+                        const value = (maxValue / 4) * (4 - i);
+                        return (
+                          <g key={i}>
+                            <line x1="40" y1={20 + i * 40} x2="380" y2={20 + i * 40} stroke="var(--border-color)" strokeWidth="0.5"/>
+                            <text x="35" y={25 + i * 40} textAnchor="end" fontSize="10" fill="var(--text-secondary)">
+                              R$ {value.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}
+                            </text>
+                          </g>
+                        );
+                      })}
+                      
+                      {/* Linha */}
+                      {dailyData && dailyData.length > 0 && (
+                        <polyline
+                          fill="none"
+                          stroke="#EF4444"
+                          strokeWidth="2"
+                          points={dailyData.map((data, index) => {
+                            const maxValue = Math.max(...dailyData.map(d => d.value), 100);
+                            const x = 50 + (index * (320 / Math.max(dailyData.length - 1, 1)));
+                            const y = 180 - ((data.value / maxValue) * 160);
+                            return `${x},${y}`;
+                          }).join(' ')}
+                        />
+                      )}
+                      
+                      {/* Pontos */}
+                      {dailyData && dailyData.map((data, index) => {
+                        const maxValue = Math.max(...dailyData.map(d => d.value), 100);
+                        const x = 50 + (index * (320 / Math.max(dailyData.length - 1, 1)));
+                        const y = 180 - ((data.value / maxValue) * 160);
+                        return (
+                          <circle
+                            key={index}
+                            cx={x}
+                            cy={y}
+                            r="3"
+                            fill="#EF4444"
+                            className="line-point"
+                            style={{ cursor: 'pointer' }}
+                            onMouseEnter={(e) => {
+                              const tooltip = document.createElement('div');
+                              tooltip.className = 'pie-tooltip';
+                              tooltip.innerHTML = `
+                                <div class="tooltip-category">Dia ${data.day}</div>
+                                <div class="tooltip-amount">R$ ${data.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+                              `;
+                              document.body.appendChild(tooltip);
+                              
+                              const updatePosition = (event) => {
+                                tooltip.style.left = event.pageX + 10 + 'px';
+                                tooltip.style.top = event.pageY - 10 + 'px';
+                              };
+                              
+                              updatePosition(e);
+                              e.target.addEventListener('mousemove', updatePosition);
+                              e.target.tooltip = tooltip;
+                              e.target.updatePosition = updatePosition;
+                            }}
+                            onMouseLeave={(e) => {
+                              if (e.target.tooltip) {
+                                e.target.removeEventListener('mousemove', e.target.updatePosition);
+                                document.body.removeChild(e.target.tooltip);
+                                e.target.tooltip = null;
+                              }
+                            }}
+                          />
+                        );
+                      })}
+                      
+                      {/* Labels dos dias */}
+                      {dailyData && dailyData.map((data, index) => {
+                        if (dailyData.length > 10 && index % Math.ceil(dailyData.length / 8) !== 0) return null;
+                        const x = 50 + (index * (320 / Math.max(dailyData.length - 1, 1)));
+                        return (
+                          <text
+                            key={index}
+                            x={x}
+                            y="195"
+                            textAnchor="middle"
+                            fontSize="8"
+                            fill="var(--text-secondary)"
+                          >
+                            {data.day}
+                          </text>
+                        );
+                      })}
+                    </svg>
+                  </div>
+                </div>
               </div>
             </div>
+          )}
 
-            <div className="kpi-card">
-              <div className="kpi-label">Economias</div>
-              <div className="kpi-value">R$ {totals.savings.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
-              <div className={`kpi-change ${percentageChanges.savings >= 0 ? 'positive' : 'negative'}`}>
-                {percentageChanges.savings}% na taxa de economia
-              </div>
-            </div>
-
-            <div className="kpi-card">
-              <div className="kpi-label">Maior Categoria</div>
-              <div className="kpi-value">{topCategory.name}</div>
-              <div className="kpi-change neutral">
-                {topCategory.percentage}% dos seus gastos
-              </div>
-            </div>
-          </div>
-
-          <div className="analytics-charts">
+          {activeTab === 'visao-geral' && (
+            <div className="analytics-charts">
             <div className="chart-container">
               <div className="chart-header">
                 <h3>Gastos por Categoria - {selectedPeriod}</h3>
@@ -233,6 +454,7 @@ export default function Analytics() {
               </div>
             </div>
           </div>
+          )}
         </div>
       </main>
     </div>
