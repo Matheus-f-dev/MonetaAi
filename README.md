@@ -132,6 +132,11 @@ npm start
 - [ ] Alertas personalizados (visualização e exclusão) feito- falta somente a integração com chatbot
 - [ ] Categorização automática dos gastos-feita so no chatbot
 
+
+EXTRAS FUNCIONALIDADES
+- [x] Pagina de análises
+
+
 ## 🎯 Arquitetura MVC - Benefícios Alcançados
 
 ### ✅ Separação de Responsabilidades
