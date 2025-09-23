@@ -134,7 +134,7 @@ npm start
 
 
 EXTRAS FUNCIONALIDADES
-- [x] Pagina de análises
+- [x] Pagina de análises(falta fazer as abas de receitas,economias e tendencias)
 
 
 ## 🎯 Arquitetura MVC - Benefícios Alcançados
