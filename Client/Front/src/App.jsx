@@ -1,8 +1,10 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import './App.css';
 import './presentation/styles/pages/profile.css';
 import './presentation/styles/pages/system-hovers.css';
 import { useTheme } from './presentation/hooks/useTheme';
+import { ProtectedRoute } from './presentation/components/ProtectedRoute';
+import { decryptRoute } from './shared/urlCrypto';
 import LandingPage from './presentation/pages/Home';
 import LoginCard from './presentation/pages/Login';
 import Cadastro from './presentation/pages/Register';
@@ -16,6 +18,43 @@ import Reports from './presentation/pages/Reports';
 import Analytics from './presentation/pages/Analytics';
 import AuthCallback from './presentation/pages/AuthCallback';
 
+function AppRouter() {
+  const location = useLocation();
+  
+  const renderComponent = () => {
+    const currentPath = location.pathname;
+    
+    if (currentPath === '/') return <LandingPage />;
+    
+    if (currentPath.startsWith('/app/')) {
+      const decryptedRoute = decryptRoute(currentPath);
+      
+      switch (decryptedRoute) {
+        case '/login': return <LoginCard />;
+        case '/cadastro': return <Cadastro />;
+        case '/esqueci-senha': return <RedefinirSenha />;
+        case '/system': return <System />;
+        case '/expenses': return <Expenses />;
+        case '/incomes': return <Incomes />;
+        case '/profile': return <Profile />;
+        case '/alerts': return <Alerts />;
+        case '/reports': return <Reports />;
+        case '/analytics': return <Analytics />;
+        case '/auth/callback': return <AuthCallback />;
+        default: return <LandingPage />;
+      }
+    }
+    
+    return <LandingPage />;
+  };
+  
+  return (
+    <ProtectedRoute>
+      {renderComponent()}
+    </ProtectedRoute>
+  );
+}
+
 function App() {
   useTheme();
   
@@ -23,18 +62,7 @@ function App() {
     <>
       <div className="background"></div>
       <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginCard />} />
-        <Route path="/cadastro" element={<Cadastro />} />
-        <Route path="/esqueci-senha" element={<RedefinirSenha />} />
-        <Route path="/system" element={<System />} />
-        <Route path="/expenses" element={<Expenses />} />
-        <Route path="/incomes" element={<Incomes />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/alerts" element={<Alerts />} />
-        <Route path="/reports" element={<Reports />} />
-        <Route path="/analytics" element={<Analytics />} />
-        <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/*" element={<AppRouter />} />
       </Routes>
     </>
   );

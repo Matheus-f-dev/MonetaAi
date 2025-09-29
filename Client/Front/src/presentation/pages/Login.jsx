@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import '../styles/pages/Login.css';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { useSecureNavigation } from '../hooks/useSecureNavigation';
 import { ValidationContext, EmailValidation, PasswordValidation } from '../../core/services/ValidationStrategy';
 
 export default function LoginCard() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate();
+  const { secureNavigate } = useSecureNavigation();
   const [searchParams] = useSearchParams();
   const { loading, message, login, googleLogin } = useAuth();
 
@@ -43,7 +44,7 @@ export default function LoginCard() {
     
     if (result.success) {
       setTimeout(() => {
-        navigate('/system');
+        secureNavigate('/system');
       }, 1000);
     }
   }
@@ -122,8 +123,8 @@ export default function LoginCard() {
         </form>
 
         <div className="footer-links">
-          <Link to="/esqueci-senha">Esqueci minha senha</Link>
-          <Link to="/cadastro">Criar conta</Link>
+          <button onClick={() => secureNavigate('/esqueci-senha')} className="link-btn">Esqueci minha senha</button>
+          <button onClick={() => secureNavigate('/cadastro')} className="link-btn">Criar conta</button>
         </div>
       </div>
     </div>

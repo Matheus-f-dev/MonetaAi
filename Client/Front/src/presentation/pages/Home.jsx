@@ -1,10 +1,12 @@
 //import '../../../src/App.css'; 
-import '../styles/pages/home.css'; // ajuste se necessário
-import landingImage from '../../assets/images/landing page.png'; // ajuste o nome conforme seu arquivo
-import { Link } from 'react-router-dom';
+import '../styles/pages/home.css';
+import landingImage from '../../assets/images/landing page.png';
 import { useEffect } from 'react';
+import { useSecureNavigation } from '../hooks/useSecureNavigation';
 
 export default function LandingPage() {
+  const { secureNavigate } = useSecureNavigation();
+  
   useEffect(() => {
     const observerOptions = {
       threshold: 0.1,
@@ -37,8 +39,8 @@ export default function LandingPage() {
         </nav>
 
         <div className="actions">
-          <Link to="/login" className="btn btn-outline">Entrar</Link>
-          <Link to="/cadastro" className="btn btn-primary">Cadastrar</Link>
+          <button onClick={() => secureNavigate('/login')} className="btn btn-outline">Entrar</button>
+          <button onClick={() => secureNavigate('/cadastro')} className="btn btn-primary">Cadastrar</button>
         </div>
       </header>
 
@@ -53,7 +55,7 @@ export default function LandingPage() {
             Mais de <strong>10.000 usuários</strong> já descobriram como economizar até <strong>30% mais</strong> usando nossa IA que aprende seus hábitos e otimiza seus gastos automaticamente.
           </p>
           <div className="hero-buttons">
-            <a href="/cadastro" className="btn-primary">🚀 Começar Grátis Agora</a>
+            <button onClick={() => secureNavigate('/cadastro')} className="btn-primary">🚀 Começar Grátis Agora</button>
             <a href="#funcionalidades" className="btn-outline">📊 Ver Como Funciona</a>
           </div>
           <div className="trust-indicators">
@@ -142,7 +144,7 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
-          <button className="botao-acao">Comece a usar agora</button>
+          <button onClick={() => secureNavigate('/cadastro')} className="botao-acao">Comece a usar agora</button>
         </div>
         <div className="mockup">
           <div className="notch"></div>
@@ -188,7 +190,7 @@ export default function LandingPage() {
             <li><span>✅</span> Planejamento de orçamento</li>
             <li className="destaque roxo"><span>🛡️</span> seu controle em multi-lugares✨</li>
           </ul>
-          <button className="botao-assinar animar-botao">Assinar Agora</button>
+          <button onClick={() => secureNavigate('/cadastro')} className="botao-assinar animar-botao">Assinar Agora</button>
           <p className="observacao">* Sem taxas ocultas. Cancele quando quiser.</p>
         </div>
       </section>
@@ -202,7 +204,7 @@ export default function LandingPage() {
             Comece gratuitamente em menos de 2 minutos!
           </p>
           <div className="chamada-acao">
-            <button className="botao-principal">Começar agora mesmo</button>
+            <button onClick={() => secureNavigate('/cadastro')} className="botao-principal">Começar agora mesmo</button>
           </div>
           <div className="beneficios">
             <div className="beneficio"><span>⭐</span> Avaliação 4.9/5</div>

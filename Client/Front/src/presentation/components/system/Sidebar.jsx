@@ -4,15 +4,15 @@ import {
   PlanIcon, BellIcon, BotIcon, GearIcon, 
   UserIcon, ExitIcon 
 } from './Icons';
-import { useNavigate } from 'react-router-dom';
+import { useSecureNavigation } from '../../hooks/useSecureNavigation';
 
 export function Sidebar() {
-  const navigate = useNavigate();
+  const { secureNavigate } = useSecureNavigation();
   
   const handleLogout = () => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-    navigate('/');
+    window.location.href = '/';
   };
   
   return (
@@ -22,15 +22,15 @@ export function Sidebar() {
       <div className="sys-side-group">
         <div className="sys-side-title">Menu Principal</div>
         <nav className="sys-side-nav">
-          <SideItem label="Início" icon={<HomeIcon />} onClick={() => navigate('/system')} />
-          <SideItem label="Gastos" icon={<BagIcon />} onClick={() => navigate('/expenses')} />
-          <SideItem label="Receitas" icon={<WalletIcon />} onClick={() => navigate('/incomes')} />
-          <SideItem label="Análises" icon={<ChartIcon />} onClick={() => navigate('/analytics')} />
-          <SideItem label="Relatórios" icon={<DocIcon />} onClick={() => navigate('/reports')} />
+          <SideItem label="Início" icon={<HomeIcon />} onClick={() => secureNavigate('/system')} />
+          <SideItem label="Gastos" icon={<BagIcon />} onClick={() => secureNavigate('/expenses')} />
+          <SideItem label="Receitas" icon={<WalletIcon />} onClick={() => secureNavigate('/incomes')} />
+          <SideItem label="Análises" icon={<ChartIcon />} onClick={() => secureNavigate('/analytics')} />
+          <SideItem label="Relatórios" icon={<DocIcon />} onClick={() => secureNavigate('/reports')} />
           <SideItem label="Planejamento" icon={<PlanIcon />} />
-          <SideItem label="Alertas" icon={<BellIcon />} onClick={() => navigate('/alerts')} />
+          <SideItem label="Alertas" icon={<BellIcon />} onClick={() => secureNavigate('/alerts')} />
           <SideItem label="Simulador Chatbot" icon={<BotIcon />} />
-          <SideItem label="Perfil" icon={<UserIcon />} onClick={() => navigate('/profile')} />
+          <SideItem label="Perfil" icon={<UserIcon />} onClick={() => secureNavigate('/profile')} />
           <SideItem label="Configurações" icon={<GearIcon />} />
         </nav>
       </div>

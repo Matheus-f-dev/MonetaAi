@@ -186,3 +186,17 @@
   width: 18px;
   height: 18px;
 }
+
+.link-btn {
+  background: none;
+  border: none;
+  color: #b5f7ee;
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 0;
+}
+
+.link-btn:hover {
+  text-decoration: underline;
+}
