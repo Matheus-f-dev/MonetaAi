@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import '../styles/pages/Login.css';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { ValidationContext, EmailValidation, PasswordValidation } from '../../core/services/ValidationStrategy';
 
 export default function LoginCard() {
   const [email, setEmail] = useState('');
@@ -20,6 +21,24 @@ export default function LoginCard() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    
+    // Strategy - validar email e senha
+    const emailValidator = new ValidationContext(new EmailValidation());
+    const passwordValidator = new ValidationContext(new PasswordValidation());
+    
+    const emailValidation = emailValidator.validate(email);
+    const passwordValidation = passwordValidator.validate(senha);
+    
+    if (!emailValidation.isValid) {
+      alert(emailValidation.message);
+      return;
+    }
+    
+    if (!passwordValidation.isValid) {
+      alert(passwordValidation.message);
+      return;
+    }
+    
     const result = await login(email, senha);
     
     if (result.success) {

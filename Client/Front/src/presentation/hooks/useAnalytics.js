@@ -13,9 +13,14 @@ export function useAnalytics(selectedPeriod, userId) {
   });
 
   useEffect(() => {
+    console.log('useAnalytics - userId:', userId);
+    console.log('useAnalytics - transactions:', transactions);
+    
     if (userId && transactions.length > 0) {
       const filteredTransactions = filterTransactionsByPeriod(transactions, selectedPeriod);
+      console.log('Filtered transactions:', filteredTransactions);
       const processedData = processAnalyticsData(filteredTransactions, transactions, selectedPeriod);
+      console.log('Processed data:', processedData);
       setAnalyticsData(processedData);
     }
   }, [transactions, selectedPeriod, userId]);

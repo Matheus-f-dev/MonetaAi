@@ -2,6 +2,7 @@ import { useState } from 'react';
 import '../styles/pages/Register.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { ValidationContext, EmailValidation, PasswordValidation, AmountValidation } from '../../core/services/ValidationStrategy';
 
 export default function Cadastro() {
   const [nome, setNome] = useState('');
@@ -24,6 +25,35 @@ export default function Cadastro() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+
+    // Strategy - validações múltiplas
+    const emailValidator = new ValidationContext(new EmailValidation());
+    const passwordValidator = new ValidationContext(new PasswordValidation());
+    const salaryValidator = new ValidationContext(new AmountValidation());
+    
+    const emailValidation = emailValidator.validate(email);
+    const passwordValidation = passwordValidator.validate(senha);
+    const salaryValidation = salaryValidator.validate(salario);
+    
+    if (!emailValidation.isValid) {
+      alert(emailValidation.message);
+      return;
+    }
+    
+    if (!passwordValidation.isValid) {
+      alert(passwordValidation.message);
+      return;
+    }
+    
+    if (!salaryValidation.isValid) {
+      alert('Salário deve ser um valor positivo');
+      return;
+    }
+    
+    if (senha !== confirmar) {
+      alert('Senhas não coincidem');
+      return;
+    }
 
     const dados = {
       nome,

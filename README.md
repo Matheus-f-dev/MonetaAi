@@ -200,12 +200,66 @@ EXTRAS FUNCIONALIDADES
 - **✅ Domain Models** - Entidades com validações
 - **✅ Separation of Concerns** - Cada camada com responsabilidade única
 
+## 🎨 Padrões GoF Implementados
+
+### 1. **Singleton Pattern**
+- **Localização:** `Service/src/config/DatabaseConnection.js`
+- **Função:** Garante uma única instância de conexão com o banco Firebase
+- **Benefício:** Evita múltiplas conexões desnecessárias
+
+### 2. **Factory Method Pattern**
+- **Localização:** `Client/Front/src/presentation/components/system/TransactionModal.jsx`
+- **Função:** Cria objetos de transação baseados no tipo (Receita/Despesa)
+- **Benefício:** Centraliza criação e aplica regras específicas (valores positivos/negativos)
+
+### 3. **Observer Pattern**
+- **Localização:** `Client/Front/src/presentation/hooks/useTransactions.js`
+- **Função:** Sistema de notificações para novas transações
+- **Benefício:** Alertas automáticos para gastos altos, logs de atividades
+
+### 4. **Strategy Pattern**
+- **Localização:** `Client/Front/src/core/services/ValidationStrategy.js`
+- **Função:** Diferentes estratégias de validação (email, senha, valores)
+- **Benefício:** Validações intercambiáveis e reutilizáveis
+- **Uso:** Implementado em `Login.jsx`, `Register.jsx` e `TransactionModal.jsx`
+
+### Benefícios dos Padrões GoF
+- **✅ Reutilização de Código** - Componentes padronizados
+- **✅ Flexibilidade** - Fácil extensão e modificação
+- **✅ Manutenibilidade** - Código mais organizado e legível
+- **✅ Desacoplamento** - Redução de dependências entre classes
+
 ### Hooks Customizados (Controllers Frontend)
 - `useAuth.js` - Controle de autenticação
-- `useTransactionData.js` - Gerenciamento de transações
+- `useTransactionData.js` - Gerenciamento de transações (Observer Pattern)
 - `useReports.js` - Lógica de relatórios
 - `useAlerts.js` - Controle de alertas
 - `useSystemSimple.js` - Dados do sistema principal
+
+### Arquivos dos Padrões GoF
+```
+Service/
+├── src/
+│   ├── config/
+│   │   └── DatabaseConnection.js     # Singleton Pattern
+│   └── services/
+│       ├── TransactionFactory.js     # Factory Method (Backend)
+│       └── TransactionObserver.js    # Observer Pattern (Backend)
+
+Client/Front/
+├── src/
+│   ├── core/
+│   │   └── services/
+│   │       └── ValidationStrategy.js # Strategy Pattern
+│   └── presentation/
+│       ├── components/system/
+│       │   └── TransactionModal.jsx  # Factory Method (Frontend)
+│       ├── hooks/
+│       │   └── useTransactions.js    # Observer Pattern (Frontend)
+│       └── pages/
+│           ├── Login.jsx             # Strategy Pattern
+│           └── Register.jsx          # Strategy Pattern
+```
 
 
 

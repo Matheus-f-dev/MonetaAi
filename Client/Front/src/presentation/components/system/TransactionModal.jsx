@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ValidationContext, AmountValidation } from '../../../core/services/ValidationStrategy';
 
 export function TransactionModal({ isOpen, onClose, onSubmit }) {
   const [formData, setFormData] = useState({
@@ -19,7 +20,28 @@ export function TransactionModal({ isOpen, onClose, onSubmit }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    
+    // Factory Method - criar objeto baseado no tipo
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const transactionData = {
+      tipo: formData.tipo,
+      valor: formData.tipo === 'Receita' ? Math.abs(parseFloat(formData.valor)) : -Math.abs(parseFloat(formData.valor)),
+      descricao: formData.descricao,
+      categoria: formData.categoria,
+      data: formData.data,
+      userId: user.uid || 'default-user'
+    };
+    
+    // Strategy - validar valor
+    const validator = new ValidationContext(new AmountValidation());
+    const validation = validator.validate(formData.valor);
+    
+    if (!validation.isValid) {
+      alert(validation.message);
+      return;
+    }
+    
+    onSubmit(transactionData);
     setFormData({ descricao: '', valor: '', categoria: '', tipo: 'Despesa', data: new Date().toISOString().split('T')[0] });
     onClose();
   };

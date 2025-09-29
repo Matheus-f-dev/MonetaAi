@@ -5,12 +5,19 @@ class Transaction {
   constructor(data) {
     this._id = data.id;
     this._userId = data.userId;
-    this._tipo = data.tipo?.toLowerCase();
-    this._valor = Math.abs(parseFloat(data.valor || 0));
-    this._descricao = data.descricao?.trim();
-    this._categoria = data.categoria || 'Outros';
-    this._dataHora = data.dataHora;
+    // Suporte aos novos campos em inglês
+    this._tipo = (data.type || data.tipo)?.toLowerCase();
+    this._valor = Math.abs(parseFloat(data.amount || data.valor || 0));
+    this._descricao = (data.description || data.descricao)?.trim();
+    this._categoria = data.category || data.categoria || 'Outros';
+    this._dataHora = data.date || data.dataHora;
     this._criadoEm = data.criadoEm;
+    
+    // Converter tipos em inglês para português
+    if (this._tipo === 'income') this._tipo = 'receita';
+    if (this._tipo === 'expense') this._tipo = 'despesa';
+    
+
     
     this._validate();
   }

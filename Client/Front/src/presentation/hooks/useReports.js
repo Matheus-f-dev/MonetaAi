@@ -126,28 +126,27 @@ export const useReports = (transactions, selectedPeriod) => {
 
   const getCategoriesData = () => {
     const categories = {};
-    const { income: totalReceitas, expenses: totalDespesas } = totals;
+    const { expenses: totalDespesas } = totals;
     
-    filteredTransactions.forEach(transaction => {
-      const category = transaction.categoria || 'Outros';
-      const amount = Math.abs(transaction.valor || 0);
-      const type = transaction.tipo?.toLowerCase() === 'receita' ? 'positive' : 'negative';
-      
-      if (!categories[category]) {
-        categories[category] = { total: 0, type };
-      }
-      categories[category].total += amount;
-    });
+    // Processar apenas despesas
+    filteredTransactions
+      .filter(t => t.tipo?.toLowerCase() === 'despesa')
+      .forEach(transaction => {
+        const category = transaction.categoria || 'Outros';
+        const amount = Math.abs(transaction.valor || 0);
+        
+        if (!categories[category]) {
+          categories[category] = { total: 0, type: 'negative' };
+        }
+        categories[category].total += amount;
+      });
     
-    return Object.entries(categories).map(([name, data]) => {
-      const baseTotal = data.type === 'positive' ? totalReceitas : totalDespesas;
-      return {
-        name,
-        total: data.total,
-        type: data.type,
-        percentage: baseTotal > 0 ? ((data.total / baseTotal) * 100).toFixed(1) : 0
-      };
-    }).sort((a, b) => b.total - a.total);
+    return Object.entries(categories).map(([name, data]) => ({
+      name,
+      total: data.total,
+      type: data.type,
+      percentage: totalDespesas > 0 ? ((data.total / totalDespesas) * 100).toFixed(1) : 0
+    })).sort((a, b) => b.total - a.total);
   };
 
   return {

@@ -14,6 +14,7 @@ class TransactionController {
       });
 
     } catch (err) {
+      console.error('Erro ao criar transação:', err);
       res.status(500).json({
         success: false,
         message: err.message
