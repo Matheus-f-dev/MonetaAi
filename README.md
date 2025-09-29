@@ -263,6 +263,52 @@ Client/Front/
 
 
 
+## 🔒 Segurança - Criptografia de URLs
+
+O sistema implementa criptografia avançada de URLs para proteger contra acesso não autorizado:
+
+### Características
+- **Algoritmo:** AES-256 com chave secreta
+- **Formato:** `/app/[hash_criptografado]`
+- **Proteção:** Impede navegação direta via URL
+- **Validação:** Rotas descriptografadas são validadas
+
+### Estrutura de Segurança
+```
+Client/Front/src/
+├── shared/
+│   └── urlCrypto.js              # Utilitário de criptografia AES
+├── presentation/
+│   ├── components/
+│   │   └── ProtectedRoute.jsx    # Componente de proteção
+│   └── hooks/
+│       └── useSecureNavigation.js # Hook de navegação segura
+```
+
+### Funcionamento
+```javascript
+// Antes: URLs expostas
+/system, /expenses, /reports
+
+// Depois: URLs criptografadas
+/app/U2FsdGVkX1+vQ8... (hash único)
+```
+
+### Rotas Protegidas
+- ✅ `/system` → Dashboard principal
+- ✅ `/expenses` → Gestão de despesas
+- ✅ `/incomes` → Gestão de receitas
+- ✅ `/analytics` → Análises financeiras
+- ✅ `/reports` → Relatórios
+- ✅ `/alerts` → Alertas
+- ✅ `/profile` → Perfil do usuário
+
+### Benefícios de Segurança
+- **🛡️ Proteção contra acesso direto** - URLs não podem ser acessadas manualmente
+- **🔐 Ofuscação de rotas** - Estrutura da aplicação não é exposta
+- **🚫 Prevenção de ataques** - Reduz superfície de ataque
+- **📱 Navegação transparente** - Usuário navega normalmente
+
 ## 🚀 Tecnologias Utilizadas
 
 ### Frontend (MVC com React)
@@ -271,6 +317,7 @@ Client/Front/
 - **Chart.js** - Gráficos interativos
 - **Custom Hooks** - Controllers do frontend
 - **CSS Modules** - Estilização componentizada
+- **CryptoJS** - Criptografia de URLs
 
 ### Backend (MVC Tradicional)
 - **Node.js** - Runtime JavaScript
@@ -284,11 +331,12 @@ Client/Front/
 - **OpenAI API** - Inteligência artificial
 - **WhatsApp API** - Integração messaging
 
-### Arquitetura
+### Arquitetura & Segurança
 - **Padrão MVC** - Organização do código
 - **RESTful API** - Comunicação cliente-servidor
 - **SPA (Single Page Application)** - Frontend React
 - **Microserviços** - Bot separado do backend principal
+- **URL Encryption** - Proteção de rotas com AES-256
 
 
 ---
