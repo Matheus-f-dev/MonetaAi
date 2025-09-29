@@ -2,12 +2,14 @@ import { useState, useMemo } from 'react';
 import { useTheme } from '../hooks/useTheme';
 import { useAnalytics } from '../hooks/useAnalytics';
 import { Sidebar } from '../components/system/Sidebar';
+import { LineChart } from '../components/LineChart';
 import '../styles/pages/Analytics.css';
 
 export default function Analytics() {
   useTheme();
   const [selectedPeriod, setSelectedPeriod] = useState('Este Mês');
   const [activeTab, setActiveTab] = useState('visao-geral');
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const userId = useMemo(() => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -34,7 +36,10 @@ export default function Analytics() {
             <h1>Análises Financeiras</h1>
             <select 
               value={selectedPeriod} 
-              onChange={(e) => setSelectedPeriod(e.target.value)}
+              onChange={(e) => {
+                setSelectedPeriod(e.target.value);
+                setRefreshKey(prev => prev + 1);
+              }}
               className="period-select"
             >
               <option>Este Mês</option>
@@ -217,105 +222,7 @@ export default function Analytics() {
                     <p>Tendência dos seus gastos ao longo do tempo</p>
                   </div>
                   <div className="line-chart">
-                    <svg viewBox="0 0 400 200" className="line-svg">
-                      <defs>
-                        <linearGradient id="lineGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                          <stop offset="0%" stopColor="#EF4444" stopOpacity="0.3"/>
-                          <stop offset="100%" stopColor="#EF4444" stopOpacity="0"/>
-                        </linearGradient>
-                      </defs>
-                      
-                      {/* Eixo Y */}
-                      {dailyData && dailyData.length > 0 && [0, 1, 2, 3, 4].map(i => {
-                        const maxValue = Math.max(...dailyData.map(d => d.value), 100);
-                        const value = (maxValue / 4) * (4 - i);
-                        return (
-                          <g key={i}>
-                            <line x1="40" y1={20 + i * 40} x2="380" y2={20 + i * 40} stroke="var(--border-color)" strokeWidth="0.5"/>
-                            <text x="35" y={25 + i * 40} textAnchor="end" fontSize="10" fill="var(--text-secondary)">
-                              R$ {value.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}
-                            </text>
-                          </g>
-                        );
-                      })}
-                      
-                      {/* Linha */}
-                      {dailyData && dailyData.length > 0 && (
-                        <polyline
-                          fill="none"
-                          stroke="#EF4444"
-                          strokeWidth="2"
-                          points={dailyData.map((data, index) => {
-                            const maxValue = Math.max(...dailyData.map(d => d.value), 100);
-                            const x = 50 + (index * (320 / Math.max(dailyData.length - 1, 1)));
-                            const y = 180 - ((data.value / maxValue) * 160);
-                            return `${x},${y}`;
-                          }).join(' ')}
-                        />
-                      )}
-                      
-                      {/* Pontos */}
-                      {dailyData && dailyData.map((data, index) => {
-                        const maxValue = Math.max(...dailyData.map(d => d.value), 100);
-                        const x = 50 + (index * (320 / Math.max(dailyData.length - 1, 1)));
-                        const y = 180 - ((data.value / maxValue) * 160);
-                        return (
-                          <circle
-                            key={index}
-                            cx={x}
-                            cy={y}
-                            r="3"
-                            fill="#EF4444"
-                            className="line-point"
-                            style={{ cursor: 'pointer' }}
-                            onMouseEnter={(e) => {
-                              const tooltip = document.createElement('div');
-                              tooltip.className = 'pie-tooltip';
-                              tooltip.innerHTML = `
-                                <div class="tooltip-category">Dia ${data.day}</div>
-                                <div class="tooltip-amount">R$ ${data.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
-                              `;
-                              document.body.appendChild(tooltip);
-                              
-                              const updatePosition = (event) => {
-                                tooltip.style.left = event.pageX + 10 + 'px';
-                                tooltip.style.top = event.pageY - 10 + 'px';
-                              };
-                              
-                              updatePosition(e);
-                              e.target.addEventListener('mousemove', updatePosition);
-                              e.target.tooltip = tooltip;
-                              e.target.updatePosition = updatePosition;
-                            }}
-                            onMouseLeave={(e) => {
-                              if (e.target.tooltip) {
-                                e.target.removeEventListener('mousemove', e.target.updatePosition);
-                                document.body.removeChild(e.target.tooltip);
-                                e.target.tooltip = null;
-                              }
-                            }}
-                          />
-                        );
-                      })}
-                      
-                      {/* Labels dos dias */}
-                      {dailyData && dailyData.map((data, index) => {
-                        if (dailyData.length > 10 && index % Math.ceil(dailyData.length / 8) !== 0) return null;
-                        const x = 50 + (index * (320 / Math.max(dailyData.length - 1, 1)));
-                        return (
-                          <text
-                            key={index}
-                            x={x}
-                            y="195"
-                            textAnchor="middle"
-                            fontSize="8"
-                            fill="var(--text-secondary)"
-                          >
-                            {data.day}
-                          </text>
-                        );
-                      })}
-                    </svg>
+                    <LineChart data={dailyData} selectedPeriod={selectedPeriod} />
                   </div>
                 </div>
               </div>

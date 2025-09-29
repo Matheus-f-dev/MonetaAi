@@ -57,16 +57,32 @@ export const useReports = (transactions, selectedPeriod) => {
       startMonth = 11;
     }
     
-    for (let i = startMonth; i >= 0; i--) {
-      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
-      const monthName = months[date.getMonth()];
-      monthlyData[monthKey] = {
-        name: monthName,
-        receitas: 0,
-        despesas: 0,
-        saldo: 0
-      };
+    if (selectedPeriod === 'Este Ano') {
+      // Para ano completo, mostrar de janeiro a dezembro
+      for (let month = 0; month < 12; month++) {
+        const date = new Date(now.getFullYear(), month, 1);
+        const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
+        const monthName = months[date.getMonth()];
+        monthlyData[monthKey] = {
+          name: monthName,
+          receitas: 0,
+          despesas: 0,
+          saldo: 0
+        };
+      }
+    } else {
+      // Para outros períodos, manter lógica atual
+      for (let i = startMonth; i >= 0; i--) {
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
+        const monthName = months[date.getMonth()];
+        monthlyData[monthKey] = {
+          name: monthName,
+          receitas: 0,
+          despesas: 0,
+          saldo: 0
+        };
+      }
     }
 
     transactionsList.forEach(transaction => {
@@ -94,7 +110,9 @@ export const useReports = (transactions, selectedPeriod) => {
       }
     });
 
-    const sortedData = Object.values(monthlyData);
+    const sortedData = selectedPeriod === 'Este Ano' 
+      ? Object.keys(monthlyData).sort().map(key => monthlyData[key])
+      : Object.values(monthlyData);
     return {
       labels: sortedData.map(d => d.name),
       receitas: sortedData.map(d => d.receitas),

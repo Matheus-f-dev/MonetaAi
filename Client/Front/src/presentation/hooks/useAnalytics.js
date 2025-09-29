@@ -13,15 +13,26 @@ export function useAnalytics(selectedPeriod, userId) {
   });
 
   useEffect(() => {
-    console.log('useAnalytics - userId:', userId);
-    console.log('useAnalytics - transactions:', transactions);
-    
     if (userId && transactions.length > 0) {
       const filteredTransactions = filterTransactionsByPeriod(transactions, selectedPeriod);
-      console.log('Filtered transactions:', filteredTransactions);
       const processedData = processAnalyticsData(filteredTransactions, transactions, selectedPeriod);
-      console.log('Processed data:', processedData);
       setAnalyticsData(processedData);
+    } else if (userId) {
+      // Reset data when no transactions
+      setAnalyticsData({
+        totals: { expenses: 0, income: 0, savings: 0 },
+        percentageChanges: { expenses: 0, income: 0, savings: 0 },
+        categoryData: [],
+        evolutionData: [],
+        topCategory: { name: 'Sem dados', percentage: 0 },
+        expensesTabData: {
+          topCategory: { name: 'Sem dados', total: 0 },
+          fastestGrowingCategory: { name: 'Sem dados', growth: 0 },
+          dailyAverage: 0
+        },
+        cumulativeLineData: [],
+        dailyData: []
+      });
     }
   }, [transactions, selectedPeriod, userId]);
 
@@ -175,8 +186,8 @@ export function useAnalytics(selectedPeriod, userId) {
     // Gerar dados de linha acumulativa
     const cumulativeLineData = generateCumulativeLineData(allTransactions, period);
     
-    // Gerar dados diários
-    const dailyData = generateDailyData(currentTransactions, period);
+    // Gerar dados diários usando todas as transações (a filtragem é feita dentro da função)
+    const dailyData = generateDailyData(allTransactions, period);
 
     return {
       totals: { expenses, income, savings },
@@ -365,6 +376,10 @@ export function useAnalytics(selectedPeriod, userId) {
     const now = new Date();
     const result = [];
     
+    // Filter transactions by the selected period first
+    const filteredTransactions = filterTransactionsByPeriod(transactions, period)
+      .filter(t => t.tipo?.toLowerCase() === 'despesa');
+    
     if (period === 'Este Mês') {
       const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
       
@@ -372,53 +387,56 @@ export function useAnalytics(selectedPeriod, userId) {
         const dayStart = new Date(now.getFullYear(), now.getMonth(), day);
         const dayEnd = new Date(now.getFullYear(), now.getMonth(), day, 23, 59, 59);
         
-        const dayExpenses = transactions
+        const dayExpenses = filteredTransactions
           .filter(t => {
             const date = getTransactionDate(t);
-            return date >= dayStart && date <= dayEnd && t.tipo?.toLowerCase() === 'despesa';
+            return date >= dayStart && date <= dayEnd;
           })
           .reduce((sum, t) => sum + Math.abs(t.valor || 0), 0);
         
-        if (dayExpenses > 0) {
-          result.push({ day: day.toString(), value: dayExpenses });
-        }
+        result.push({ day: day.toString(), value: dayExpenses });
       }
     } else if (period === 'Últimos 3 Meses') {
-      for (let i = 89; i >= 0; i--) {
-        const targetDate = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
-        const dayStart = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
-        const dayEnd = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 23, 59, 59);
+      // Group by weeks for better visualization
+      const startDate = new Date(now.getFullYear(), now.getMonth() - 2, 1);
+      const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      
+      let currentDate = new Date(startDate);
+      let weekNumber = 1;
+      
+      while (currentDate <= endDate) {
+        const weekStart = new Date(currentDate);
+        const weekEnd = new Date(currentDate.getTime() + 6 * 24 * 60 * 60 * 1000);
+        if (weekEnd > endDate) weekEnd.setTime(endDate.getTime());
         
-        const dayExpenses = transactions
+        const weekExpenses = filteredTransactions
           .filter(t => {
             const date = getTransactionDate(t);
-            return date >= dayStart && date <= dayEnd && t.tipo?.toLowerCase() === 'despesa';
+            return date >= weekStart && date <= weekEnd;
           })
           .reduce((sum, t) => sum + Math.abs(t.valor || 0), 0);
         
-        if (dayExpenses > 0) {
-          result.push({ day: `${targetDate.getDate()}/${targetDate.getMonth() + 1}`, value: dayExpenses });
-        }
+        result.push({ day: `S${weekNumber}`, value: weekExpenses });
+        
+        currentDate.setTime(currentDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+        weekNumber++;
       }
     } else {
-      const startOfYear = new Date(now.getFullYear(), 0, 1);
-      const daysDiff = Math.floor((now - startOfYear) / (24 * 60 * 60 * 1000)) + 1;
+      // Group by months for the year view
+      const monthNames = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
       
-      for (let i = 0; i < daysDiff; i++) {
-        const targetDate = new Date(startOfYear.getTime() + i * 24 * 60 * 60 * 1000);
-        const dayStart = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
-        const dayEnd = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 23, 59, 59);
+      for (let month = 0; month < 12; month++) {
+        const monthStart = new Date(now.getFullYear(), month, 1);
+        const monthEnd = new Date(now.getFullYear(), month + 1, 0);
         
-        const dayExpenses = transactions
+        const monthExpenses = filteredTransactions
           .filter(t => {
             const date = getTransactionDate(t);
-            return date >= dayStart && date <= dayEnd && t.tipo?.toLowerCase() === 'despesa';
+            return date >= monthStart && date <= monthEnd;
           })
           .reduce((sum, t) => sum + Math.abs(t.valor || 0), 0);
         
-        if (dayExpenses > 0) {
-          result.push({ day: `${targetDate.getDate()}/${targetDate.getMonth() + 1}`, value: dayExpenses });
-        }
+        result.push({ day: monthNames[month], value: monthExpenses });
       }
     }
     
