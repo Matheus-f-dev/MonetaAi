@@ -1,10 +1,28 @@
 const TransactionService = require('../services/TransactionService');
+const DatabaseConnection = require('../config/DatabaseConnection');
+const TransactionFactory = require('../services/TransactionFactory');
 
 class TransactionController {
   static async create(req, res) {
     try {
-      const transactionService = new TransactionService();
+      // Singleton Pattern - Conexão única com banco
+      const dbConnection = new DatabaseConnection();
+      const db = dbConnection.getFirestore();
+      
       const transactionData = req.body;
+      
+      // Factory Method Pattern - Criar transação baseada no tipo
+      const transactionType = transactionData.tipo?.toLowerCase() === 'receita' ? 'income' : 'expense';
+      const factoryTransaction = TransactionFactory.createTransaction(transactionType, {
+        amount: transactionData.valor,
+        description: transactionData.descricao,
+        category: transactionData.categoria,
+        date: transactionData.dataHora
+      });
+      
+      console.log('Factory Backend criou:', factoryTransaction);
+      
+      const transactionService = new TransactionService();
       const transaction = await transactionService.createTransaction(transactionData);
 
       res.status(201).json({

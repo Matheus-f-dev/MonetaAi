@@ -202,32 +202,65 @@ EXTRAS FUNCIONALIDADES
 
 ## 🎨 Padrões GoF Implementados
 
-### 1. **Singleton Pattern**
-- **Localização:** `Service/src/config/DatabaseConnection.js`
-- **Função:** Garante uma única instância de conexão com o banco Firebase
+### 1. **Singleton Pattern** ✅ FUNCIONANDO
+- **Backend:** `Service/src/config/DatabaseConnection.js` - Conexão única Firebase
+- **Frontend:** `Client/Front/src/core/services/ApiConnection.js` - Conexão única API
+- **Uso:** TransactionController, useTransactionData
 - **Benefício:** Evita múltiplas conexões desnecessárias
 
-### 2. **Factory Method Pattern**
-- **Localização:** `Client/Front/src/presentation/components/system/TransactionModal.jsx`
-- **Função:** Cria objetos de transação baseados no tipo (Receita/Despesa)
-- **Benefício:** Centraliza criação e aplica regras específicas (valores positivos/negativos)
+### 2. **Factory Method Pattern** ✅ FUNCIONANDO
+- **Backend:** `Service/src/services/TransactionFactory.js` - Criação de transações
+- **Frontend:** `Client/Front/src/core/services/TransactionFactory.js` - Validação e criação
+- **Uso:** TransactionController, TransactionModal
+- **Benefício:** Centraliza criação e aplica regras específicas por tipo
 
-### 3. **Observer Pattern**
-- **Localização:** `Client/Front/src/presentation/hooks/useTransactions.js`
-- **Função:** Sistema de notificações para novas transações
-- **Benefício:** Alertas automáticos para gastos altos, logs de atividades
+### 3. **Observer Pattern** ✅ FUNCIONANDO
+- **Service:** `Client/Front/src/core/services/ObserverService.js` - Lógica de negócio
+- **Controller:** `Client/Front/src/presentation/hooks/useTransactions.js` - Hook customizado
+- **View:** `Client/Front/src/presentation/components/system/ObserverLog.jsx` - Interface
+- **Benefício:** Alertas automáticos, logs de atividades, análise de padrões
 
-### 4. **Strategy Pattern**
+### 4. **Strategy Pattern** ✅ FUNCIONANDO
 - **Localização:** `Client/Front/src/core/services/ValidationStrategy.js`
 - **Função:** Diferentes estratégias de validação (email, senha, valores)
+- **Uso:** Login.jsx, Register.jsx, TransactionModal.jsx
 - **Benefício:** Validações intercambiáveis e reutilizáveis
-- **Uso:** Implementado em `Login.jsx`, `Register.jsx` e `TransactionModal.jsx`
 
 ### Benefícios dos Padrões GoF
 - **✅ Reutilização de Código** - Componentes padronizados
 - **✅ Flexibilidade** - Fácil extensão e modificação
 - **✅ Manutenibilidade** - Código mais organizado e legível
 - **✅ Desacoplamento** - Redução de dependências entre classes
+
+### 🧪 Como Testar os Padrões GoF
+
+#### **Singleton Pattern**
+```javascript
+// Console do navegador (F12)
+const api1 = new ApiConnection();
+const api2 = new ApiConnection();
+console.log(api1 === api2); // Deve retornar: true
+```
+
+#### **Factory Method Pattern**
+1. Crie uma nova transação na aplicação
+2. Abra o Console (F12) antes de submeter
+3. Veja logs: `"Factory criou: {objeto}"`
+4. Teste com tipo inválido para ver erro
+
+#### **Strategy Pattern**
+- Digite email inválido no login → Veja validação
+- Digite senha < 8 caracteres → Veja validação
+- Digite valor negativo em transação → Veja validação
+
+#### **Observer Pattern**
+1. Vá para aba "Atividades"
+2. Crie nova transação com **valor > R$ 500**
+3. Verifique:
+   - ✅ Alerta automático aparece
+   - ✅ Log no console
+   - ✅ Dados aparecem no ObserverLog
+   - ✅ Gastos por categoria atualizados
 
 ### Hooks Customizados (Controllers Frontend)
 - `useAuth.js` - Controle de autenticação
@@ -241,24 +274,31 @@ EXTRAS FUNCIONALIDADES
 Service/
 ├── src/
 │   ├── config/
-│   │   └── DatabaseConnection.js     # Singleton Pattern
+│   │   └── DatabaseConnection.js     # Singleton Pattern (Backend)
+│   ├── controllers/
+│   │   └── TransactionController.js  # Usa Singleton + Factory
 │   └── services/
-│       ├── TransactionFactory.js     # Factory Method (Backend)
-│       └── TransactionObserver.js    # Observer Pattern (Backend)
+│       └── TransactionFactory.js     # Factory Method (Backend)
 
 Client/Front/
 ├── src/
 │   ├── core/
 │   │   └── services/
+│   │       ├── ApiConnection.js      # Singleton Pattern (Frontend)
+│   │       ├── ObserverService.js    # Observer Pattern (Service)
+│   │       ├── TransactionFactory.js # Factory Method (Frontend)
 │   │       └── ValidationStrategy.js # Strategy Pattern
 │   └── presentation/
 │       ├── components/system/
-│       │   └── TransactionModal.jsx  # Factory Method (Frontend)
+│       │   ├── ObserverLog.jsx       # Observer Pattern (View)
+│       │   └── TransactionModal.jsx  # Usa Factory + Strategy
 │       ├── hooks/
-│       │   └── useTransactions.js    # Observer Pattern (Frontend)
+│       │   ├── useTransactionData.js # Usa Singleton
+│       │   └── useTransactions.js    # Observer Pattern (Controller)
 │       └── pages/
 │           ├── Login.jsx             # Strategy Pattern
-│           └── Register.jsx          # Strategy Pattern
+│           ├── Register.jsx          # Strategy Pattern
+│           └── system.jsx            # Integra Observer
 ```
 
 

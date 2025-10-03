@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ValidationContext, AmountValidation } from '../../../core/services/ValidationStrategy';
+import { TransactionFactory } from '../../../core/services/TransactionFactory';
 
 export function TransactionModal({ isOpen, onClose, onSubmit }) {
   const [formData, setFormData] = useState({
@@ -21,18 +22,7 @@ export function TransactionModal({ isOpen, onClose, onSubmit }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Factory Method - criar objeto baseado no tipo
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    const transactionData = {
-      tipo: formData.tipo,
-      valor: formData.tipo === 'Receita' ? Math.abs(parseFloat(formData.valor)) : -Math.abs(parseFloat(formData.valor)),
-      descricao: formData.descricao,
-      categoria: formData.categoria,
-      data: formData.data,
-      userId: user.uid || 'default-user'
-    };
-    
-    // Strategy - validar valor
+    // Strategy - validar valor primeiro
     const validator = new ValidationContext(new AmountValidation());
     const validation = validator.validate(formData.valor);
     
@@ -41,7 +31,34 @@ export function TransactionModal({ isOpen, onClose, onSubmit }) {
       return;
     }
     
-    onSubmit(transactionData);
+    // Factory Method Pattern - criar objeto baseado no tipo
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    
+    try {
+      const factoryTransaction = TransactionFactory.createTransaction(formData.tipo, {
+        valor: formData.valor,
+        descricao: formData.descricao,
+        categoria: formData.categoria,
+        data: formData.data,
+        userId: user.uid || 'default-user'
+      });
+      
+      console.log('Factory criou:', factoryTransaction);
+    } catch (error) {
+      alert('Erro ao criar transação: ' + error.message);
+      return;
+    }
+    
+    const transactionPayload = {
+      tipo: formData.tipo,
+      valor: formData.tipo === 'Receita' ? Math.abs(parseFloat(formData.valor)) : -Math.abs(parseFloat(formData.valor)),
+      descricao: formData.descricao,
+      categoria: formData.categoria,
+      data: formData.data,
+      userId: user.uid || 'default-user'
+    };
+    
+    onSubmit(transactionPayload);
     setFormData({ descricao: '', valor: '', categoria: '', tipo: 'Despesa', data: new Date().toISOString().split('T')[0] });
     onClose();
   };

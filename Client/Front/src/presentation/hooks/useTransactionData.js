@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import ApiConnection from '../../core/services/ApiConnection';
 
 export const useTransactionData = (userId) => {
   const [transactions, setTransactions] = useState([]);
@@ -12,8 +13,9 @@ export const useTransactionData = (userId) => {
     setError('');
     
     try {
-      const response = await fetch(`http://localhost:3000/api/transactions/${userId}`);
-      const data = await response.json();
+      // Singleton Pattern - Conexão única com API
+      const apiConnection = new ApiConnection();
+      const data = await apiConnection.get(`/api/transactions/${userId}`);
       
       if (data.success) {
         setTransactions(data.transactions);
@@ -32,13 +34,9 @@ export const useTransactionData = (userId) => {
     setError('');
     
     try {
-      const response = await fetch('http://localhost:3000/api/transactions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(transactionData)
-      });
-      
-      const result = await response.json();
+      // Singleton Pattern - Conexão única com API
+      const apiConnection = new ApiConnection();
+      const result = await apiConnection.post('/api/transactions', transactionData);
       
       if (result.success) {
         await fetchTransactions(); // Recarregar dados
