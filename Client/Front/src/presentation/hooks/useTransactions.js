@@ -1,35 +1,7 @@
 import { useState, useEffect } from 'react';
+import observerService from '../../core/services/ObserverService';
 
-// Observer Pattern
-class TransactionSubject {
-  constructor() {
-    this.observers = [];
-  }
-  
-  subscribe(observer) {
-    this.observers.push(observer);
-  }
-  
-  notify(transaction) {
-    this.observers.forEach(obs => obs.update(transaction));
-  }
-}
-
-class NotificationObserver {
-  update(transaction) {
-    console.log(`Nova transação: ${transaction.type} - R$ ${Math.abs(transaction.amount)}`);
-    
-    // Notificação para gastos altos
-    if (transaction.type === 'expense' && Math.abs(transaction.amount) > 500) {
-      alert(`Atenção: Gasto alto de R$ ${Math.abs(transaction.amount)} detectado!`);
-    }
-  }
-}
-
-const transactionSubject = new TransactionSubject();
-const notificationObserver = new NotificationObserver();
-transactionSubject.subscribe(notificationObserver);
-
+// Hook integrado com Observer Pattern
 export function useTransactions() {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -53,12 +25,9 @@ export function useTransactions() {
     }
   };
   
-  const addTransaction = (transactionData) => {
-    // Observer - notificar sobre nova transação
-    transactionSubject.notify(transactionData);
-    
-    // Adicionar à lista local
-    setTransactions(prev => [...prev, transactionData]);
+  // Método para notificar observers sobre nova transação
+  const notifyNewTransaction = (transactionData) => {
+    observerService.notify(transactionData);
   };
 
   useEffect(() => {
@@ -69,6 +38,7 @@ export function useTransactions() {
     transactions,
     loading,
     refreshTransactions: fetchTransactions,
-    addTransaction
+    notifyNewTransaction
   };
 }
+

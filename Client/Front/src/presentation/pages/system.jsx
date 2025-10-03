@@ -2,10 +2,12 @@ import { useState, useEffect, useMemo } from 'react';
 import "../styles/pages/System.css";
 import "../styles/components/TransactionModal.css";
 import "../styles/components/ActivityHistory.css";
+import "../styles/components/ObserverLog.css";
 import { useMonthlyProgress } from '../hooks/useMonthlyProgress';
 import { useTheme } from '../hooks/useTheme';
 import { useTransactionData } from '../hooks/useTransactionData';
 import { useSystemSimple } from '../hooks/useSystemSimple';
+import { useTransactions } from '../hooks/useTransactions';
 
 import {
   Chart as ChartJS,
@@ -29,6 +31,7 @@ import {
 } from '../components/system';
 import { ActivityHistory } from '../components/system/ActivityHistory';
 import { TransactionModal } from '../components/system/TransactionModal';
+import { ObserverLog } from '../components/system/ObserverLog';
 
 ChartJS.register(
   CategoryScale,
@@ -51,6 +54,7 @@ export default function System() {
   
   const { transactions, createTransaction } = useTransactionData(userId);
   const { userSalary, chartFilter, setChartFilter } = useSystemSimple(userId);
+  const { notifyNewTransaction } = useTransactions();
   const [chartData, setChartData] = useState(null);
   const { progress, monthlyExpenses } = useMonthlyProgress(transactions, userSalary);
   
@@ -279,6 +283,8 @@ export default function System() {
     const result = await createTransaction(payload);
     
     if (result.success) {
+      // Observer Pattern - Notificar sobre nova transação
+      notifyNewTransaction(payload);
       alert('Transação adicionada com sucesso!');
     } else {
       alert('Erro: ' + result.message);
@@ -324,7 +330,10 @@ export default function System() {
           )}
           
           {activeTab === 'activities' && (
-            <ActivityHistory key={transactions.length} />
+            <>
+              <ObserverLog />
+              <ActivityHistory key={transactions.length} />
+            </>
           )}
         </section>
       </main>
