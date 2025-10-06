@@ -32,6 +32,8 @@ import {
 import { ActivityHistory } from '../components/system/ActivityHistory';
 import { TransactionModal } from '../components/system/TransactionModal';
 import { ObserverLog } from '../components/system/ObserverLog';
+import { FutureBalance } from '../components/system/FutureBalance';
+import '../styles/components/FutureBalance.css';
 
 ChartJS.register(
   CategoryScale,
@@ -323,10 +325,10 @@ export default function System() {
           )}
           
           {activeTab === 'future' && (
-            <div className="future-balance">
-              <h2>Saldo Futuro</h2>
-              <p>Funcionalidade em desenvolvimento...</p>
-            </div>
+            <FutureBalance 
+              transactions={transactions} 
+              userSalary={userSalary}
+            />
           )}
           
           {activeTab === 'activities' && (

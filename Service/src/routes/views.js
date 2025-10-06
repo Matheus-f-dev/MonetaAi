@@ -18,6 +18,7 @@ router.post('/completar-perfil', AuthViewController.completarPerfil);
 
 // Rotas de transações
 router.get('/historico-page', TransactionViewController.renderHistorico);
+router.get('/projecao-saldo-page', TransactionViewController.renderProjecaoSaldo);
 
 // Rota raiz
 router.get('/', (req, res) => {

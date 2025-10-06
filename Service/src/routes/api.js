@@ -3,6 +3,7 @@ const AuthController = require('../controllers/AuthController');
 const TransactionController = require('../controllers/TransactionController');
 const EmailController = require('../controllers/EmailController');
 const AlertController = require('../controllers/AlertController');
+const ProjecaoSaldoController = require('../controllers/ProjecaoSaldoController');
 
 const router = express.Router();
 
@@ -25,5 +26,14 @@ router.post('/alerts', AlertController.create);
 router.get('/alerts/:userId', AlertController.getUserAlerts);
 router.put('/alerts/:alertId', AlertController.update);
 router.delete('/alerts/:alertId', AlertController.delete);
+
+// Rotas de projeção de saldo
+router.get('/projecao-saldo', ProjecaoSaldoController.obterProjecaoSaldo);
+router.post('/projecao-saldo/:meses', ProjecaoSaldoController.calcularProjecao);
+
+// Debug route
+router.get('/test', (req, res) => {
+  res.json({ message: 'API funcionando' });
+});
 
 module.exports = router;

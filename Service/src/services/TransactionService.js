@@ -64,6 +64,18 @@ class TransactionService {
       saldo: receitas - despesas
     };
   }
+
+  static async obterTransacoesPorUsuario(userId) {
+    const service = new TransactionService();
+    const transactions = await service.getUserTransactions(userId);
+    return transactions.map(t => ({
+      tipo: t.tipo,
+      valor: t.valor,
+      categoria: t.categoria,
+      descricao: t.descricao,
+      dataHora: t.dataHora
+    }));
+  }
 }
 
 module.exports = TransactionService;

@@ -8,4 +8,5 @@ export { ProgressCard } from './ProgressCard';
 export { BillsCard } from './BillsCard';
 export { TransactionsTable } from './TransactionsTable';
 export { SideItem } from './SideItem';
+export { FutureBalance } from './FutureBalance';
 export * from './Icons';
