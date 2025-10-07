@@ -1,5 +1,18 @@
 class ProjectionService {
   static calculateAdvancedProjection(transactions, period = 12) {
+    if (!transactions || transactions.length === 0) {
+      const emptyProjection = [{ month: 0, balance: 0 }];
+      return {
+        currentBalance: 0,
+        scenarios: {
+          optimistic: emptyProjection,
+          realistic: emptyProjection,
+          pessimistic: emptyProjection
+        },
+        trend: 'estável'
+      };
+    }
+    
     const balance = this.getCurrentBalance(transactions);
     const monthlyData = this.groupTransactionsByMonth(transactions);
     const trend = this.calculateTrend(transactions);
@@ -78,26 +91,41 @@ class ProjectionService {
   }
 
   static projectScenario(balance, baseNet, trend, period, seasonalFactors, currentMonth) {
-    const projection = [{ month: 0, balance }];
+    const projection = [{ month: 0, balance: Math.round(balance * 100) / 100 }];
     let currentBalance = balance;
 
     for (let i = 1; i <= period; i++) {
       const futureMonth = (currentMonth + i) % 12;
       const seasonalFactor = seasonalFactors[futureMonth];
-      const trendAdjustment = 1 + (trend * i * 0.1); // Tendência gradual
+      const trendAdjustment = 1 + (trend * i * 0.05); // Tendência mais suave
       const monthlyNet = baseNet * seasonalFactor * trendAdjustment;
       
-      currentBalance += monthlyNet;
-      projection.push({ month: i, balance: currentBalance });
+      // Adiciona variação aleatória pequena para realismo
+      const randomVariation = (Math.random() - 0.5) * Math.abs(baseNet) * 0.1;
+      currentBalance += monthlyNet + randomVariation;
+      
+      projection.push({ 
+        month: i, 
+        balance: Math.round(currentBalance * 100) / 100 
+      });
     }
 
     return projection;
   }
 
   static getAverage(monthlyData, field) {
-    const values = Object.values(monthlyData);
-    return values.length > 0 ? 
-      values.reduce((sum, m) => sum + m[field], 0) / values.length : 0;
+    const values = Object.values(monthlyData).filter(m => m[field] > 0);
+    if (values.length === 0) return 0;
+    
+    // Média ponderada dando mais peso aos meses recentes
+    const weightedSum = values.reduce((sum, m, index) => {
+      const weight = (index + 1) / values.length; // Peso crescente
+      return sum + (m[field] * weight);
+    }, 0);
+    
+    const totalWeight = values.reduce((sum, _, index) => sum + ((index + 1) / values.length), 0);
+    
+    return totalWeight > 0 ? weightedSum / totalWeight : 0;
   }
 
   static getTrendStatus(trend) {

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { Line } from 'react-chartjs-2';
 
 export function FutureBalance({ transactions, userSalary }) {
   const [period, setPeriod] = useState(12);
@@ -9,15 +10,30 @@ export function FutureBalance({ transactions, userSalary }) {
   const [futureBalance, setFutureBalance] = useState(0);
   const [totalVariation, setTotalVariation] = useState(0);
   const [trend, setTrend] = useState('estável');
-  const [tooltip, setTooltip] = useState({ show: false, x: 0, y: 0, value: 0, month: 0 });
-  const canvasRef = useRef(null);
+  const [chartData, setChartData] = useState(null);
 
   useEffect(() => {
+    console.log('FutureBalance - Dados recebidos:', {
+      transactions: transactions?.length || 0,
+      period,
+      userSalary
+    });
     calculateProjection();
   }, [transactions, period, userSalary]);
 
   const calculateProjection = async () => {
-    if (!transactions || transactions.length === 0) return;
+    if (!transactions || transactions.length === 0) {
+      // Dados padrão quando não há transações
+      const defaultData = [{ month: 0, balance: 0 }];
+      setScenarios({ optimistic: defaultData, realistic: defaultData, pessimistic: defaultData });
+      setCurrentBalance(0);
+      setTrend('estável');
+      setProjectionData(defaultData);
+      setFutureBalance(0);
+      setTotalVariation(0);
+      drawChart(defaultData);
+      return;
+    }
     
     try {
       const res = await fetch(`http://localhost:3000/api/projecao-saldo/${period}`, {
@@ -30,19 +46,25 @@ export function FutureBalance({ transactions, userSalary }) {
       
       const data = await res.json();
       
+      console.log('Dados da projeção recebidos:', data);
+      
       setScenarios(data.cenarios);
       setCurrentBalance(data.saldoAtual);
       setTrend(data.tendencia);
       
       // Atualizar com cenário ativo
-      const activeData = data.cenarios[activeScenario];
+      const activeData = data.cenarios[activeScenario] || [{ month: 0, balance: data.saldoAtual }];
       setProjectionData(activeData);
       setFutureBalance(activeData[activeData.length - 1]?.balance || data.saldoAtual);
       setTotalVariation((activeData[activeData.length - 1]?.balance || data.saldoAtual) - data.saldoAtual);
       
-      drawChart(activeData);
+      updateChartData(activeData);
     } catch (error) {
       console.error('Erro ao calcular projeção:', error);
+      // Fallback em caso de erro
+      const fallbackData = [{ month: 0, balance: currentBalance }];
+      setProjectionData(fallbackData);
+      updateChartData(fallbackData);
     }
   };
 
@@ -52,152 +74,60 @@ export function FutureBalance({ transactions, userSalary }) {
       setProjectionData(scenarioData);
       setFutureBalance(scenarioData[scenarioData.length - 1]?.balance || 0);
       setTotalVariation((scenarioData[scenarioData.length - 1]?.balance || 0) - currentBalance);
-      drawChart(scenarioData);
+      
+      updateChartData(scenarioData);
     }
   }, [activeScenario, scenarios, currentBalance]);
 
-  const drawChart = (data) => {
-    const canvas = canvasRef.current;
-    if (!canvas || data.length === 0) return;
-
-    const ctx = canvas.getContext('2d');
-    const { width, height } = canvas;
+  const updateChartData = (data) => {
+    if (!data || data.length === 0) return;
     
-    ctx.clearRect(0, 0, width, height);
-    
-    const padding = 60;
-    const chartWidth = width - 2 * padding;
-    const chartHeight = height - 2 * padding;
-    
-    const maxValue = Math.max(...data.map(d => d.balance));
-    const minValue = Math.min(...data.map(d => d.balance));
-    const range = maxValue - minValue || 1;
-
-    // Grid lines
-    ctx.strokeStyle = 'rgba(148, 163, 184, 0.2)';
-    ctx.lineWidth = 1;
-    for (let i = 0; i <= 4; i++) {
-      const y = padding + (i / 4) * chartHeight;
-      ctx.beginPath();
-      ctx.moveTo(padding, y);
-      ctx.lineTo(padding + chartWidth, y);
-      ctx.stroke();
-    }
-
-    // Gradient fill
-    const gradient = ctx.createLinearGradient(0, padding, 0, padding + chartHeight);
-    gradient.addColorStop(0, 'rgba(139, 92, 246, 0.3)');
-    gradient.addColorStop(1, 'rgba(139, 92, 246, 0.05)');
-
-    // Area under curve
-    ctx.beginPath();
-    ctx.fillStyle = gradient;
-    
-    data.forEach((point, index) => {
-      const x = padding + (index / (data.length - 1)) * chartWidth;
-      const y = padding + chartHeight - ((point.balance - minValue) / range) * chartHeight;
-      
-      if (index === 0) {
-        ctx.moveTo(x, y);
-      } else {
-        ctx.lineTo(x, y);
-      }
+    setChartData({
+      labels: data.map((_, index) => `Mês ${index + 1}`),
+      datasets: [{
+        label: `Cenário ${activeScenario === 'optimistic' ? 'Otimista' : activeScenario === 'realistic' ? 'Realista' : 'Pessimista'}`,
+        data: data.map(d => d.balance),
+        borderColor: '#8b5cf6',
+        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: '#8b5cf6',
+        pointBorderColor: '#ffffff',
+        pointBorderWidth: 2,
+        pointRadius: 6
+      }]
     });
-    
-    ctx.lineTo(padding + chartWidth, padding + chartHeight);
-    ctx.lineTo(padding, padding + chartHeight);
-    ctx.closePath();
-    ctx.fill();
-
-    // Main line with shadow
-    ctx.shadowColor = 'rgba(139, 92, 246, 0.3)';
-    ctx.shadowBlur = 8;
-    ctx.shadowOffsetY = 2;
-    
-    ctx.beginPath();
-    ctx.strokeStyle = '#8b5cf6';
-    ctx.lineWidth = 4;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-
-    data.forEach((point, index) => {
-      const x = padding + (index / (data.length - 1)) * chartWidth;
-      const y = padding + chartHeight - ((point.balance - minValue) / range) * chartHeight;
-      
-      if (index === 0) {
-        ctx.moveTo(x, y);
-      } else {
-        ctx.lineTo(x, y);
-      }
-    });
-    
-    ctx.stroke();
-    ctx.shadowBlur = 0;
-
-    // Uma bolinha para cada mês
-    for (let month = 0; month < period; month++) {
-      const dataIndex = Math.floor((month / (period - 1)) * (data.length - 1));
-      const point = data[dataIndex];
-      
-      if (point) {
-        const x = padding + (dataIndex / (data.length - 1)) * chartWidth;
-        const y = padding + chartHeight - ((point.balance - minValue) / range) * chartHeight;
-        
-        ctx.beginPath();
-        ctx.fillStyle = '#8b5cf6';
-        ctx.arc(x, y, 6, 0, 2 * Math.PI);
-        ctx.fill();
-        
-        ctx.beginPath();
-        ctx.fillStyle = '#ffffff';
-        ctx.arc(x, y, 2, 0, 2 * Math.PI);
-        ctx.fill();
-      }
-    }
-
-    // Y-axis labels
-    ctx.fillStyle = '#64748b';
-    ctx.font = '12px -apple-system, BlinkMacSystemFont, sans-serif';
-    ctx.textAlign = 'right';
-    
-    for (let i = 0; i <= 4; i++) {
-      const value = minValue + (range * i / 4);
-      const y = padding + chartHeight - (i / 4) * chartHeight;
-      ctx.fillText(`R$ ${value.toLocaleString('pt-BR')}`, padding - 15, y + 4);
-    }
   };
 
-  const handleMouseMove = (e) => {
-    const canvas = canvasRef.current;
-    if (!canvas || projectionData.length === 0) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
-    const padding = 60;
-    const chartWidth = canvas.width - 2 * padding;
-    
-    if (x >= padding && x <= padding + chartWidth) {
-      const relativeX = (x - padding) / chartWidth;
-      const dataIndex = Math.round(relativeX * (projectionData.length - 1));
-      
-      if (dataIndex >= 0 && dataIndex < projectionData.length) {
-        setTooltip({
-          show: true,
-          x: e.clientX,
-          y: e.clientY - 10,
-          value: projectionData[dataIndex].balance,
-          month: dataIndex
-        });
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false
+      },
+      tooltip: {
+        callbacks: {
+          label: (context) => `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`
+        }
       }
-    } else {
-      setTooltip({ ...tooltip, show: false });
+    },
+    scales: {
+      y: {
+        beginAtZero: false,
+        ticks: {
+          callback: (value) => formatCurrency(value)
+        },
+        grid: {
+          color: 'rgba(148, 163, 184, 0.2)'
+        }
+      },
+      x: {
+        grid: {
+          display: false
+        }
+      }
     }
-  };
-
-  const handleMouseLeave = () => {
-    setTooltip({ ...tooltip, show: false });
   };
 
   const formatCurrency = (value) => {
@@ -207,7 +137,7 @@ export function FutureBalance({ transactions, userSalary }) {
     }).format(value);
   };
 
-  const monthLabels = Array.from({ length: period }, (_, i) => `Mês ${i + 1}`);
+
 
   return (
     <div className="future-balance-container">
@@ -242,19 +172,28 @@ export function FutureBalance({ transactions, userSalary }) {
           <div className="scenario-buttons">
             <button 
               className={`scenario-btn ${activeScenario === 'optimistic' ? 'active' : ''}`}
-              onClick={() => setActiveScenario('optimistic')}
+              onClick={() => {
+                setActiveScenario('optimistic');
+                console.log('Cenário alterado para: optimistic');
+              }}
             >
               📈 Otimista
             </button>
             <button 
               className={`scenario-btn ${activeScenario === 'realistic' ? 'active' : ''}`}
-              onClick={() => setActiveScenario('realistic')}
+              onClick={() => {
+                setActiveScenario('realistic');
+                console.log('Cenário alterado para: realistic');
+              }}
             >
               🎯 Realista
             </button>
             <button 
               className={`scenario-btn ${activeScenario === 'pessimistic' ? 'active' : ''}`}
-              onClick={() => setActiveScenario('pessimistic')}
+              onClick={() => {
+                setActiveScenario('pessimistic');
+                console.log('Cenário alterado para: pessimistic');
+              }}
             >
               📉 Pessimista
             </button>
@@ -280,31 +219,9 @@ export function FutureBalance({ transactions, userSalary }) {
       </div>
 
       <div className="chart-section">
-        <canvas 
-          ref={canvasRef}
-          width={800} 
-          height={300}
-          className="projection-chart"
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseLeave}
-        />
-        <div className="month-labels">
-          {monthLabels.map((label, index) => (
-            <span key={index} className="month-label">{label}</span>
-          ))}
-        </div>
-        {tooltip.show && (
-          <div 
-            className="chart-tooltip"
-            style={{
-              position: 'fixed',
-              left: tooltip.x,
-              top: tooltip.y,
-              transform: 'translateX(-50%)'
-            }}
-          >
-            <div>Mês {tooltip.month + 1}</div>
-            <div>{formatCurrency(tooltip.value)}</div>
+        {chartData && (
+          <div style={{ height: '300px' }}>
+            <Line data={chartData} options={chartOptions} />
           </div>
         )}
       </div>
