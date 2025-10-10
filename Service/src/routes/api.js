@@ -18,6 +18,8 @@ router.post('/esqueci-senha', EmailController.enviarLinkRedefinicao);
 router.post('/transactions', TransactionController.create);
 router.get('/transactions/:userId', TransactionController.getUserTransactions);
 router.get('/balance/:userId', TransactionController.getUserBalance);
+router.get('/chart-data/:userId', TransactionController.getChartData);
+router.get('/percentage-change/:userId', TransactionController.getPercentageChange);
 router.put('/transactions/:id', TransactionController.update);
 router.delete('/transactions/:id', TransactionController.delete);
 

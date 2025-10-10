@@ -1,12 +1,14 @@
 import { useState } from 'react';
-import { useTransactions } from '../../hooks/useTransactions';
+import { useTransactionData } from '../../hooks/useTransactionData';
 
 export function ActivityHistory() {
-  const { transactions: rawTransactions, loading } = useTransactions();
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const userId = user.uid || 'default-user';
+  const { transactions: rawTransactions, loading, fetchTransactions } = useTransactionData(userId);
   const [filters, setFilters] = useState({
-    type: 'all', // all, receita, despesa
+    type: 'all',
     category: 'all',
-    period: 'all' // all, thisMonth, lastMonth, last3Months
+    period: 'all'
   });
 
   const transactions = rawTransactions
@@ -31,48 +33,41 @@ export function ActivityHistory() {
     })
     .sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  // Aplicar filtros
-  const processedTransactions = transactions.filter(transaction => {
-    // Filtro por tipo
-    if (filters.type !== 'all' && transaction.type !== filters.type) {
-      return false;
+  const processedTransactions = transactions;
+
+  const handleFilterChange = async (filterType, value) => {
+    const newFilters = { ...filters, [filterType]: value };
+    setFilters(newFilters);
+    
+    const backendFilters = {};
+    
+    if (newFilters.type !== 'all') {
+      backendFilters.type = newFilters.type;
     }
     
-    // Filtro por categoria
-    if (filters.category !== 'all' && transaction.category !== filters.category) {
-      return false;
+    if (newFilters.category !== 'all') {
+      backendFilters.category = newFilters.category;
     }
     
-    // Filtro por período
-    if (filters.period !== 'all') {
-      const transactionDate = new Date(transaction.date);
+    if (newFilters.period !== 'all') {
       const now = new Date();
-      
-      switch (filters.period) {
+      switch (newFilters.period) {
         case 'thisMonth':
-          if (transactionDate.getMonth() !== now.getMonth() || 
-              transactionDate.getFullYear() !== now.getFullYear()) {
-            return false;
-          }
+          backendFilters.startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+          backendFilters.endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
           break;
         case 'lastMonth':
-          const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1);
-          if (transactionDate.getMonth() !== lastMonth.getMonth() || 
-              transactionDate.getFullYear() !== lastMonth.getFullYear()) {
-            return false;
-          }
+          backendFilters.startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().split('T')[0];
+          backendFilters.endDate = new Date(now.getFullYear(), now.getMonth(), 0).toISOString().split('T')[0];
           break;
         case 'last3Months':
-          const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 3);
-          if (transactionDate < threeMonthsAgo) {
-            return false;
-          }
+          backendFilters.startDate = new Date(now.getFullYear(), now.getMonth() - 3, 1).toISOString().split('T')[0];
           break;
       }
     }
     
-    return true;
-  });
+    await fetchTransactions(backendFilters);
+  };
 
   // Obter categorias únicas para o filtro
   const uniqueCategories = [...new Set(transactions.map(t => t.category))];
@@ -92,7 +87,7 @@ export function ActivityHistory() {
       <div className="activity-filters">
         <select 
           value={filters.type} 
-          onChange={(e) => setFilters({...filters, type: e.target.value})}
+          onChange={(e) => handleFilterChange('type', e.target.value)}
           className="filter-select"
         >
           <option value="all">Todos os tipos</option>
@@ -102,7 +97,7 @@ export function ActivityHistory() {
 
         <select 
           value={filters.category} 
-          onChange={(e) => setFilters({...filters, category: e.target.value})}
+          onChange={(e) => handleFilterChange('category', e.target.value)}
           className="filter-select"
         >
           <option value="all">Todas as categorias</option>
@@ -113,7 +108,7 @@ export function ActivityHistory() {
 
         <select 
           value={filters.period} 
-          onChange={(e) => setFilters({...filters, period: e.target.value})}
+          onChange={(e) => handleFilterChange('period', e.target.value)}
           className="filter-select"
         >
           <option value="all">Todos os períodos</option>

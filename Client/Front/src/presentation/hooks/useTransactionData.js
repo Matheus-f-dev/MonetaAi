@@ -6,7 +6,7 @@ export const useTransactionData = (userId) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = async (filters = {}) => {
     if (!userId) return;
     
     setLoading(true);
@@ -15,7 +15,19 @@ export const useTransactionData = (userId) => {
     try {
       // Singleton Pattern - Conexão única com API
       const apiConnection = new ApiConnection();
-      const data = await apiConnection.get(`/api/transactions/${userId}`);
+      
+      // Construir query string com filtros
+      const queryParams = new URLSearchParams();
+      if (filters.filter) queryParams.append('filter', filters.filter);
+      if (filters.startDate) queryParams.append('startDate', filters.startDate);
+      if (filters.endDate) queryParams.append('endDate', filters.endDate);
+      if (filters.category) queryParams.append('category', filters.category);
+      if (filters.type) queryParams.append('type', filters.type);
+      
+      const queryString = queryParams.toString();
+      const url = `/api/transactions/${userId}${queryString ? `?${queryString}` : ''}`;
+      
+      const data = await apiConnection.get(url);
       
       if (data.success) {
         setTransactions(data.transactions);
@@ -58,11 +70,29 @@ export const useTransactionData = (userId) => {
     fetchTransactions();
   }, [userId]);
 
+  const fetchChartData = async (filter = 'month') => {
+    if (!userId) return null;
+    
+    try {
+      const apiConnection = new ApiConnection();
+      const data = await apiConnection.get(`/api/chart-data/${userId}?filter=${filter}`);
+      
+      if (data.success) {
+        return data.chartData;
+      }
+      return null;
+    } catch (error) {
+      console.error('Erro ao buscar dados do gráfico:', error);
+      return null;
+    }
+  };
+  
   return {
     transactions,
     loading,
     error,
     fetchTransactions,
-    createTransaction
+    createTransaction,
+    fetchChartData
   };
 };

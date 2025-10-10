@@ -44,7 +44,15 @@ class TransactionController {
     try {
       const transactionService = new TransactionService();
       const { userId } = req.params;
-      const transactions = await transactionService.getUserTransactions(userId);
+      const { filter, startDate, endDate, category, type } = req.query;
+      
+      const transactions = await transactionService.getUserTransactions(userId, {
+        filter,
+        startDate,
+        endDate,
+        category,
+        type
+      });
 
       res.json({
         success: true,
@@ -63,7 +71,15 @@ class TransactionController {
     try {
       const transactionService = new TransactionService();
       const { userId } = req.params;
-      const balance = await transactionService.getUserBalance(userId);
+      const { filter, startDate, endDate, category, type } = req.query;
+      
+      const balance = await transactionService.getUserBalance(userId, {
+        filter,
+        startDate,
+        endDate,
+        category,
+        type
+      });
 
       res.json({
         success: true,
@@ -74,6 +90,48 @@ class TransactionController {
       res.status(500).json({
         success: false,
         message: 'Erro ao calcular saldo'
+      });
+    }
+  }
+  
+  static async getChartData(req, res) {
+    try {
+      const transactionService = new TransactionService();
+      const { userId } = req.params;
+      const { filter } = req.query;
+      
+      const chartData = await transactionService.getChartData(userId, filter);
+
+      res.json({
+        success: true,
+        chartData
+      });
+
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        message: 'Erro ao gerar dados do gráfico'
+      });
+    }
+  }
+  
+  static async getPercentageChange(req, res) {
+    try {
+      const transactionService = new TransactionService();
+      const { userId } = req.params;
+      const { period } = req.query;
+      
+      const percentageChange = await transactionService.getPercentageChange(userId, period);
+
+      res.json({
+        success: true,
+        percentageChange
+      });
+
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        message: 'Erro ao calcular porcentagens'
       });
     }
   }

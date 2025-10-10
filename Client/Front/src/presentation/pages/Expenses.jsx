@@ -12,7 +12,7 @@ export default function Expenses() {
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const userId = user.uid || "default-user";
-  const { transactions } = useTransactionData(userId);
+  const { transactions, fetchTransactions } = useTransactionData(userId);
 
   const expenses = useMemo(() => {
     return transactions
@@ -83,25 +83,36 @@ export default function Expenses() {
     return expenses.filter((expense) => expense.category === category);
   };
 
-  const filteredExpenses = useMemo(() => {
-    let filtered = expenses;
+  const filteredExpenses = expenses;
 
-    if (activeTab === "este-mes") {
-      filtered = filterByCurrentMonth(filtered);
-    } else if (activeTab === "mes-passado") {
-      filtered = filterByLastMonth(filtered);
+  const handleTabChange = async (tab) => {
+    setActiveTab(tab);
+    const filters = { type: 'despesa' };
+    
+    if (tab === 'este-mes') {
+      const now = new Date();
+      const startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+      const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+      filters.startDate = startDate;
+      filters.endDate = endDate;
+    } else if (tab === 'mes-passado') {
+      const now = new Date();
+      const startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().split('T')[0];
+      const endDate = new Date(now.getFullYear(), now.getMonth(), 0).toISOString().split('T')[0];
+      filters.startDate = startDate;
+      filters.endDate = endDate;
     }
+    
+    if (categoryFilter) filters.category = categoryFilter;
+    await fetchTransactions(filters);
+  };
 
-    if (searchTerm) {
-      filtered = filterBySearch(filtered, searchTerm);
-    }
-
-    if (categoryFilter) {
-      filtered = filterByCategory(filtered, categoryFilter);
-    }
-
-    return filtered;
-  }, [expenses, activeTab, searchTerm, categoryFilter]);
+  const handleCategoryChange = async (category) => {
+    setCategoryFilter(category);
+    const filters = { type: 'despesa' };
+    if (category) filters.category = category;
+    await fetchTransactions(filters);
+  };
 
   const categories = useMemo(
     () => [...new Set(expenses.map((expense) => expense.category))],
@@ -122,19 +133,19 @@ export default function Expenses() {
             <div className="tabs">
               <button
                 className={activeTab === "todas" ? "active" : ""}
-                onClick={() => setActiveTab("todas")}
+                onClick={() => handleTabChange("todas")}
               >
                 Todas
               </button>
               <button
                 className={activeTab === "este-mes" ? "active" : ""}
-                onClick={() => setActiveTab("este-mes")}
+                onClick={() => handleTabChange("este-mes")}
               >
                 Este Mês
               </button>
               <button
                 className={activeTab === "mes-passado" ? "active" : ""}
-                onClick={() => setActiveTab("mes-passado")}
+                onClick={() => handleTabChange("mes-passado")}
               >
                 Mês Passado
               </button>
@@ -152,7 +163,7 @@ export default function Expenses() {
 
               <select
                 value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value)}
+                onChange={(e) => handleCategoryChange(e.target.value)}
                 className="category-filter"
               >
                 <option value="">Filtrar por categoria</option>

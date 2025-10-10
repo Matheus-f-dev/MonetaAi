@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTheme } from '../hooks/useTheme';
 import { useTransactionData } from '../hooks/useTransactionData';
 import { useReports } from '../hooks/useReports';
@@ -13,61 +13,35 @@ export default function Reports() {
 
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const userId = user.uid || 'default-user';
-  const { transactions } = useTransactionData(userId);
-  const { filteredTransactions, chartData, totals, getCategoriesData } = useReports(transactions, selectedPeriod);
+  const { filteredTransactions, chartData, totals, getCategoriesData } = useReports(userId, selectedPeriod);
+  
+  useEffect(() => {
+    const fetchPercentageChange = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/api/percentage-change/${userId}?period=${selectedPeriod}`);
+        const data = await response.json();
+        if (data.success) {
+          setPercentageChange(data.percentageChange);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar porcentagens:', error);
+      }
+    };
+    
+    if (userId) {
+      fetchPercentageChange();
+    }
+  }, [selectedPeriod, userId, totals]);
 
   const { income, expenses, balance } = totals;
 
-  const getPercentageChange = () => {
-    const now = new Date();
-    let previousPeriodTransactions = [];
-    
-    // Definir período anterior baseado no filtro atual
-    if (selectedPeriod === 'Este Mês') {
-      const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-      const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0);
-      previousPeriodTransactions = transactions.filter(t => {
-        const date = getTransactionDate(t);
-        return date >= lastMonth && date <= lastMonthEnd;
-      });
-    } else if (selectedPeriod === 'Últimos 3 Meses') {
-      const previous3Months = new Date(now.getFullYear(), now.getMonth() - 5, 1);
-      const previous3MonthsEnd = new Date(now.getFullYear(), now.getMonth() - 3, 0);
-      previousPeriodTransactions = transactions.filter(t => {
-        const date = getTransactionDate(t);
-        return date >= previous3Months && date <= previous3MonthsEnd;
-      });
-    } else if (selectedPeriod === 'Este Ano') {
-      const lastYear = new Date(now.getFullYear() - 1, 0, 1);
-      const lastYearEnd = new Date(now.getFullYear() - 1, 11, 31);
-      previousPeriodTransactions = transactions.filter(t => {
-        const date = getTransactionDate(t);
-        return date >= lastYear && date <= lastYearEnd;
-      });
-    }
-    
-    const prevIncome = previousPeriodTransactions
-      .filter(t => t.tipo?.toLowerCase() === 'receita')
-      .reduce((sum, t) => sum + Math.abs(t.valor || 0), 0);
-      
-    const prevExpenses = previousPeriodTransactions
-      .filter(t => t.tipo?.toLowerCase() === 'despesa')
-      .reduce((sum, t) => sum + Math.abs(t.valor || 0), 0);
-      
-    const prevBalance = prevIncome - prevExpenses;
-    
-    const calculatePercentage = (current, previous) => {
-      if (previous === 0) return current > 0 ? '+100%' : '0%';
-      const change = ((current - previous) / previous) * 100;
-      return change >= 0 ? `+${change.toFixed(0)}%` : `${change.toFixed(0)}%`;
-    };
-    
-    return {
-      income: calculatePercentage(income, prevIncome),
-      expenses: calculatePercentage(expenses, prevExpenses),
-      balance: calculatePercentage(balance, prevBalance)
-    };
-  };
+  const [percentageChange, setPercentageChange] = useState({
+    income: '+0%',
+    expenses: '+0%',
+    balance: '+0%'
+  });
+  
+
   
   const getTransactionDate = (transaction) => {
     const dateField = transaction.dataHora || transaction.data || transaction.criadoEm;
@@ -81,7 +55,7 @@ export default function Reports() {
     return new Date(dateField);
   };
 
-  const percentageChange = getPercentageChange();
+
 
 
 
@@ -105,7 +79,7 @@ export default function Reports() {
     const transacoesData = [
       ['DATA', 'DESCRIÇÃO', 'CATEGORIA', 'TIPO', 'VALOR']
     ];
-    filteredTransactions.forEach(t => {
+    (filteredTransactions || []).forEach(t => {
       transacoesData.push([
         t.dataHora || t.data || t.criadoEm,
         t.descricao || '',
@@ -237,7 +211,7 @@ export default function Reports() {
               <div className="transactions-column">
                 <h3>Receitas ({selectedPeriod})</h3>
                 <div className="transactions-list">
-                  {filteredTransactions
+                  {(filteredTransactions || [])
                     .filter(t => t.tipo?.toLowerCase() === 'receita')
                     .map((transaction, index) => (
                       <div key={index} className="transaction-item positive">
@@ -254,7 +228,7 @@ export default function Reports() {
               <div className="transactions-column">
                 <h3>Despesas ({selectedPeriod})</h3>
                 <div className="transactions-list">
-                  {filteredTransactions
+                  {(filteredTransactions || [])
                     .filter(t => t.tipo?.toLowerCase() === 'despesa')
                     .map((transaction, index) => (
                       <div key={index} className="transaction-item negative">

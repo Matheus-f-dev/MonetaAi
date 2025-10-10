@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTransactionData } from './useTransactionData';
 
 export function useAnalytics(selectedPeriod, userId) {
-  const { transactions } = useTransactionData(userId);
+  const { transactions, fetchTransactions } = useTransactionData(userId);
   
   const [analyticsData, setAnalyticsData] = useState({
     totals: { expenses: 0, income: 0, savings: 0 },
@@ -11,30 +11,68 @@ export function useAnalytics(selectedPeriod, userId) {
     evolutionData: [],
     topCategory: { name: 'Sem dados', percentage: 0 }
   });
+  
+  const [percentageChanges, setPercentageChanges] = useState({
+    expenses: 0,
+    income: 0,
+    savings: 0
+  });
 
   useEffect(() => {
-    if (userId && transactions.length > 0) {
-      const filteredTransactions = filterTransactionsByPeriod(transactions, selectedPeriod);
-      const processedData = processAnalyticsData(filteredTransactions, transactions, selectedPeriod);
-      setAnalyticsData(processedData);
-    } else if (userId) {
-      // Reset data when no transactions
-      setAnalyticsData({
-        totals: { expenses: 0, income: 0, savings: 0 },
-        percentageChanges: { expenses: 0, income: 0, savings: 0 },
-        categoryData: [],
-        evolutionData: [],
-        topCategory: { name: 'Sem dados', percentage: 0 },
-        expensesTabData: {
-          topCategory: { name: 'Sem dados', total: 0 },
-          fastestGrowingCategory: { name: 'Sem dados', growth: 0 },
-          dailyAverage: 0
-        },
-        cumulativeLineData: [],
-        dailyData: []
-      });
+    const loadData = async () => {
+      if (!userId) return;
+      
+      const filters = getPeriodFilters(selectedPeriod);
+      await fetchTransactions(filters);
+      
+      try {
+        const response = await fetch(`http://localhost:3000/api/percentage-change/${userId}?period=${selectedPeriod}`);
+        const data = await response.json();
+        if (data.success) {
+          setPercentageChanges({
+            expenses: parseInt(data.percentageChange.expenses) || 0,
+            income: parseInt(data.percentageChange.income) || 0,
+            savings: parseInt(data.percentageChange.balance) || 0
+          });
+        }
+      } catch (error) {
+        console.error('Erro ao buscar porcentagens:', error);
+      }
+    };
+    
+    loadData();
+  }, [selectedPeriod, userId]);
+  
+  useEffect(() => {
+    if (transactions.length > 0) {
+      const processedData = processAnalyticsData(transactions, selectedPeriod);
+      setAnalyticsData({...processedData, percentageChanges});
     }
-  }, [transactions, selectedPeriod, userId]);
+  }, [transactions, selectedPeriod, percentageChanges]);
+  
+  const getPeriodFilters = (period) => {
+    const now = new Date();
+    let startDate, endDate;
+
+    switch (period) {
+      case 'Este Mês':
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+        endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+        break;
+      case 'Últimos 3 Meses':
+        startDate = new Date(now.getFullYear(), now.getMonth() - 2, 1).toISOString().split('T')[0];
+        endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+        break;
+      case 'Este Ano':
+        startDate = new Date(now.getFullYear(), 0, 1).toISOString().split('T')[0];
+        endDate = new Date(now.getFullYear(), 11, 31).toISOString().split('T')[0];
+        break;
+      default:
+        return {};
+    }
+
+    return { startDate, endDate };
+  };
 
   const filterTransactionsByPeriod = (transactions, period) => {
     const now = new Date();
@@ -75,7 +113,7 @@ export function useAnalytics(selectedPeriod, userId) {
     return new Date(dateField);
   };
 
-  const processAnalyticsData = (currentTransactions, allTransactions, period) => {
+  const processAnalyticsData = (currentTransactions, period) => {
     const expenses = currentTransactions
       .filter(t => t.tipo?.toLowerCase() === 'despesa')
       .reduce((sum, t) => sum + Math.abs(t.valor || 0), 0);
@@ -86,8 +124,8 @@ export function useAnalytics(selectedPeriod, userId) {
     
     const savings = income - expenses;
 
-    // Calcular mudanças percentuais
-    const previousPeriodTransactions = getPreviousPeriodTransactions(allTransactions, period);
+    // Calcular mudanças percentuais usando backend
+    const previousPeriodTransactions = [];
     const prevExpenses = previousPeriodTransactions
       .filter(t => t.tipo?.toLowerCase() === 'despesa')
       .reduce((sum, t) => sum + Math.abs(t.valor || 0), 0);
@@ -126,7 +164,7 @@ export function useAnalytics(selectedPeriod, userId) {
     const topCategory = categoryData[0] || { name: 'Moradia', percentage: 35 };
 
     // Dados de evolução baseados no período selecionado
-    const evolutionData = generateEvolutionData(allTransactions, period);
+    const evolutionData = generateEvolutionData(currentTransactions, period);
 
     // Calcular valor máximo para escala do gráfico
     const maxValue = Math.max(...evolutionData.map(d => d.value), 1000);
@@ -184,17 +222,17 @@ export function useAnalytics(selectedPeriod, userId) {
     };
 
     // Gerar dados de linha acumulativa
-    const cumulativeLineData = generateCumulativeLineData(allTransactions, period);
+    const cumulativeLineData = generateCumulativeLineData(currentTransactions, period);
     
     // Gerar dados diários usando todas as transações (a filtragem é feita dentro da função)
-    const dailyData = generateDailyData(allTransactions, period);
+    const dailyData = generateDailyData(currentTransactions, period);
 
     return {
       totals: { expenses, income, savings },
       percentageChanges: {
-        expenses: calculatePercentageChange(expenses, prevExpenses),
-        income: calculatePercentageChange(income, prevIncome),
-        savings: calculatePercentageChange(savings, prevSavings)
+        expenses: 0,
+        income: 0,
+        savings: 0
       },
       categoryData: categoryData.length > 0 ? categoryData : [
         { name: 'Sem dados', total: 0, percentage: 100, color: '#6B7280' }
@@ -376,9 +414,8 @@ export function useAnalytics(selectedPeriod, userId) {
     const now = new Date();
     const result = [];
     
-    // Filter transactions by the selected period first
-    const filteredTransactions = filterTransactionsByPeriod(transactions, period)
-      .filter(t => t.tipo?.toLowerCase() === 'despesa');
+    // Use transactions already filtered by backend
+    const filteredTransactions = transactions.filter(t => t.tipo?.toLowerCase() === 'despesa');
     
     if (period === 'Este Mês') {
       const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();

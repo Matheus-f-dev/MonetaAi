@@ -56,143 +56,22 @@ export default function System() {
   const userName = user.nome || user.displayName || "Usuário";
   const userId = user.uid || 'default-user';
   
-  const { transactions, createTransaction } = useTransactionData(userId);
+  const { transactions, createTransaction, fetchTransactions, fetchChartData } = useTransactionData(userId);
   const { userSalary, chartFilter, setChartFilter } = useSystemSimple(userId);
   const { notifyNewTransaction } = useTransactions();
   const [chartData, setChartData] = useState(null);
   const { progress, monthlyExpenses } = useMonthlyProgress(transactions, userSalary);
   
   useEffect(() => {
-    if (transactions.length > 0) {
-      const generateChartData = (transactionsList, filter = 'month') => {
-        const now = new Date();
-        let filteredTransactions = [];
-        
-        switch (filter) {
-          case 'week':
-            const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-            filteredTransactions = transactionsList.filter(transaction => {
-              const dateField = transaction.dataHora || transaction.data || transaction.criadoEm;
-              if (!dateField) return false;
-              
-              let transactionDate;
-              if (typeof dateField === 'string' && dateField.includes('/')) {
-                const [datePart] = dateField.split(', ');
-                const [day, month, year] = datePart.split('/');
-                transactionDate = new Date(year, month - 1, day);
-              } else {
-                transactionDate = new Date(dateField);
-              }
-              
-              return transactionDate >= weekAgo;
-            });
-            break;
-          case 'year':
-            filteredTransactions = transactionsList.filter(transaction => {
-              const dateField = transaction.dataHora || transaction.data || transaction.criadoEm;
-              if (!dateField) return false;
-              
-              let transactionDate;
-              if (typeof dateField === 'string' && dateField.includes('/')) {
-                const [datePart] = dateField.split(', ');
-                const [day, month, year] = datePart.split('/');
-                transactionDate = new Date(year, month - 1, day);
-              } else {
-                transactionDate = new Date(dateField);
-              }
-              
-              return transactionDate.getFullYear() === now.getFullYear();
-            });
-            break;
-          default:
-            const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 3, 1);
-            filteredTransactions = transactionsList.filter(transaction => {
-              const dateField = transaction.dataHora || transaction.data || transaction.criadoEm;
-              if (!dateField) return false;
-              
-              let transactionDate;
-              if (typeof dateField === 'string' && dateField.includes('/')) {
-                const [datePart] = dateField.split(', ');
-                const [day, month, year] = datePart.split('/');
-                transactionDate = new Date(year, month - 1, day);
-              } else {
-                transactionDate = new Date(dateField);
-              }
-              
-              return transactionDate >= threeMonthsAgo;
-            });
-        }
-        
-        const groupedByDate = {};
-        
-        filteredTransactions.forEach(transaction => {
-          const dateField = transaction.dataHora || transaction.data || transaction.criadoEm;
-          let date;
-          
-          if (dateField && typeof dateField === 'string' && dateField.includes('/')) {
-            const [datePart] = dateField.split(', ');
-            date = datePart;
-          } else {
-            date = new Date().toLocaleDateString('pt-BR');
-          }
-          
-          if (!groupedByDate[date]) {
-            groupedByDate[date] = { receitas: 0, despesas: 0 };
-          }
-          
-          const valor = Math.abs(transaction.valor || 0);
-          if (transaction.tipo?.toLowerCase() === 'receita') {
-            groupedByDate[date].receitas += valor;
-          } else {
-            groupedByDate[date].despesas += valor;
-          }
-        });
-        
-        const sortedDates = Object.keys(groupedByDate).sort((a, b) => {
-          const [dayA, monthA, yearA] = a.split('/');
-          const [dayB, monthB, yearB] = b.split('/');
-          return new Date(yearA, monthA - 1, dayA) - new Date(yearB, monthB - 1, dayB);
-        });
-        
-        // Calcular distribuição acumulativa
-        let receitasAcumuladas = 0;
-        let despesasAcumuladas = 0;
-        
-        const receitasData = sortedDates.map(date => {
-          receitasAcumuladas += groupedByDate[date].receitas;
-          return receitasAcumuladas;
-        });
-        
-        const despesasData = sortedDates.map(date => {
-          despesasAcumuladas += groupedByDate[date].despesas;
-          return despesasAcumuladas;
-        });
-        
-        return {
-          labels: sortedDates,
-          datasets: [
-            {
-              label: 'Receitas Acumuladas',
-              data: receitasData,
-              borderColor: '#16a34a',
-              backgroundColor: 'rgba(22, 163, 74, 0.1)',
-              tension: 0.4,
-            },
-            {
-              label: 'Despesas Acumuladas',
-              data: despesasData,
-              borderColor: '#ef4444',
-              backgroundColor: 'rgba(239, 68, 68, 0.1)',
-              tension: 0.4,
-            }
-          ],
-        };
-      };
-      
-      const data = generateChartData(transactions, chartFilter);
-      setChartData(data);
-    }
-  }, [chartFilter, transactions]);
+    const loadChartData = async () => {
+      const data = await fetchChartData(chartFilter);
+      if (data) {
+        setChartData(data);
+      }
+    };
+    
+    loadChartData();
+  }, [chartFilter, fetchChartData]);
   const totals = useMemo(() => {
     const income = transactions
       .filter(t => t.tipo?.toLowerCase() === 'receita')
@@ -316,6 +195,7 @@ export default function System() {
                     activeFilter={chartFilter}
                     onFilterChange={(filter) => {
                       setChartFilter(filter);
+                      fetchTransactions({ filter });
                     }}
                   />
                 )}

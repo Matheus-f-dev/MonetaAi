@@ -1,42 +1,46 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useTransactionData } from './useTransactionData';
 
-export const useReports = (transactions, selectedPeriod) => {
+export const useReports = (userId, selectedPeriod) => {
   const [chartData, setChartData] = useState(null);
-
-  const filteredTransactions = useMemo(() => {
+  const { transactions, fetchTransactions } = useTransactionData(userId);
+  
+  useEffect(() => {
+    const loadReportsData = async () => {
+      if (!userId) return;
+      
+      const filters = getPeriodFilters(selectedPeriod);
+      await fetchTransactions(filters);
+    };
+    
+    loadReportsData();
+  }, [selectedPeriod, userId]);
+  
+  const getPeriodFilters = (period) => {
     const now = new Date();
-    let startDate;
+    let startDate, endDate;
 
-    switch (selectedPeriod) {
+    switch (period) {
       case 'Este Mês':
-        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+        endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
         break;
       case 'Últimos 3 Meses':
-        startDate = new Date(now.getFullYear(), now.getMonth() - 2, 1);
+        startDate = new Date(now.getFullYear(), now.getMonth() - 2, 1).toISOString().split('T')[0];
+        endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
         break;
       case 'Este Ano':
-        startDate = new Date(now.getFullYear(), 0, 1);
+        startDate = new Date(now.getFullYear(), 0, 1).toISOString().split('T')[0];
+        endDate = new Date(now.getFullYear(), 11, 31).toISOString().split('T')[0];
         break;
       default:
-        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        return {};
     }
 
-    return transactions.filter(transaction => {
-      const dateField = transaction.dataHora || transaction.data || transaction.criadoEm;
-      if (!dateField) return false;
+    return { startDate, endDate };
+  };
 
-      let transactionDate;
-      if (typeof dateField === 'string' && dateField.includes('/')) {
-        const [datePart] = dateField.split(', ');
-        const [day, month, year] = datePart.split('/');
-        transactionDate = new Date(year, month - 1, day);
-      } else {
-        transactionDate = new Date(dateField);
-      }
-
-      return transactionDate >= startDate;
-    });
-  }, [transactions, selectedPeriod]);
+  const filteredTransactions = transactions;
 
   const generateChartData = (transactionsList) => {
     const monthlyData = {};
@@ -85,7 +89,7 @@ export const useReports = (transactions, selectedPeriod) => {
       }
     }
 
-    transactionsList.forEach(transaction => {
+    (transactionsList || []).forEach(transaction => {
       const dateField = transaction.dataHora || transaction.data || transaction.criadoEm;
       if (!dateField) return;
 
@@ -122,32 +126,32 @@ export const useReports = (transactions, selectedPeriod) => {
   };
 
   useEffect(() => {
-    if (filteredTransactions.length > 0) {
-      const data = generateChartData(filteredTransactions);
+    if (transactions.length > 0) {
+      const data = generateChartData(transactions);
       setChartData(data);
     }
-  }, [filteredTransactions, selectedPeriod]);
+  }, [transactions, selectedPeriod]);
 
   const totals = useMemo(() => {
-    const income = filteredTransactions
+    const income = transactions
       .filter(t => t.tipo?.toLowerCase() === 'receita')
       .reduce((sum, t) => sum + Math.abs(t.valor || 0), 0);
       
-    const expenses = filteredTransactions
+    const expenses = transactions
       .filter(t => t.tipo?.toLowerCase() === 'despesa')
       .reduce((sum, t) => sum + Math.abs(t.valor || 0), 0);
       
     const balance = income - expenses;
 
     return { income, expenses, balance };
-  }, [filteredTransactions]);
+  }, [transactions]);
 
   const getCategoriesData = () => {
     const categories = {};
     const { expenses: totalDespesas } = totals;
     
     // Processar apenas despesas
-    filteredTransactions
+    transactions
       .filter(t => t.tipo?.toLowerCase() === 'despesa')
       .forEach(transaction => {
         const category = transaction.categoria || 'Outros';
@@ -168,7 +172,7 @@ export const useReports = (transactions, selectedPeriod) => {
   };
 
   return {
-    filteredTransactions,
+    filteredTransactions: transactions,
     chartData,
     totals,
     getCategoriesData

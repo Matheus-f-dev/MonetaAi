@@ -12,7 +12,7 @@ export default function Incomes() {
 
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const userId = user.uid || 'default-user';
-  const { transactions } = useTransactionData(userId);
+  const { transactions, fetchTransactions } = useTransactionData(userId);
 
   const incomes = useMemo(() => {
     return transactions
@@ -37,43 +37,36 @@ export default function Incomes() {
       });
   }, [transactions]);
 
-  const filteredIncomes = useMemo(() => {
-    let filtered = incomes;
+  const filteredIncomes = incomes;
 
-    // Filtro por período
-    if (activeTab === 'este-mes') {
-      const currentMonth = new Date().getMonth();
-      const currentYear = new Date().getFullYear();
-      filtered = filtered.filter(income => {
-        if (!income.date) return false;
-        const incomeDate = new Date(income.date);
-        return incomeDate.getMonth() === currentMonth && incomeDate.getFullYear() === currentYear;
-      });
-    } else if (activeTab === 'mes-passado') {
-      const lastMonth = new Date().getMonth() - 1;
-      const year = lastMonth < 0 ? new Date().getFullYear() - 1 : new Date().getFullYear();
-      const month = lastMonth < 0 ? 11 : lastMonth;
-      filtered = filtered.filter(income => {
-        if (!income.date) return false;
-        const incomeDate = new Date(income.date);
-        return incomeDate.getMonth() === month && incomeDate.getFullYear() === year;
-      });
+  const handleTabChange = async (tab) => {
+    setActiveTab(tab);
+    const filters = { type: 'receita' };
+    
+    if (tab === 'este-mes') {
+      const now = new Date();
+      const startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+      const endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+      filters.startDate = startDate;
+      filters.endDate = endDate;
+    } else if (tab === 'mes-passado') {
+      const now = new Date();
+      const startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().split('T')[0];
+      const endDate = new Date(now.getFullYear(), now.getMonth(), 0).toISOString().split('T')[0];
+      filters.startDate = startDate;
+      filters.endDate = endDate;
     }
+    
+    if (categoryFilter) filters.category = categoryFilter;
+    await fetchTransactions(filters);
+  };
 
-    // Filtro por busca
-    if (searchTerm) {
-      filtered = filtered.filter(income => 
-        income.description.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    // Filtro por categoria
-    if (categoryFilter) {
-      filtered = filtered.filter(income => income.category === categoryFilter);
-    }
-
-    return filtered;
-  }, [incomes, activeTab, searchTerm, categoryFilter]);
+  const handleCategoryChange = async (category) => {
+    setCategoryFilter(category);
+    const filters = { type: 'receita' };
+    if (category) filters.category = category;
+    await fetchTransactions(filters);
+  };
 
   const categories = useMemo(() => [...new Set(incomes.map(income => income.category))], [incomes]);
 
@@ -92,19 +85,19 @@ export default function Incomes() {
             <div className="tabs">
               <button 
                 className={activeTab === 'todas' ? 'active' : ''}
-                onClick={() => setActiveTab('todas')}
+                onClick={() => handleTabChange('todas')}
               >
                 Todas
               </button>
               <button 
                 className={activeTab === 'este-mes' ? 'active' : ''}
-                onClick={() => setActiveTab('este-mes')}
+                onClick={() => handleTabChange('este-mes')}
               >
                 Este Mês
               </button>
               <button 
                 className={activeTab === 'mes-passado' ? 'active' : ''}
-                onClick={() => setActiveTab('mes-passado')}
+                onClick={() => handleTabChange('mes-passado')}
               >
                 Mês Passado
               </button>
@@ -122,7 +115,7 @@ export default function Incomes() {
               
               <select 
                 value={categoryFilter} 
-                onChange={(e) => setCategoryFilter(e.target.value)}
+                onChange={(e) => handleCategoryChange(e.target.value)}
                 className="category-filter"
               >
                 <option value="">Filtrar por categoria</option>
