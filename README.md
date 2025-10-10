@@ -76,7 +76,7 @@ cd MonetaAi/Client/Front
 npm install
 
 # Executar a aplicação
-npm start
+npm run dev
 # Aplicação rodará em http://localhost:5173
 ```
 
