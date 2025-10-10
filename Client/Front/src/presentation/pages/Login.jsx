@@ -4,6 +4,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useSecureNavigation } from '../hooks/useSecureNavigation';
 import { ValidationContext, EmailValidation, PasswordValidation } from '../../core/services/ValidationStrategy';
+import { useToast } from '../hooks/useToast';
 
 export default function LoginCard() {
   const [email, setEmail] = useState('');
@@ -12,6 +13,7 @@ export default function LoginCard() {
   const { secureNavigate } = useSecureNavigation();
   const [searchParams] = useSearchParams();
   const { loading, message, login, googleLogin } = useAuth();
+  const { addToast } = useToast();
 
   useEffect(() => {
     const error = searchParams.get('error');
@@ -31,12 +33,12 @@ export default function LoginCard() {
     const passwordValidation = passwordValidator.validate(senha);
     
     if (!emailValidation.isValid) {
-      alert(emailValidation.message);
+      addToast(emailValidation.message, 'error');
       return;
     }
     
     if (!passwordValidation.isValid) {
-      alert(passwordValidation.message);
+      addToast(passwordValidation.message, 'error');
       return;
     }
     

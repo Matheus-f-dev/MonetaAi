@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Sidebar } from '../components/system/Sidebar';
+import { useToast } from '../hooks/useToast';
 
 export default function Profile() {
+  const { addToast } = useToast();
   const [theme, setTheme] = useState('light');
   const [colorScheme, setColorScheme] = useState('purple');
   const [font, setFont] = useState('Roboto');
@@ -56,7 +58,7 @@ export default function Profile() {
     localStorage.setItem('colorScheme', colorScheme);
     localStorage.setItem('font', font);
     localStorage.setItem('fontSize', fontSize);
-    alert('Preferências salvas com sucesso!');
+    addToast('Preferências salvas com sucesso!', 'success');
   };
 
   const resetToDefault = () => {

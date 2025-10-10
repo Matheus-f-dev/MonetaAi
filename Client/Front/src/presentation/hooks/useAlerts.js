@@ -7,35 +7,35 @@ export const useAlerts = (userId = null) => {
 
   const fetchAlerts = async () => {
     if (!userId) {
-      console.log('fetchAlerts: userId não definido');
+
       return;
     }
     
-    console.log('fetchAlerts: Buscando alertas para userId:', userId);
+
     setLoading(true);
     
     try {
       const url = `http://localhost:3000/api/alerts/${userId}`;
-      console.log('fetchAlerts: URL:', url);
+
       
       const response = await fetch(url);
-      console.log('fetchAlerts: Response status:', response.status);
+
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
       const result = await response.json();
-      console.log('fetchAlerts: Result:', result);
+
       
       if (result.success) {
         setAlerts(result.alerts || []);
       } else {
-        console.error('fetchAlerts: API retornou erro:', result.message);
+
         setAlerts([]);
       }
     } catch (error) {
-      console.error('fetchAlerts: Erro ao buscar alertas:', error);
+
       setAlerts([]);
     } finally {
       setLoading(false);

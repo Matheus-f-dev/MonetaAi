@@ -3,6 +3,7 @@ import '../styles/pages/Register.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { ValidationContext, EmailValidation, PasswordValidation, AmountValidation } from '../../core/services/ValidationStrategy';
+import { useToast } from '../hooks/useToast';
 
 export default function Cadastro() {
   const [nome, setNome] = useState('');
@@ -15,6 +16,7 @@ export default function Cadastro() {
   const [emailStatus, setEmailStatus] = useState('');
   const navigate = useNavigate();
   const { loading, message, register, verifyEmail } = useAuth();
+  const { addToast } = useToast();
 
   async function verificarEmail(email) {
     if (!email || !email.includes('@')) return;
@@ -36,22 +38,22 @@ export default function Cadastro() {
     const salaryValidation = salaryValidator.validate(salario);
     
     if (!emailValidation.isValid) {
-      alert(emailValidation.message);
+      addToast(emailValidation.message, 'error');
       return;
     }
     
     if (!passwordValidation.isValid) {
-      alert(passwordValidation.message);
+      addToast(passwordValidation.message, 'error');
       return;
     }
     
     if (!salaryValidation.isValid) {
-      alert('Salário deve ser um valor positivo');
+      addToast('Salário deve ser um valor positivo', 'error');
       return;
     }
     
     if (senha !== confirmar) {
-      alert('Senhas não coincidem');
+      addToast('Senhas não coincidem', 'error');
       return;
     }
 
