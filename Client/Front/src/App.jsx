@@ -5,6 +5,7 @@ import './presentation/styles/pages/system-hovers.css';
 import { useTheme } from './presentation/hooks/useTheme';
 import { ProtectedRoute } from './presentation/components/ProtectedRoute';
 import { decryptRoute } from './shared/urlCrypto';
+import { ToastContainer } from './presentation/components/system/ToastContainer';
 import LandingPage from './presentation/pages/Home';
 import LoginCard from './presentation/pages/Login';
 import Cadastro from './presentation/pages/Register';
@@ -64,6 +65,7 @@ function App() {
       <Routes>
         <Route path="/*" element={<AppRouter />} />
       </Routes>
+      <ToastContainer />
     </>
   );
 }

@@ -13,11 +13,7 @@ export function FutureBalance({ transactions, userSalary }) {
   const [chartData, setChartData] = useState(null);
 
   useEffect(() => {
-    console.log('FutureBalance - Dados recebidos:', {
-      transactions: transactions?.length || 0,
-      period,
-      userSalary
-    });
+
     calculateProjection();
   }, [transactions, period, userSalary]);
 
@@ -46,7 +42,7 @@ export function FutureBalance({ transactions, userSalary }) {
       
       const data = await res.json();
       
-      console.log('Dados da projeção recebidos:', data);
+
       
       setScenarios(data.cenarios);
       setCurrentBalance(data.saldoAtual);
@@ -174,7 +170,7 @@ export function FutureBalance({ transactions, userSalary }) {
               className={`scenario-btn ${activeScenario === 'optimistic' ? 'active' : ''}`}
               onClick={() => {
                 setActiveScenario('optimistic');
-                console.log('Cenário alterado para: optimistic');
+
               }}
             >
               📈 Otimista
@@ -183,7 +179,7 @@ export function FutureBalance({ transactions, userSalary }) {
               className={`scenario-btn ${activeScenario === 'realistic' ? 'active' : ''}`}
               onClick={() => {
                 setActiveScenario('realistic');
-                console.log('Cenário alterado para: realistic');
+
               }}
             >
               🎯 Realista
@@ -192,7 +188,7 @@ export function FutureBalance({ transactions, userSalary }) {
               className={`scenario-btn ${activeScenario === 'pessimistic' ? 'active' : ''}`}
               onClick={() => {
                 setActiveScenario('pessimistic');
-                console.log('Cenário alterado para: pessimistic');
+
               }}
             >
               📉 Pessimista

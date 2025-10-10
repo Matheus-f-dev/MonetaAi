@@ -1,4 +1,6 @@
 // Service Layer - Observer Pattern
+import { useToast } from '../../presentation/hooks/useToast.js';
+
 class TransactionObserverService {
   constructor() {
     this.observers = [];
@@ -24,7 +26,8 @@ class HighExpenseObserver {
     
     if (transaction.tipo?.toLowerCase() === 'despesa' && valor > 500) {
       setTimeout(() => {
-        alert(`⚠️ Gasto Alto Detectado!\n\nDescrição: ${transaction.descricao}\nValor: R$ ${valor.toFixed(2)}\nCategoria: ${transaction.categoria}`);
+        const { addToast } = useToast();
+        addToast(`⚠️ Gasto Alto Detectado! ${transaction.descricao} - R$ ${valor.toFixed(2)} [${transaction.categoria}]`, 'warning');
       }, 100);
     }
   }
@@ -35,7 +38,7 @@ class ActivityLogObserver {
     const valor = Math.abs(transaction.valor || 0);
     const tipo = transaction.tipo?.toLowerCase() === 'receita' ? 'Receita' : 'Despesa';
     
-    console.log(`📊 Nova ${tipo}: ${transaction.descricao} - R$ ${valor.toFixed(2)} [${transaction.categoria}]`);
+
     
     const activities = JSON.parse(localStorage.getItem('activityLog') || '[]');
     activities.unshift({
@@ -61,9 +64,7 @@ class PatternAnalysisObserver {
       categorySpending[categoria] = (categorySpending[categoria] || 0) + valor;
       localStorage.setItem('categorySpending', JSON.stringify(categorySpending));
       
-      if (categorySpending[categoria] > 1000) {
-        console.warn(`💰 Categoria '${categoria}' já ultrapassou R$ 1000 este mês!`);
-      }
+
     }
   }
 }

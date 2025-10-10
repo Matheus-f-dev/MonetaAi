@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTheme } from '../hooks/useTheme';
 import { useAlerts } from '../hooks/useAlerts';
 import { Sidebar } from '../components/system';
+import { useToast } from '../hooks/useToast';
 import '../styles/pages/Alerts.css';
 
 export default function Alerts() {
@@ -17,15 +18,16 @@ export default function Alerts() {
   const userId = user.uid || null;
   
   const { loading, message, alerts, createAlert, updateAlert, deleteAlert } = useAlerts(userId);
+  const { addToast } = useToast();
 
   const handleCreateAlert = async () => {
     if (!alertName || !value) {
-      alert('Preencha todos os campos');
+      addToast('Preencha todos os campos', 'error');
       return;
     }
     
     if (!userId) {
-      alert('Usuário não encontrado. Faça login novamente.');
+      addToast('Usuário não encontrado. Faça login novamente.', 'error');
       return;
     }
     
@@ -41,7 +43,7 @@ export default function Alerts() {
       setValue('');
     }
     
-    alert(message);
+    addToast(message, result.success ? 'success' : 'error');
   };
 
   const handleEditAlert = (alert) => {
@@ -54,7 +56,7 @@ export default function Alerts() {
 
   const handleUpdateAlert = async () => {
     if (!alertName || !value) {
-      alert('Preencha todos os campos');
+      addToast('Preencha todos os campos', 'error');
       return;
     }
     
@@ -69,21 +71,19 @@ export default function Alerts() {
       setAlertName('');
       setValue('');
       setEditingAlert(null);
-      alert('Alerta atualizado com sucesso!');
+      addToast('Alerta atualizado com sucesso!', 'success');
     } else {
-      alert('Erro ao atualizar alerta');
+      addToast('Erro ao atualizar alerta', 'error');
     }
   };
 
   const handleDeleteAlert = async (alertId) => {
-    if (confirm('Tem certeza que deseja excluir este alerta?')) {
-      const result = await deleteAlert(alertId);
-      
-      if (result.success) {
-        alert('Alerta excluído com sucesso!');
-      } else {
-        alert('Erro ao excluir alerta');
-      }
+    const result = await deleteAlert(alertId);
+    
+    if (result.success) {
+      addToast('Alerta excluído com sucesso!', 'success');
+    } else {
+      addToast('Erro ao excluir alerta', 'error');
     }
   };
 

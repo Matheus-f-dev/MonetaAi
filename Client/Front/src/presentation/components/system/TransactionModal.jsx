@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { ValidationContext, AmountValidation } from '../../../core/services/ValidationStrategy';
 import { TransactionFactory } from '../../../core/services/TransactionFactory';
+import { useToast } from '../../hooks/useToast';
 
 export function TransactionModal({ isOpen, onClose, onSubmit }) {
+  const { addToast } = useToast();
   const [formData, setFormData] = useState({
     descricao: '',
     valor: '',
@@ -27,7 +29,7 @@ export function TransactionModal({ isOpen, onClose, onSubmit }) {
     const validation = validator.validate(formData.valor);
     
     if (!validation.isValid) {
-      alert(validation.message);
+      addToast(validation.message, 'error');
       return;
     }
     
@@ -43,9 +45,9 @@ export function TransactionModal({ isOpen, onClose, onSubmit }) {
         userId: user.uid || 'default-user'
       });
       
-      console.log('Factory criou:', factoryTransaction);
+
     } catch (error) {
-      alert('Erro ao criar transação: ' + error.message);
+      addToast('Erro ao criar transação: ' + error.message, 'error');
       return;
     }
     

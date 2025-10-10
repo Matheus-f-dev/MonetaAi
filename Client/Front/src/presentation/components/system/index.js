@@ -9,4 +9,6 @@ export { BillsCard } from './BillsCard';
 export { TransactionsTable } from './TransactionsTable';
 export { SideItem } from './SideItem';
 export { FutureBalance } from './FutureBalance';
+export { Toast } from './Toast';
+export { ToastContainer } from './ToastContainer';
 export * from './Icons';

@@ -8,6 +8,7 @@ import { useTheme } from '../hooks/useTheme';
 import { useTransactionData } from '../hooks/useTransactionData';
 import { useSystemSimple } from '../hooks/useSystemSimple';
 import { useTransactions } from '../hooks/useTransactions';
+import { useToast } from '../hooks/useToast';
 
 import {
   Chart as ChartJS,
@@ -47,6 +48,7 @@ ChartJS.register(
 
 export default function System() {
   useTheme();
+  const { addToast } = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   
@@ -287,9 +289,9 @@ export default function System() {
     if (result.success) {
       // Observer Pattern - Notificar sobre nova transação
       notifyNewTransaction(payload);
-      alert('Transação adicionada com sucesso!');
+      addToast('Transação adicionada com sucesso!', 'success');
     } else {
-      alert('Erro: ' + result.message);
+      addToast('Erro: ' + result.message, 'error');
     }
   };
 
