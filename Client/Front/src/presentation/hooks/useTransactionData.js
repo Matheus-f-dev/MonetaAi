@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import ApiConnection from '../../core/services/ApiConnection';
+import observerService from '../../core/services/ObserverService';
 
 export const useTransactionData = (userId) => {
   const [transactions, setTransactions] = useState([]);
@@ -51,6 +52,9 @@ export const useTransactionData = (userId) => {
       const result = await apiConnection.post('/api/transactions', transactionData);
       
       if (result.success) {
+        // Observer Pattern - Notificar observers sobre nova transação
+        observerService.notify(transactionData);
+        
         await fetchTransactions(); // Recarregar dados
       } else {
         setError(result.message || 'Erro ao criar transação');
@@ -93,6 +97,7 @@ export const useTransactionData = (userId) => {
     error,
     fetchTransactions,
     createTransaction,
-    fetchChartData
+    fetchChartData,
+    observerService // Expor para uso externo se necessário
   };
 };
