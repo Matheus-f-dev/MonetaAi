@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import ApiConnection from '../../core/services/ApiConnection';
 import observerService from '../../core/services/ObserverService';
+import { FilterContext, DateRangeFilter, CategoryFilter, TypeFilter, PeriodFilter } from '../../core/services/FilterStrategy';
 
 export const useTransactionData = (userId) => {
   const [transactions, setTransactions] = useState([]);
@@ -31,7 +32,15 @@ export const useTransactionData = (userId) => {
       const data = await apiConnection.get(url);
       
       if (data.success) {
-        setTransactions(data.transactions);
+        // Strategy Pattern - Aplicar filtros locais se necessário
+        let filteredTransactions = data.transactions;
+        
+        if (filters.localFilter) {
+          const filterContext = new FilterContext(getFilterStrategy(filters.localFilter));
+          filteredTransactions = filterContext.filter(data.transactions, filters);
+        }
+        
+        setTransactions(filteredTransactions);
       } else {
         setError(data.message || 'Erro ao buscar transações');
       }
@@ -39,6 +48,16 @@ export const useTransactionData = (userId) => {
       setError('Erro ao conectar com o servidor');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const getFilterStrategy = (filterType) => {
+    switch (filterType) {
+      case 'dateRange': return new DateRangeFilter();
+      case 'category': return new CategoryFilter();
+      case 'type': return new TypeFilter();
+      case 'period': return new PeriodFilter();
+      default: return new DateRangeFilter();
     }
   };
 

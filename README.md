@@ -220,10 +220,10 @@ EXTRAS FUNCIONALIDADES
 - **Benefício:** Alertas automáticos, logs de atividades, análise de padrões
 
 ### 4. **Strategy Pattern** ✅ FUNCIONANDO
-- **Localização:** `Client/Front/src/core/services/ValidationStrategy.js`
-- **Função:** Diferentes estratégias de validação (email, senha, valores)
-- **Uso:** Login.jsx, Register.jsx, TransactionModal.jsx
-- **Benefício:** Validações intercambiáveis e reutilizáveis
+- **Validação:** `Client/Front/src/core/services/ValidationStrategy.js` - Estratégias de validação
+- **Filtros:** `Client/Front/src/core/services/FilterStrategy.js` - Estratégias de filtros
+- **Uso:** Login.jsx, Register.jsx, TransactionModal.jsx, useTransactionData.js
+- **Benefício:** Validações e filtros intercambiáveis e reutilizáveis
 
 ### Benefícios dos Padrões GoF
 - **✅ Reutilização de Código** - Componentes padronizados
@@ -278,7 +278,8 @@ Service/
 │   ├── controllers/
 │   │   └── TransactionController.js  # Usa Singleton + Factory
 │   └── services/
-│       └── TransactionFactory.js     # Factory Method (Backend)
+│       ├── TransactionFactory.js     # Factory Method (Backend)
+│       └── FilterStrategy.js         # Strategy Pattern (Filtros Backend)
 
 Client/Front/
 ├── src/
@@ -287,7 +288,8 @@ Client/Front/
 │   │       ├── ApiConnection.js      # Singleton Pattern (Frontend)
 │   │       ├── ObserverService.js    # Observer Pattern (Service)
 │   │       ├── TransactionFactory.js # Factory Method (Frontend)
-│   │       └── ValidationStrategy.js # Strategy Pattern
+│   │       ├── ValidationStrategy.js # Strategy Pattern (Validação)
+│   │       └── FilterStrategy.js     # Strategy Pattern (Filtros)
 │   └── presentation/
 │       ├── components/system/
 │       │   ├── ObserverLog.jsx       # Observer Pattern (View)

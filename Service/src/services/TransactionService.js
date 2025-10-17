@@ -1,5 +1,6 @@
 const Transaction = require('../models/Transaction');
 const TransactionRepository = require('../repositories/TransactionRepository');
+const { FilterContext, DateRangeFilter, CategoryFilter, TypeFilter, PeriodFilter } = require('./FilterStrategy');
 
 class TransactionService {
   constructor() {
@@ -21,21 +22,25 @@ class TransactionService {
     const data = await this.repository.findByUserId(userId);
     let transactions = data.map(item => Transaction.fromRepository(item));
     
-    // Aplicar filtros no backend
+    // Strategy Pattern - Aplicar filtros no backend
     if (filters.filter) {
-      transactions = this.applyDateFilter(transactions, filters.filter);
+      const filterContext = new FilterContext(new PeriodFilter());
+      transactions = filterContext.filter(transactions, { period: filters.filter });
     }
     
     if (filters.startDate && filters.endDate) {
-      transactions = this.applyDateRangeFilter(transactions, filters.startDate, filters.endDate);
+      const filterContext = new FilterContext(new DateRangeFilter());
+      transactions = filterContext.filter(transactions, filters);
     }
     
     if (filters.category) {
-      transactions = transactions.filter(t => t.categoria === filters.category);
+      const filterContext = new FilterContext(new CategoryFilter());
+      transactions = filterContext.filter(transactions, filters);
     }
     
     if (filters.type) {
-      transactions = transactions.filter(t => t.tipo?.toLowerCase() === filters.type.toLowerCase());
+      const filterContext = new FilterContext(new TypeFilter());
+      transactions = filterContext.filter(transactions, filters);
     }
     
     return transactions;
