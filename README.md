@@ -215,7 +215,7 @@ EXTRAS FUNCIONALIDADES
 
 ### 3. **Observer Pattern** ✅ FUNCIONANDO
 - **Service:** `Client/Front/src/core/services/ObserverService.js` - Lógica de negócio
-- **Controller:** `Client/Front/src/presentation/hooks/useTransactions.js` - Hook customizado
+- **Controller:** `Client/Front/src/presentation/hooks/useTransactionData.js` - Hook customizado (método create)
 - **View:** `Client/Front/src/presentation/components/system/ObserverLog.jsx` - Interface
 - **Benefício:** Alertas automáticos, logs de atividades, análise de padrões
 
@@ -256,10 +256,11 @@ console.log(api1 === api2); // Deve retornar: true
 1. Vá para aba "Atividades"
 2. Crie nova transação com **valor > R$ 500**
 3. Verifique:
-   - ✅ Alerta automático aparece
+   - ✅ Alerta automático aparece (toast)
    - ✅ Log no console
    - ✅ Dados aparecem no ObserverLog
    - ✅ Gastos por categoria atualizados
+   - ✅ Observer executado no método `createTransaction`
 
 ### Hooks Customizados (Controllers Frontend)
 - `useAuth.js` - Controle de autenticação
@@ -292,8 +293,8 @@ Client/Front/
 │       │   ├── ObserverLog.jsx       # Observer Pattern (View)
 │       │   └── TransactionModal.jsx  # Usa Factory + Strategy
 │       ├── hooks/
-│       │   ├── useTransactionData.js # Usa Singleton
-│       │   └── useTransactions.js    # Observer Pattern (Controller)
+│       │   ├── useTransactionData.js # Observer Pattern (método create) + Singleton
+│       │   └── useTransactions.js    # Hook de transações
 │       └── pages/
 │           ├── Login.jsx             # Strategy Pattern
 │           ├── Register.jsx          # Strategy Pattern
