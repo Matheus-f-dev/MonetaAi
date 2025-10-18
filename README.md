@@ -126,12 +126,10 @@ npm run dev
 - [x] exportar relatorios de acompanhamentos
 - [x] Distribuição acumulativa
 - [x] Previsão saldo futuro
+- [x] Categorização automática dos gastos-feita via chatbot
 ### Funcionalidades em desenvolvimento
 - [ ] Análise de impacto financeiro
 - [ ] Alertas personalizados (visualização e exclusão) feito- falta somente a integração com chatbot
-- [ ] Categorização automática dos gastos-feita so no chatbot
-
-
 EXTRAS FUNCIONALIDADES
 - [x] Pagina de análises(falta fazer as abas de receitas,economias e tendencias)
 
