@@ -12,7 +12,16 @@ export default function Alerts() {
   const [alertName, setAlertName] = useState('');
   const [condition, setCondition] = useState('Maior que');
   const [value, setValue] = useState('');
+  const [category, setCategory] = useState('');
   const [editingAlert, setEditingAlert] = useState(null);
+  
+  const categories = [
+    'Alimentação', 'Transporte', 'Moradia', 'Saúde', 'Lazer', 'Educação',
+    'Vestuário', 'Tecnologia', 'Assinaturas e serviços', 'Impostos e taxas',
+    'Doações e caridade', 'Pets', 'Investimentos', 'Dívidas e financiamentos',
+    'Presentes e comemorações', 'Casa e decoração', 'Serviços domésticos',
+    'Trabalho / Renda extra', 'Salário / Provento fixo', 'Outros'
+  ];
   
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const userId = user.uid || null;
@@ -21,7 +30,7 @@ export default function Alerts() {
   const { addToast } = useToast();
 
   const handleCreateAlert = async () => {
-    if (!alertName || !value) {
+    if (!alertName || !value || !category) {
       addToast('Preencha todos os campos', 'error');
       return;
     }
@@ -35,12 +44,14 @@ export default function Alerts() {
       userId,
       nome: alertName,
       condicao: condition,
-      valor: value
+      valor: value,
+      categoria: category
     });
     
     if (result.success) {
       setAlertName('');
       setValue('');
+      setCategory('');
     }
     
     addToast(message, result.success ? 'success' : 'error');
@@ -51,11 +62,12 @@ export default function Alerts() {
     setAlertName(alert.nome);
     setCondition(alert.condicao);
     setValue(alert.valor.toString());
+    setCategory(alert.categoria || '');
     setActiveTab('create');
   };
 
   const handleUpdateAlert = async () => {
-    if (!alertName || !value) {
+    if (!alertName || !value || !category) {
       addToast('Preencha todos os campos', 'error');
       return;
     }
@@ -64,12 +76,14 @@ export default function Alerts() {
       userId,
       nome: alertName,
       condicao: condition,
-      valor: value
+      valor: value,
+      categoria: category
     });
     
     if (result.success) {
       setAlertName('');
       setValue('');
+      setCategory('');
       setEditingAlert(null);
       addToast('Alerta atualizado com sucesso!', 'success');
     } else {
@@ -91,6 +105,7 @@ export default function Alerts() {
     setEditingAlert(null);
     setAlertName('');
     setValue('');
+    setCategory('');
     setCondition('Maior que');
   };
 
@@ -147,6 +162,20 @@ export default function Alerts() {
               </div>
               
               <div className="form-group">
+                <label htmlFor="category">Categoria</label>
+                <select
+                  id="category"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                >
+                  <option value="">Selecione uma categoria</option>
+                  {categories.map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="form-group">
                 <label htmlFor="value">Valor</label>
                 <input
                   id="value"
@@ -190,6 +219,7 @@ export default function Alerts() {
                       <div className="alert-info">
                         <h3>{alert.nome}</h3>
                         <p>{alert.condicao} R$ {alert.valor.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
+                        <p className="alert-category">Categoria: {alert.categoria || 'Não especificada'}</p>
                         <span className="alert-date">
                           Criado em: {new Date(alert.criadoEm).toLocaleDateString('pt-BR')}
                         </span>

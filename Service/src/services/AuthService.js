@@ -23,33 +23,39 @@ class AuthService {
   }
 
   static async login(email, senha) {
-    console.log('FIREBASE_API_KEY:', process.env.FIREBASE_API_KEY ? 'Definida' : 'Não definida');
-    
-    const response = await axios.post(
-      `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.FIREBASE_API_KEY}`,
-      {
-        email,
-        password: senha,
-        returnSecureToken: true
-      }
-    );
-
-    const authData = response.data;
-    const user = await User.findById(authData.localId);
-    
-    if (!user) {
-      throw new Error('Dados do usuário não encontrados');
+    if (!process.env.FIREBASE_API_KEY) {
+      throw new Error('FIREBASE_API_KEY não configurada');
     }
+    
+    try {
+      const response = await axios.post(
+        `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.FIREBASE_API_KEY}`,
+        {
+          email,
+          password: senha,
+          returnSecureToken: true
+        }
+      );
 
-    return {
-      user: {
-        uid: user.uid,
-        nome: user.nome,
-        email: user.email,
-        salario: user.salario
-      },
-      token: authData.idToken
-    };
+      const authData = response.data;
+      const user = await User.findById(authData.localId);
+      
+      if (!user) {
+        throw new Error('Dados do usuário não encontrados');
+      }
+
+      return {
+        user: {
+          uid: user.uid,
+          nome: user.nome,
+          email: user.email,
+          salario: user.salario
+        },
+        token: authData.idToken
+      };
+    } catch (error) {
+      throw error;
+    }
   }
 
   static async getUserById(uid) {

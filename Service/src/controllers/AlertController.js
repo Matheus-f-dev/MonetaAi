@@ -3,9 +3,9 @@ const { db } = require('../config/firebase');
 class AlertController {
   static async create(req, res) {
     try {
-      const { userId, nome, condicao, valor } = req.body;
+      const { userId, nome, condicao, valor, categoria } = req.body;
 
-      if (!userId || !nome || !condicao || !valor) {
+      if (!userId || !nome || !condicao || !valor || !categoria) {
         return res.status(400).json({
           success: false,
           message: 'Todos os campos são obrigatórios'
@@ -16,6 +16,7 @@ class AlertController {
         nome,
         condicao,
         valor: parseFloat(valor.replace('R$', '').replace(',', '.')),
+        categoria,
         criadoEm: new Date().toISOString(),
         ativo: true
       };
@@ -29,7 +30,6 @@ class AlertController {
       });
 
     } catch (error) {
-      console.error('Erro ao criar alerta:', error);
       res.status(500).json({
         success: false,
         message: 'Erro interno do servidor'
@@ -48,8 +48,6 @@ class AlertController {
         });
       }
 
-      console.log('Buscando alertas para userId:', userId);
-      
       const snapshot = await db.collection('usuarios').doc(userId).collection('alerta')
         .where('ativo', '==', true)
         .get();
@@ -62,15 +60,12 @@ class AlertController {
         });
       });
 
-      console.log('Alertas encontrados:', alerts.length);
-
       res.json({
         success: true,
         alerts: alerts || []
       });
 
     } catch (error) {
-      console.error('Erro ao buscar alertas:', error);
       res.status(500).json({
         success: false,
         message: 'Erro interno do servidor',
@@ -82,9 +77,9 @@ class AlertController {
   static async update(req, res) {
     try {
       const { alertId } = req.params;
-      const { userId, nome, condicao, valor } = req.body;
+      const { userId, nome, condicao, valor, categoria } = req.body;
 
-      if (!userId || !nome || !condicao || !valor) {
+      if (!userId || !nome || !condicao || !valor || !categoria) {
         return res.status(400).json({
           success: false,
           message: 'Todos os campos são obrigatórios'
@@ -95,6 +90,7 @@ class AlertController {
         nome,
         condicao,
         valor: parseFloat(valor.toString().replace('R$', '').replace(',', '.')),
+        categoria,
         atualizadoEm: new Date().toISOString()
       };
 
@@ -106,7 +102,6 @@ class AlertController {
       });
 
     } catch (error) {
-      console.error('Erro ao atualizar alerta:', error);
       res.status(500).json({
         success: false,
         message: 'Erro interno do servidor'
@@ -134,7 +129,6 @@ class AlertController {
       });
 
     } catch (error) {
-      console.error('Erro ao excluir alerta:', error);
       res.status(500).json({
         success: false,
         message: 'Erro interno do servidor'

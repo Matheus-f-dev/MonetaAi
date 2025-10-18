@@ -20,7 +20,7 @@ class TransactionController {
         date: transactionData.dataHora
       });
       
-      console.log('Factory Backend criou:', factoryTransaction);
+
       
       const transactionService = new TransactionService();
       const transaction = await transactionService.createTransaction(transactionData);
@@ -32,7 +32,6 @@ class TransactionController {
       });
 
     } catch (err) {
-      console.error('Erro ao criar transação:', err);
       res.status(500).json({
         success: false,
         message: err.message
