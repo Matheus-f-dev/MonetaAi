@@ -54,7 +54,7 @@ export default function Alerts() {
       setCategory('');
     }
     
-    addToast(message, result.success ? 'success' : 'error');
+    addToast(result.message || (result.success ? 'Alerta criado com sucesso!' : 'Erro ao criar alerta'), result.success ? 'success' : 'error');
   };
 
   const handleEditAlert = (alert) => {
@@ -85,20 +85,15 @@ export default function Alerts() {
       setValue('');
       setCategory('');
       setEditingAlert(null);
-      addToast('Alerta atualizado com sucesso!', 'success');
-    } else {
-      addToast('Erro ao atualizar alerta', 'error');
     }
+    
+    addToast(result.message || (result.success ? 'Alerta atualizado com sucesso!' : 'Erro ao atualizar alerta'), result.success ? 'success' : 'error');
   };
 
   const handleDeleteAlert = async (alertId) => {
     const result = await deleteAlert(alertId);
     
-    if (result.success) {
-      addToast('Alerta excluído com sucesso!', 'success');
-    } else {
-      addToast('Erro ao excluir alerta', 'error');
-    }
+    addToast(result.message || (result.success ? 'Alerta excluído com sucesso!' : 'Erro ao excluir alerta'), result.success ? 'success' : 'error');
   };
 
   const handleCancelEdit = () => {
