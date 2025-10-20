@@ -1,6 +1,9 @@
 const TransactionService = require('../services/TransactionService');
 const DatabaseConnection = require('../config/DatabaseConnection');
 const TransactionFactory = require('../services/TransactionFactory');
+const { TransactionSubject } = require('../services/TransactionObserver');
+
+const transactionSubject = new TransactionSubject();
 
 class TransactionController {
   static async create(req, res) {
@@ -24,6 +27,9 @@ class TransactionController {
       
       const transactionService = new TransactionService();
       const transaction = await transactionService.createTransaction(transactionData);
+      
+      // Notificar observers sobre a nova transação
+      transactionSubject.notify(transactionData);
 
       res.status(201).json({
         success: true,

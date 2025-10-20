@@ -1,6 +1,14 @@
+const AlertObserver = require('./AlertObserver');
+
 class TransactionSubject {
     constructor() {
         this.observers = [];
+        this.setupDefaultObservers();
+    }
+    
+    setupDefaultObservers() {
+        this.subscribe(new AlertObserver());
+        this.subscribe(new LogNotifier());
     }
     
     subscribe(observer) {
@@ -32,7 +40,7 @@ class AlertNotifier {
 
 class LogNotifier {
     update(transaction) {
-        console.log(`Log: ${new Date().toISOString()} - ${transaction.type}: ${transaction.description}`);
+        console.log(`Log: ${new Date().toISOString()} - ${transaction.tipo}: ${transaction.descricao}`);
     }
 }
 

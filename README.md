@@ -212,10 +212,11 @@ EXTRAS FUNCIONALIDADES
 - **Benefício:** Centraliza criação e aplica regras específicas por tipo
 
 ### 3. **Observer Pattern** ✅ FUNCIONANDO
-- **Service:** `Client/Front/src/core/services/ObserverService.js` - Lógica de negócio
-- **Controller:** `Client/Front/src/presentation/hooks/useTransactionData.js` - Hook customizado (método create)
-- **View:** `Client/Front/src/presentation/components/system/ObserverLog.jsx` - Interface
-- **Benefício:** Alertas automáticos, logs de atividades, análise de padrões
+- **Backend:** `Service/src/services/TransactionObserver.js` - Subject e Observers
+- **AlertObserver:** `Service/src/services/AlertObserver.js` - Monitora limites de gastos
+- **Controller:** `Service/src/controllers/TransactionController.js` - Notifica observers
+- **Frontend:** `Client/Front/src/presentation/hooks/useTransactionData.js` - Hook customizado
+- **Benefício:** Alertas automáticos por categoria, notificações em tempo real, monitoramento de limites
 
 ### 4. **Strategy Pattern** ✅ FUNCIONANDO
 - **Validação:** `Client/Front/src/core/services/ValidationStrategy.js` - Estratégias de validação
@@ -251,13 +252,13 @@ console.log(api1 === api2); // Deve retornar: true
 - Digite valor negativo em transação → Veja validação
 
 #### **Observer Pattern**
-1. Vá para aba "Atividades"
-2. Crie nova transação com **valor > R$ 500**
-3. Verifique:
-   - ✅ Alerta automático aparece (toast)
-   - ✅ Log no console
-   - ✅ Dados aparecem no ObserverLog
-   - ✅ Gastos por categoria atualizados
+1. Crie um alerta personalizado em "Alertas"
+2. Defina categoria e limite (ex: Alimentação > R$ 500)
+3. Registre despesas nesta categoria
+4. Verifique:
+   - ✅ AlertObserver monitora automaticamente
+   - ✅ Notificação criada quando limite ultrapassado
+   - ✅ Log no console do servidor
    - ✅ Observer executado no método `createTransaction`
 
 ### Hooks Customizados (Controllers Frontend)
@@ -274,9 +275,12 @@ Service/
 │   ├── config/
 │   │   └── DatabaseConnection.js     # Singleton Pattern (Backend)
 │   ├── controllers/
-│   │   └── TransactionController.js  # Usa Singleton + Factory
+│   │   ├── TransactionController.js  # Usa Singleton + Factory + Observer
+│   │   └── AlertController.js        # Gerencia alertas e notificações
 │   └── services/
 │       ├── TransactionFactory.js     # Factory Method (Backend)
+│       ├── TransactionObserver.js    # Observer Pattern (Subject)
+│       ├── AlertObserver.js          # Observer Pattern (Concrete Observer)
 │       └── FilterStrategy.js         # Strategy Pattern (Filtros Backend)
 
 Client/Front/

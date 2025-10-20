@@ -135,6 +135,43 @@ class AlertController {
       });
     }
   }
+
+  static async getNotifications(req, res) {
+    try {
+      const { userId } = req.params;
+      
+      if (!userId) {
+        return res.status(400).json({
+          success: false,
+          message: 'ID do usuário é obrigatório'
+        });
+      }
+
+      const snapshot = await db.collection('usuarios').doc(userId).collection('notificacoes')
+        .orderBy('disparadoEm', 'desc')
+        .limit(50)
+        .get();
+
+      const notifications = [];
+      snapshot.forEach(doc => {
+        notifications.push({
+          id: doc.id,
+          ...doc.data()
+        });
+      });
+
+      res.json({
+        success: true,
+        notifications
+      });
+
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Erro interno do servidor'
+      });
+    }
+  }
 }
 
 module.exports = AlertController;

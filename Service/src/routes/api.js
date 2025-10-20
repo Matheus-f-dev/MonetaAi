@@ -28,6 +28,7 @@ router.post('/alerts', AlertController.create);
 router.get('/alerts/:userId', AlertController.getUserAlerts);
 router.put('/alerts/:alertId', AlertController.update);
 router.delete('/alerts/:alertId', AlertController.delete);
+router.get('/notifications/:userId', AlertController.getNotifications);
 
 // Rotas de projeção de saldo
 router.get('/projecao-saldo', ProjecaoSaldoController.obterProjecaoSaldo);
