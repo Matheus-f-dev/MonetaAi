@@ -130,6 +130,7 @@ npm run dev
 ### Funcionalidades em desenvolvimento
 - [ ] Análise de impacto financeiro
 - [ ] Alertas personalizados (visualização e exclusão) feito- falta somente a integração com chatbot
+      
 EXTRAS FUNCIONALIDADES
 - [x] Pagina de análises(falta fazer as abas de receitas,economias e tendencias)
 
