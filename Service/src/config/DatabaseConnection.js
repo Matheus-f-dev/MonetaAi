@@ -14,7 +14,7 @@ class DatabaseConnection {
       
       admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
-        databaseURL: "https://moneta-19f70.firebaseio.com"
+        databaseURL: "https://moneta2ai-default-rtdb.firebaseio.com"
       });
 
       this.auth = admin.auth();

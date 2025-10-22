@@ -36,7 +36,7 @@ export function useAnalytics(selectedPeriod, userId) {
           });
         }
       } catch (error) {
-        console.error('Erro ao buscar porcentagens:', error);
+        // Erro silencioso
       }
     };
     

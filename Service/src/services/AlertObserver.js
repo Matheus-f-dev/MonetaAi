@@ -19,24 +19,32 @@ class AlertObserver {
       
       // Calcular total de gastos da categoria no mês atual
       const now = new Date();
-      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      const currentMonth = now.getMonth() + 1;
+      const currentYear = now.getFullYear();
       
       const transactionsSnapshot = await db.collection('usuarios').doc(userId).collection('transacoes')
         .where('categoria', '==', categoria)
         .where('tipo', '==', 'despesa')
-        .where('dataHora', '>=', startOfMonth.toISOString())
-        .where('dataHora', '<=', endOfMonth.toISOString())
         .get();
       
       let totalGastos = 0;
       transactionsSnapshot.forEach(doc => {
-        totalGastos += Math.abs(doc.data().valor);
+        const transactionData = doc.data();
+        const dateField = transactionData.dataHora;
+        
+        if (dateField && typeof dateField === 'string' && dateField.includes('/')) {
+          const [datePart] = dateField.split(', ');
+          const [day, month, year] = datePart.split('/');
+          
+          if (parseInt(month) === currentMonth && parseInt(year) === currentYear) {
+            totalGastos += Math.abs(transactionData.valor);
+          }
+        }
       });
       
       // Verificar cada alerta
       alertsSnapshot.forEach(alertDoc => {
-        const alert = alertDoc.data();
+        const alert = { ...alertDoc.data(), id: alertDoc.id };
         const limite = alert.valor;
         const condicao = alert.condicao;
         

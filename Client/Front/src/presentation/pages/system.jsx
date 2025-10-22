@@ -9,6 +9,7 @@ import { useTransactionData } from '../hooks/useTransactionData';
 import { useSystemSimple } from '../hooks/useSystemSimple';
 import { useTransactions } from '../hooks/useTransactions';
 import { useToast } from '../hooks/useToast';
+import { useAlertNotifications } from '../hooks/useAlertNotifications';
 
 import {
   Chart as ChartJS,
@@ -19,6 +20,7 @@ import {
   Title,
   Tooltip,
   Legend,
+  Filler,
 } from 'chart.js';
 
 import { 
@@ -43,7 +45,8 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 );
 
 export default function System() {
@@ -55,6 +58,9 @@ export default function System() {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const userName = user.nome || user.displayName || "Usuário";
   const userId = user.uid || 'default-user';
+  
+  // Hook para notificações de alertas
+  useAlertNotifications(userId);
   
   const { transactions, createTransaction, fetchTransactions, fetchChartData } = useTransactionData(userId);
   const { userSalary, chartFilter, setChartFilter } = useSystemSimple(userId);

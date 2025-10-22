@@ -10,19 +10,15 @@ class ProjecaoSaldoController {
 
       res.json({ saldoAtual });
     } catch (error) {
-      console.error('Erro ao obter projeção:', error);
       res.status(500).json({ error: 'Erro interno do servidor' });
     }
   }
 
   static async calcularProjecao(req, res) {
-    console.log('Rota calcularProjecao chamada:', req.params, req.body);
     try {
       const { meses } = req.params;
       const periodo = parseInt(meses) || 12;
       const { transactions } = req.body;
-      
-      console.log('Transactions recebidas:', transactions?.length || 0);
       
       if (!transactions || transactions.length === 0) {
         return res.json({
@@ -44,7 +40,6 @@ class ProjecaoSaldoController {
         variacao: (resultado.scenarios.realistic[resultado.scenarios.realistic.length - 1]?.balance || resultado.currentBalance) - resultado.currentBalance
       });
     } catch (error) {
-      console.error('Erro ao calcular projeção:', error);
       res.status(500).json({ error: error.message });
     }
   }

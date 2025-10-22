@@ -107,7 +107,7 @@ export const useTransactionData = (userId) => {
       }
       return null;
     } catch (error) {
-      console.error('Erro ao buscar dados do gráfico:', error);
+      // Erro silencioso
       return null;
     }
   };

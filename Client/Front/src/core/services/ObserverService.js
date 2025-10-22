@@ -34,11 +34,21 @@ class HighExpenseObserver {
 }
 
 class ActivityLogObserver {
+  constructor() {
+    this.processedTransactions = new Set();
+  }
+  
   update(transaction) {
     const valor = Math.abs(transaction.valor || 0);
     const tipo = transaction.tipo?.toLowerCase() === 'receita' ? 'Receita' : 'Despesa';
+    const transactionId = `${transaction.userId}-${transaction.descricao}-${valor}-${transaction.dataHora}`;
     
-
+    // Evitar processar a mesma transação duas vezes
+    if (this.processedTransactions.has(transactionId)) {
+      return;
+    }
+    
+    this.processedTransactions.add(transactionId);
     
     const activities = JSON.parse(localStorage.getItem('activityLog') || '[]');
     activities.unshift({
@@ -54,8 +64,20 @@ class ActivityLogObserver {
 }
 
 class PatternAnalysisObserver {
+  constructor() {
+    this.processedTransactions = new Set();
+  }
+  
   update(transaction) {
     const valor = Math.abs(transaction.valor || 0);
+    const transactionId = `${transaction.userId}-${transaction.descricao}-${valor}-${transaction.dataHora}`;
+    
+    // Evitar processar a mesma transação duas vezes
+    if (this.processedTransactions.has(transactionId)) {
+      return;
+    }
+    
+    this.processedTransactions.add(transactionId);
     
     if (transaction.tipo?.toLowerCase() === 'despesa') {
       const categorySpending = JSON.parse(localStorage.getItem('categorySpending') || '{}');
@@ -63,8 +85,6 @@ class PatternAnalysisObserver {
       
       categorySpending[categoria] = (categorySpending[categoria] || 0) + valor;
       localStorage.setItem('categorySpending', JSON.stringify(categorySpending));
-      
-
     }
   }
 }
