@@ -127,8 +127,8 @@ npm run dev
 - [x] Distribuição acumulativa
 - [x] Previsão saldo futuro
 - [x] Categorização automática dos gastos-feita via chatbot
+- [x] Análise de impacto financeiro
 ### Funcionalidades em desenvolvimento
-- [ ] Análise de impacto financeiro
 - [ ] Alertas personalizados (visualização e exclusão) feito- falta somente a integração com chatbot
       
 EXTRAS FUNCIONALIDADES
