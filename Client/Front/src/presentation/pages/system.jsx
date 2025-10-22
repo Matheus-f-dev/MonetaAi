@@ -72,6 +72,12 @@ export default function System() {
     
     loadChartData();
   }, [chartFilter, fetchChartData]);
+  
+  useEffect(() => {
+    if (!isModalOpen) {
+      fetchTransactions();
+    }
+  }, [isModalOpen, fetchTransactions]);
   const totals = useMemo(() => {
     const income = transactions
       .filter(t => t.tipo?.toLowerCase() === 'receita')
@@ -96,27 +102,34 @@ export default function System() {
     return transactions
       .map(transaction => {
         const dateField = transaction.dataHora || transaction.data || transaction.criadoEm;
-        let processedDate = dateField;
+        let processedDate;
+        let displayDate;
         
         if (dateField && typeof dateField === 'string' && dateField.includes('/')) {
           const [datePart] = dateField.split(', ');
           const [day, month, year] = datePart.split('/');
           processedDate = new Date(year, month - 1, day);
+          displayDate = datePart;
+        } else if (dateField) {
+          processedDate = new Date(dateField);
+          displayDate = processedDate.toLocaleDateString('pt-BR');
+        } else {
+          processedDate = new Date();
+          displayDate = processedDate.toLocaleDateString('pt-BR');
         }
         
         return {
           type: transaction.tipo?.toLowerCase() === 'receita' ? 'in' : 'out',
           desc: transaction.descricao || 'Sem descrição',
           category: transaction.categoria || 'Outros',
-          date: processedDate ? 
-            processedDate.toLocaleDateString('pt-BR') : 
-            new Date().toLocaleDateString('pt-BR'),
+          date: displayDate,
           amount: transaction.tipo?.toLowerCase() === 'receita' ? 
             Math.abs(transaction.valor || 0) : 
-            -Math.abs(transaction.valor || 0)
+            -Math.abs(transaction.valor || 0),
+          sortDate: processedDate
         };
       })
-      .sort((a, b) => new Date(b.date) - new Date(a.date))
+      .sort((a, b) => b.sortDate - a.sortDate)
       .slice(0, 5);
   }, [transactions]);
 
