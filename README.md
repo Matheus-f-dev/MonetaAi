@@ -217,6 +217,7 @@ EXTRAS FUNCIONALIDADES
 - **AlertObserver:** `Service/src/services/AlertObserver.js` - Monitora limites de gastos
 - **Controller:** `Service/src/controllers/TransactionController.js` - Notifica observers
 - **Frontend:** `Client/Front/src/presentation/hooks/useTransactionData.js` - Hook customizado
+- **Uso nos Alertas Personalizados:** Sistema de alertas automáticos que monitora gastos por categoria
 - **Benefício:** Alertas automáticos por categoria, notificações em tempo real, monitoramento de limites
 
 ### 4. **Strategy Pattern** ✅ FUNCIONANDO
@@ -252,15 +253,16 @@ console.log(api1 === api2); // Deve retornar: true
 - Digite senha < 8 caracteres → Veja validação
 - Digite valor negativo em transação → Veja validação
 
-#### **Observer Pattern**
+#### **Observer Pattern - Alertas Personalizados**
 1. Crie um alerta personalizado em "Alertas"
 2. Defina categoria e limite (ex: Alimentação > R$ 500)
 3. Registre despesas nesta categoria
 4. Verifique:
-   - ✅ AlertObserver monitora automaticamente
+   - ✅ AlertObserver monitora automaticamente todas as transações
    - ✅ Notificação criada quando limite ultrapassado
-   - ✅ Log no console do servidor
-   - ✅ Observer executado no método `createTransaction`
+   - ✅ Log no console do servidor mostra execução do observer
+   - ✅ Observer executado automaticamente no método `createTransaction`
+   - ✅ Sistema de alertas personalizados funciona em tempo real
 
 ### Hooks Customizados (Controllers Frontend)
 - `useAuth.js` - Controle de autenticação
