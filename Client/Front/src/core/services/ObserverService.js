@@ -21,10 +21,89 @@ class TransactionObserverService {
 
 // Observers específicos
 class HighExpenseObserver {
-  update(transaction) {
-    const valor = Math.abs(transaction.valor || 0);
+  constructor() {
+    this.alerts = [];
+    this.loadAlerts();
+  }
+  
+  async loadAlerts() {
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const userId = user.uid;
+      
+      if (!userId) return;
+      
+      const response = await fetch(`http://localhost:3000/api/alerts/${userId}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        this.alerts = data.alerts || [];
+      }
+    } catch (error) {
+      // Erro silencioso
+    }
+  }
+  
+  async update(transaction) {
+    if (transaction.tipo?.toLowerCase() !== 'despesa') return;
     
-    if (transaction.tipo?.toLowerCase() === 'despesa' && valor > 500) {
+    const valor = Math.abs(transaction.valor || 0);
+    const categoria = transaction.categoria;
+    
+    // Recarregar alertas se necessário
+    if (this.alerts.length === 0) {
+      await this.loadAlerts();
+    }
+    
+    // Verificar alertas personalizados
+    const categoryAlerts = this.alerts.filter(alert => 
+      alert.categoria === categoria && alert.ativo
+    );
+    
+    if (categoryAlerts.length > 0) {
+      // Buscar total de gastos da categoria no mês
+      try {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const userId = user.uid;
+        
+        const now = new Date();
+        const startOfMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+        const endOfMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()}`;
+        
+        const response = await fetch(`http://localhost:3000/api/transactions/${userId}?startDate=${startOfMonth}&endDate=${endOfMonth}&category=${categoria}&type=despesa`);
+        const data = await response.json();
+        
+        if (data.success) {
+          const totalGastos = data.transactions.reduce((sum, t) => sum + Math.abs(t.valor), 0);
+          
+          categoryAlerts.forEach(alert => {
+            let alertTriggered = false;
+            
+            switch (alert.condicao) {
+              case 'Maior que':
+                alertTriggered = totalGastos > alert.valor;
+                break;
+              case 'Menor que':
+                alertTriggered = totalGastos < alert.valor;
+                break;
+              case 'Igual a':
+                alertTriggered = totalGastos === alert.valor;
+                break;
+            }
+            
+            if (alertTriggered) {
+              setTimeout(() => {
+                const { addToast } = useToast();
+                addToast(`🚨 ${alert.nome}: ${categoria} ${alert.condicao.toLowerCase()} R$ ${alert.valor}. Total atual: R$ ${totalGastos.toFixed(2)}`, 'warning');
+              }, 100);
+            }
+          });
+        }
+      } catch (error) {
+        // Erro silencioso
+      }
+    } else if (valor > 1000) {
+      // Fallback para gasto alto genérico
       setTimeout(() => {
         const { addToast } = useToast();
         addToast(`⚠️ Gasto Alto Detectado! ${transaction.descricao} - R$ ${valor.toFixed(2)} [${transaction.categoria}]`, 'warning');
