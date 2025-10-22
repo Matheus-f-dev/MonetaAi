@@ -29,7 +29,7 @@ export function Sidebar() {
           <SideItem label="Relatórios" icon={<DocIcon />} onClick={() => secureNavigate('/reports')} />
           <SideItem label="Planejamento" icon={<PlanIcon />} />
           <SideItem label="Alertas" icon={<BellIcon />} onClick={() => secureNavigate('/alerts')} />
-          <SideItem label="Impacto Financeiro" icon={<ChartIcon />} />
+          <SideItem label="Impacto Financeiro" icon={<ChartIcon />} onClick={() => secureNavigate('/impacto-financeiro')} />
           <SideItem label="Perfil" icon={<UserIcon />} onClick={() => secureNavigate('/profile')} />
           <SideItem label="Configurações" icon={<GearIcon />} />
         </nav>

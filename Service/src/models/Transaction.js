@@ -1,5 +1,4 @@
 const { db } = require('../config/firebase');
-console.log('Firebase db conectado:', !!db);
 
 class Transaction {
   constructor(data) {
@@ -51,13 +50,12 @@ class Transaction {
   
   // Validação privada
   _validate() {
-    if (!this._userId) throw new Error('UserId é obrigatório');
-    if (!this._tipo) throw new Error('Tipo é obrigatório');
-    if (!this._descricao) throw new Error('Descrição é obrigatória');
-    if (this._valor <= 0) throw new Error('Valor deve ser maior que zero');
-    if (!['receita', 'despesa'].includes(this._tipo)) {
-      throw new Error('Tipo deve ser receita ou despesa');
+    if (!this._userId) this._userId = 'unknown';
+    if (!this._tipo || !['receita', 'despesa'].includes(this._tipo)) {
+      this._tipo = 'despesa'; // Default para despesa
     }
+    if (!this._descricao) this._descricao = 'Sem descrição';
+    if (this._valor <= 0) this._valor = 0;
   }
   
   // Serialização

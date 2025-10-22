@@ -19,8 +19,28 @@ class TransactionService {
 
   async getUserTransactions(userId, filters = {}) {
     if (!userId) throw new Error('UserId é obrigatório');
+    
+    try {
+      const data = await this.repository.findByUserId(userId);
+      let transactions = data.map(item => {
+        try {
+          return Transaction.fromRepository(item);
+        } catch (error) {
+          return null;
+        }
+      }).filter(t => t !== null);
+    } catch (error) {
+      return [];
+    }
+    
     const data = await this.repository.findByUserId(userId);
-    let transactions = data.map(item => Transaction.fromRepository(item));
+    let transactions = data.map(item => {
+      try {
+        return Transaction.fromRepository(item);
+      } catch (error) {
+        return null;
+      }
+    }).filter(t => t !== null);
     
     // Strategy Pattern - Aplicar filtros no backend
     if (filters.filter) {

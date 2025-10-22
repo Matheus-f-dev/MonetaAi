@@ -4,6 +4,7 @@ const TransactionController = require('../controllers/TransactionController');
 const EmailController = require('../controllers/EmailController');
 const AlertController = require('../controllers/AlertController');
 const ProjecaoSaldoController = require('../controllers/ProjecaoSaldoController');
+const ImpactoFinanceiroController = require('../controllers/ImpactoFinanceiroController');
 
 const router = express.Router();
 
@@ -33,6 +34,9 @@ router.get('/notifications/:userId', AlertController.getNotifications);
 // Rotas de projeção de saldo
 router.get('/projecao-saldo', ProjecaoSaldoController.obterProjecaoSaldo);
 router.post('/projecao-saldo/:meses', ProjecaoSaldoController.calcularProjecao);
+
+// Rotas de impacto financeiro
+router.post('/impacto-financeiro', ImpactoFinanceiroController.calcularImpacto);
 
 // Debug route
 router.get('/test', (req, res) => {

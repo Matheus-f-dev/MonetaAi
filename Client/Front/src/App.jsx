@@ -17,6 +17,7 @@ import Profile from './presentation/pages/Profile';
 import Alerts from './presentation/pages/Alerts';
 import Reports from './presentation/pages/Reports';
 import Analytics from './presentation/pages/Analytics';
+import ImpactoFinanceiro from './presentation/pages/ImpactoFinanceiro';
 import AuthCallback from './presentation/pages/AuthCallback';
 
 function AppRouter() {
@@ -41,6 +42,7 @@ function AppRouter() {
         case '/alerts': return <Alerts />;
         case '/reports': return <Reports />;
         case '/analytics': return <Analytics />;
+        case '/impacto-financeiro': return <ImpactoFinanceiro />;
         case '/auth/callback': return <AuthCallback />;
         default: return <LandingPage />;
       }

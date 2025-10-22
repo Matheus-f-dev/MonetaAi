@@ -15,6 +15,7 @@ const ROUTE_MAP = {
   '/alerts': 'notify',
   '/reports': 'data',
   '/analytics': 'stats',
+  '/impacto-financeiro': 'impact',
   '/auth/callback': 'callback'
 };
 

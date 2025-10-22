@@ -34,7 +34,7 @@ import {
 } from '../components/system';
 import { ActivityHistory } from '../components/system/ActivityHistory';
 import { TransactionModal } from '../components/system/TransactionModal';
-import { ObserverLog } from '../components/system/ObserverLog';
+
 import { FutureBalance } from '../components/system/FutureBalance';
 import '../styles/components/FutureBalance.css';
 
@@ -233,10 +233,7 @@ export default function System() {
           )}
           
           {activeTab === 'activities' && (
-            <>
-              <ObserverLog />
-              <ActivityHistory key={transactions.length} />
-            </>
+            <ActivityHistory key={transactions.length} />
           )}
         </section>
       </main>

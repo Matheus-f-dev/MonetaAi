@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@google-cloud/local-auth": "^3.0.1",
-    "chart.js": "^4.5.0",
+    "chart.js": "^4.5.1",
     "crypto-js": "^4.2.0",
     "googleapis": "^159.0.0",
     "react": "^19.1.0",

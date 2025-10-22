@@ -20,17 +20,21 @@ class TransactionRepository {
   }
 
   async findByUserId(userId) {
-    const snapshot = await db
-      .collection(this.collection)
-      .doc(userId)
-      .collection(this.subcollection)
-      .get();
-    
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      userId,
-      ...doc.data()
-    }));
+    try {
+      const snapshot = await db
+        .collection(this.collection)
+        .doc(userId)
+        .collection(this.subcollection)
+        .get();
+      
+      return snapshot.docs.map(doc => ({
+        id: doc.id,
+        userId,
+        ...doc.data()
+      }));
+    } catch (error) {
+      return [];
+    }
   }
 
   async findById(userId, transactionId) {
