@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import ApiConnection from '../../core/services/ApiConnection';
 import observerService from '../../core/services/ObserverService';
 import { FilterContext, DateRangeFilter, CategoryFilter, TypeFilter, PeriodFilter } from '../../core/services/FilterStrategy';
@@ -8,7 +8,7 @@ export const useTransactionData = (userId) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const fetchTransactions = async (filters = {}) => {
+  const fetchTransactions = useCallback(async (filters = {}) => {
     if (!userId) return;
     
     setLoading(true);
@@ -49,7 +49,7 @@ export const useTransactionData = (userId) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
 
   const getFilterStrategy = (filterType) => {
     switch (filterType) {
@@ -90,7 +90,9 @@ export const useTransactionData = (userId) => {
   };
 
   useEffect(() => {
-    fetchTransactions();
+    if (userId) {
+      fetchTransactions();
+    }
   }, [userId]);
 
   const fetchChartData = async (filter = 'month') => {

@@ -41,7 +41,7 @@ export function useAnalytics(selectedPeriod, userId) {
     };
     
     loadData();
-  }, [selectedPeriod, userId]);
+  }, [selectedPeriod, userId, fetchTransactions]);
   
   useEffect(() => {
     if (transactions.length > 0) {
