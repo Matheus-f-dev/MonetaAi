@@ -128,8 +128,9 @@ npm run dev
 - [x] Previsão saldo futuro
 - [x] Categorização automática dos gastos-feita via chatbot
 - [x] Análise de impacto financeiro
-### Funcionalidades em desenvolvimento
-- [ ] Alertas personalizados (visualização e exclusão) feito- falta somente a integração com chatbot
+- [x] Alertas personalizados feito- e integrado com chatbot
+
+
       
 EXTRAS FUNCIONALIDADES
 - [x] Pagina de análises(falta fazer as abas de receitas,economias e tendencias)
