@@ -400,6 +400,6 @@ Oferecer uma alternativa gratuita e inteligente para controle financeiro pessoal
 ## 📲 Contato
 
 Caso queira contribuir, sugerir melhorias ou relatar bugs, fique à vontade para abrir uma *issue* ou entrar em contato com algum membro da equipe.
-31 988494168
+31 989295058
 
 ---
