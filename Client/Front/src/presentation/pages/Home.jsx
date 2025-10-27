@@ -258,9 +258,9 @@ export default function LandingPage() {
         <div className="footer-bottom">
           <span>© 2025 Moneta. Todos os direitos reservados.</span>
           <div className="footer-links">
-            <a href="#">Termos de Uso</a>
-            <a href="#">Política de Privacidade</a>
-            <a href="#">Cookies</a>
+            <button onClick={() => secureNavigate('/terms-of-service')} className="footer-link">Termos de Uso</button>
+            <button onClick={() => secureNavigate('/privacy-policy')} className="footer-link">Política de Privacidade</button>
+          
           </div>
         </div>
       </footer>

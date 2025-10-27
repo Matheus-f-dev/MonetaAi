@@ -16,7 +16,9 @@ const ROUTE_MAP = {
   '/reports': 'data',
   '/analytics': 'stats',
   '/impacto-financeiro': 'impact',
-  '/auth/callback': 'callback'
+  '/auth/callback': 'callback',
+  '/privacy-policy': 'privacy',
+  '/terms-of-service': 'terms'
 };
 
 // Mapeamento reverso

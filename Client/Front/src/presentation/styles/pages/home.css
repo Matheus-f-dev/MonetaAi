@@ -1155,6 +1155,22 @@ hr {
   color: var(--primary-color);
 }
 
+.footer-link {
+  background: none;
+  border: none;
+  color: var(--neutral-600);
+  text-decoration: none;
+  transition: color 0.3s;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  margin-left: 20px;
+}
+
+.footer-link:hover {
+  color: var(--primary-color);
+}
+
 @keyframes pulse-card {
   0% { transform: scale(1); }
   50% { transform: scale(1.06); }

@@ -19,6 +19,8 @@ import Reports from './presentation/pages/Reports';
 import Analytics from './presentation/pages/Analytics';
 import ImpactoFinanceiro from './presentation/pages/ImpactoFinanceiro';
 import AuthCallback from './presentation/pages/AuthCallback';
+import PrivacyPolicy from './presentation/pages/legal/PrivacyPolicy';
+import TermsOfService from './presentation/pages/legal/TermsOfService';
 
 function AppRouter() {
   const location = useLocation();
@@ -44,6 +46,8 @@ function AppRouter() {
         case '/analytics': return <Analytics />;
         case '/impacto-financeiro': return <ImpactoFinanceiro />;
         case '/auth/callback': return <AuthCallback />;
+        case '/privacy-policy': return <PrivacyPolicy />;
+        case '/terms-of-service': return <TermsOfService />;
         default: return <LandingPage />;
       }
     }

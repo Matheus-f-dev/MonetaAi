@@ -18,7 +18,8 @@ export function ProtectedRoute({ children }) {
     // Verificar se a rota criptografada é válida
     if (currentPath.startsWith('/app/')) {
       const decryptedRoute = decryptRoute(currentPath);
-      if (decryptedRoute === '/') {
+      // Só redireciona se a descriptografia falhou e não é uma rota legal
+      if (decryptedRoute === '/' && !['/privacy-policy', '/terms-of-service'].includes(decryptedRoute)) {
         navigate('/', { replace: true });
       }
     }
