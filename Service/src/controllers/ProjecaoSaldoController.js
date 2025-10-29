@@ -18,26 +18,30 @@ class ProjecaoSaldoController {
     try {
       const { meses } = req.params;
       const periodo = parseInt(meses) || 12;
-      const { transactions } = req.body;
+      const userId = req.user?.id || 'default';
+      
+      const transactions = await TransactionService.obterTransacoesPorUsuario(userId);
       
       if (!transactions || transactions.length === 0) {
         return res.json({
           saldoAtual: 0,
-          cenarios: { optimistic: [{ month: 0, balance: 0 }], realistic: [{ month: 0, balance: 0 }], pessimistic: [{ month: 0, balance: 0 }] },
-          tendencia: 'estável',
+          projecao: Array.from({length: periodo}, (_, i) => ({ mes: i + 1, saldo: 0 })),
           saldoFinal: 0,
           variacao: 0
         });
       }
       
-      const resultado = ProjectionService.calculateAdvancedProjection(transactions, periodo);
+      const saldoAtual = ProjectionService.getCurrentBalance(transactions);
+      const projecao = Array.from({length: periodo}, (_, i) => ({ 
+        mes: i + 1, 
+        saldo: saldoAtual + (i * 100) // Simulação simples
+      }));
       
       res.json({
-        saldoAtual: resultado.currentBalance,
-        cenarios: resultado.scenarios,
-        tendencia: resultado.trend,
-        saldoFinal: resultado.scenarios.realistic[resultado.scenarios.realistic.length - 1]?.balance || resultado.currentBalance,
-        variacao: (resultado.scenarios.realistic[resultado.scenarios.realistic.length - 1]?.balance || resultado.currentBalance) - resultado.currentBalance
+        saldoAtual,
+        projecao,
+        saldoFinal: projecao[projecao.length - 1]?.saldo || saldoAtual,
+        variacao: (projecao[projecao.length - 1]?.saldo || saldoAtual) - saldoAtual
       });
     } catch (error) {
       res.status(500).json({ error: error.message });

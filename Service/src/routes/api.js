@@ -5,6 +5,9 @@ const EmailController = require('../controllers/EmailController');
 const AlertController = require('../controllers/AlertController');
 const ProjecaoSaldoController = require('../controllers/ProjecaoSaldoController');
 const ImpactoFinanceiroController = require('../controllers/ImpactoFinanceiroController');
+const ReceitasController = require('../controllers/ReceitasController');
+const EconomiasController = require('../controllers/EconomiasController');
+const TendenciasController = require('../controllers/TendenciasController');
 
 const router = express.Router();
 
@@ -33,10 +36,19 @@ router.get('/notifications/:userId', AlertController.getNotifications);
 
 // Rotas de projeção de saldo
 router.get('/projecao-saldo', ProjecaoSaldoController.obterProjecaoSaldo);
-router.post('/projecao-saldo/:meses', ProjecaoSaldoController.calcularProjecao);
+router.get('/projecao-saldo/:meses', ProjecaoSaldoController.calcularProjecao);
 
 // Rotas de impacto financeiro
 router.post('/impacto-financeiro', ImpactoFinanceiroController.calcularImpacto);
+
+// Rotas de receitas
+router.get('/receitas/:userId', ReceitasController.obterAnaliseReceitas);
+
+// Rotas de economias
+router.get('/economias/:userId', EconomiasController.obterAnaliseEconomias);
+
+// Rotas de tendências
+router.get('/tendencias/:userId', TendenciasController.obterAnaliseTendencias);
 
 // Debug route
 router.get('/test', (req, res) => {
