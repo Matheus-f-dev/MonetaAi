@@ -36,7 +36,9 @@ router.get('/notifications/:userId', AlertController.getNotifications);
 
 // Rotas de projeção de saldo
 router.get('/projecao-saldo', ProjecaoSaldoController.obterProjecaoSaldo);
+router.get('/projecao-saldo/:userId/:meses', ProjecaoSaldoController.calcularProjecao);
 router.get('/projecao-saldo/:meses', ProjecaoSaldoController.calcularProjecao);
+router.post('/projecao-saldo/:meses', ProjecaoSaldoController.calcularProjecao);
 
 // Rotas de impacto financeiro
 router.post('/impacto-financeiro', ImpactoFinanceiroController.calcularImpacto);
