@@ -135,7 +135,8 @@ npm run dev
 
       
 EXTRAS FUNCIONALIDADES
-- [x] Pagina de análises(falta fazer as abas de receitas,economias e tendencias)
+- [x] Pagina de análises(incluindo 5 novos campos de analises)
+- [ ] planejar despesas futuras-em desenvolvimento
 
 
 ## 🎯 Arquitetura MVC - Benefícios Alcançados
