@@ -59,8 +59,28 @@ npm install
 
 # Configurar variáveis de ambiente
 # Criar arquivo .env com as configurações do Firebase
+EMAIL_USER=gpmonetaai@gmail.com
+EMAIL_PASS=bwst eyld sban vvyd
 
+GOOGLE_CLIENT_ID=1007906899291-fjb28r2pd2f5jacivi1frm7o5vq8a56e.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=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
 
+FIREBASE_API_KEY=AIzaSyAWDvSZn9qpCLTqDBMiVF5GyQv6YFFi2so
+
+# Criar arquivo ServiceAccountKey.json com as configurações do Firebase
+{
+  "type": "service_account",
+  "project_id": "moneta2ai",
+  "private_key_id": "3e68f4b45eea9ab1308effaf4c3459d2f29d09cd",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDLl0rkkGN10vEj\nmjtlygTB0fsUtBrjUzb8DnRYs4vRohakf8e+Hz31e7m25Ui4SHn27SZNnLF/LLl6\nFzyJqeH3vjIkpmjKpTDCpnthgUFwfIKTDkZb3C5UhzaKSBeVGoZV+79z7kWuhern\no3ZUYLxdt1G9NKpKUaBoMCEXeuDp9C8J15PDwIPGUMckmYQPeHubq1dwKxXLkVBW\nlNIlPdU3tmb0WrL8KLUuRHQA1eHPiWGhqu4/TGYQEhs/vLjVMSQjEVsCBRBjHtZI\nUWXsCfPkY1EfiePkf10E8T8YNhk+IYfMhpaZ88WByBpU5V05Z8VBMc43Xw3l40fp\n8zCNuUPFAgMBAAECggEALZPueopfldhWTzXfT8ug8oIvj2Q9s8AkqluTDOuPJOyA\nXK3VmfjVDmC3RByDAeyJz2+qeEwYyYOJ92z9ysTrN2MPRziw85L1PlJ2gy7kZ0oc\nkk7rDfQWNCq8GUuH6gOw6M1uAEZqt6Y330kvO7cXXHSmmjDQ4cfx3PlPYzoJYZ54\nc7yq55I7Nl8WH+zphSGSJEUSp5B6NcxJbhTXF4lXRrzlzdwfV1cTZxoSJMHvRwPo\n7Bku9NxRQ//vZA5aW2gfXlobjrHdxsmoOyycTsnnhjgH/C1mwmCqTznTi5MKkUE9\nI8QuOonfsa9R6+yWL7g2K2KPLksHB/TrMjWeLqO4MQKBgQDl1/0CD+BFPxHssasW\nodl+bXOZT1O7WWaM2IBBa+kl4sW9BR8GVAzksyqSYkKBxeqcY+AX1CWX1CeBvirK\n2WPqaJunT3CHkWyncJn3jHv3DnxaCON0Lw+3C1ygfYIQdTb7imZsrYQfUHmjpDN4\nD7iXio6ul41Ul6OlRgY1ro0KEQKBgQDiwnyVr3n/9MlNh8KGDBqq+8L8xTZmMnQz\nTOffUYkEJcczef08YFF5FkMn5FMe1Vq0eSVa5UBbUklG74WYVUclfRFRZWyd/X0R\nxaNmjKNKiTKYtLa1TBVafGO6fjwJ3Ik7EOS62w9cJhzwRpuex2qHhgWNwMjXXYaO\nciGE7+8KdQKBgQCw6/xubOgWhYD3sJ9g0X8IiZnVJjHu4ddFjZXURgt2xUOux1Vl\nWqd+F8gqXAaTvFRmw56I2R2C7KTogwiPkp0NoC5IsKaPRErd7Jgn7HSz7Oudpn/n\nPB6dqNpJE7NdlcyX/aXv+/Ta4ehwJYIU5g0SYW6JSFFbD0rBetBm3BDm8QKBgQCb\nt+0wKaHBCIuYp0sJHJTPqDY9uPxjb/BmLkDpFafe5kaGbhZd+NLaMVSKt3vxJ5iz\naKIjal0omThi8yct9hn2f4199QWC9UmHA87zJE8aZ18MiMUTeR0M13Dw57E5IG5I\n1pAMVVSV9kJXKlXB0rWwPXPg5WvGoZ4+gdfM36uq5QKBgBXP0O3MgbcmyN3MdT6t\n3z0eao2dQ3m6zP/VeFEu16yg4LnbMsIaU/nb7CFsMX9Gbl4dIm4wlumexAanWgVa\nGoi5vtkRTTS/0000MkcinxaN97075aJurWOIm4H+rOTwLHQtHwnsrnusPOUTEX9v\nebvDam6olcW6U36umVQPPAJF\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-fbsvc@moneta2ai.iam.gserviceaccount.com",
+  "client_id": "111258876540049599387",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40moneta2ai.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
 
 # Executar o servidor
 npm start
