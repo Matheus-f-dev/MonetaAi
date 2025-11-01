@@ -1,0 +1,16 @@
+/* Hovers específicos para a página system */
+.sys-layout .sys-side-item:hover {
+  border-color: var(--primary-color) !important;
+}
+
+.sys-layout .sys-btn:hover {
+  border-color: var(--primary-color) !important;
+}
+
+.sys-layout .sys-tab:hover {
+  border-color: var(--primary-color) !important;
+}
+
+.sys-layout .sys-seg:hover {
+  border-color: var(--primary-color) !important;
+}

@@ -1,0 +1,15 @@
+# Ignora node_modules
+node_modules/
+
+# Ignora arquivos .env (segurança!)
+.env
+
+# Logs
+*.log
+
+# Pastas de build/output (opcional)
+dist/
+build/
+
+
+serviceAccountKey.json

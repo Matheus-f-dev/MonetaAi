@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Projeção de Saldo Futuro</title>
+  <link rel="stylesheet" href="/css/projecao-saldo.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📈 Projeção de Saldo Futuro</h1>
+      <p class="subtitle">Como seu saldo pode evoluir baseado no padrão atual</p>
+      <button class="btn-crescimento">Crescimento</button>
+    </div>
+
+    <div class="periodo-section">
+      <label for="periodo">Período de Projeção</label>
+      <select id="periodo" onchange="atualizarProjecao()">
+        <option value="12">1 ano</option>
+        <option value="6">6 meses</option>
+        <option value="24">2 anos</option>
+      </select>
+    </div>
+
+    <div class="cards-container">
+      <div class="card">
+        <div class="card-label">Saldo Atual</div>
+        <div class="card-value" id="saldo-atual">R$ 0.00</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Saldo em <span id="periodo-texto">12 meses</span></div>
+        <div class="card-value" id="saldo-futuro">R$ 10824.20</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Variação Total</div>
+        <div class="card-value positive" id="variacao-total">📈 +R$ 10824.20</div>
+      </div>
+    </div>
+
+    <div class="chart-container">
+      <canvas id="chart" width="800" height="300"></canvas>
+      <div class="chart-labels">
+        <div class="month-labels" id="month-labels"></div>
+      </div>
+    </div>
+
+    <div class="disclaimer">
+      * Projeção baseada no padrão atual de receitas e despesas
+    </div>
+
+    <button onclick="location.href='/historico-page'" class="btn-voltar">Voltar</button>
+  </div>
+
+  <script>
+    let dadosProjecao = [];
+    let periodoAtual = 12;
+
+    async function carregarDados() {
+      try {
+        const res = await fetch('/api/projecao-saldo');
+        const data = await res.json();
+        
+        document.getElementById('saldo-atual').textContent = `R$ ${data.saldoAtual.toFixed(2)}`;
+        atualizarProjecao();
+      } catch (error) {
+        console.error('Erro ao carregar dados:', error);
+      }
+    }
+
+    async function atualizarProjecao() {
+      periodoAtual = parseInt(document.getElementById('periodo').value);
+      document.getElementById('periodo-texto').textContent = `${periodoAtual} meses`;
+
+      try {
+        const res = await fetch(`/api/projecao-saldo/${periodoAtual}`);
+        const data = await res.json();
+        
+        dadosProjecao = data.projecao;
+        
+        document.getElementById('saldo-futuro').textContent = `R$ ${data.saldoFinal.toFixed(2)}`;
+        document.getElementById('variacao-total').textContent = `📈 +R$ ${data.variacao.toFixed(2)}`;
+        
+        desenharGrafico();
+        atualizarLabels();
+      } catch (error) {
+        console.error('Erro ao atualizar projeção:', error);
+      }
+    }
+
+    function desenharGrafico() {
+      const canvas = document.getElementById('chart');
+      const ctx = canvas.getContext('2d');
+      
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      if (dadosProjecao.length === 0) return;
+
+      const padding = 50;
+      const width = canvas.width - 2 * padding;
+      const height = canvas.height - 2 * padding;
+      
+      const maxValue = Math.max(...dadosProjecao.map(d => d.saldo));
+      const minValue = Math.min(...dadosProjecao.map(d => d.saldo));
+      const range = maxValue - minValue || 1;
+
+      // Desenhar linha do gráfico
+      ctx.beginPath();
+      ctx.strokeStyle = '#6366f1';
+      ctx.lineWidth = 3;
+
+      dadosProjecao.forEach((ponto, index) => {
+        const x = padding + (index / (dadosProjecao.length - 1)) * width;
+        const y = padding + height - ((ponto.saldo - minValue) / range) * height;
+        
+        if (index === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      });
+      
+      ctx.stroke();
+
+      // Desenhar área sob a curva
+      ctx.beginPath();
+      ctx.fillStyle = 'rgba(99, 102, 241, 0.1)';
+      
+      dadosProjecao.forEach((ponto, index) => {
+        const x = padding + (index / (dadosProjecao.length - 1)) * width;
+        const y = padding + height - ((ponto.saldo - minValue) / range) * height;
+        
+        if (index === 0) {
+          ctx.moveTo(x, y);
+        } else {
+          ctx.lineTo(x, y);
+        }
+      });
+      
+      ctx.lineTo(padding + width, padding + height);
+      ctx.lineTo(padding, padding + height);
+      ctx.closePath();
+      ctx.fill();
+
+      // Desenhar labels do eixo Y
+      ctx.fillStyle = '#6b7280';
+      ctx.font = '12px Arial';
+      ctx.textAlign = 'right';
+      
+      for (let i = 0; i <= 4; i++) {
+        const value = minValue + (range * i / 4);
+        const y = padding + height - (i / 4) * height;
+        ctx.fillText(`R$${value.toFixed(0)}`, padding - 10, y + 4);
+      }
+    }
+
+    function atualizarLabels() {
+      const container = document.getElementById('month-labels');
+      container.innerHTML = '';
+      
+      const meses = ['Mês 1', 'Mês 2', 'Mês 3', 'Mês 4', 'Mês 5', 'Mês 6', 
+                    'Mês 7', 'Mês 8', 'Mês 9', 'Mês 10', 'Mês 11', 'Mês 12'];
+      
+      for (let i = 0; i < periodoAtual; i++) {
+        const label = document.createElement('div');
+        label.className = 'month-label';
+        label.textContent = meses[i] || `Mês ${i + 1}`;
+        container.appendChild(label);
+      }
+    }
+
+    window.onload = carregarDados;
+  </script>
+</body>
+</html>

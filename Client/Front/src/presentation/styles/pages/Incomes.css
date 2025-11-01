@@ -1,0 +1,212 @@
+.incomes-container {
+  padding: 20px;
+  height: 100vh;
+  overflow-y: auto;
+  margin-top: 0;
+  background: var(--bg) !important;
+}
+
+.incomes-header {
+  margin-bottom: 30px;
+}
+
+.incomes-header h1 {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-color) !important;
+  margin: 0;
+}
+
+.incomes-filters {
+  background: var(--card) !important;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.tabs button {
+  padding: 8px 16px;
+  border: none;
+  background: var(--bg-secondary) !important;
+  color: var(--text-secondary) !important;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tabs button.active {
+  background: var(--primary-color) !important;
+  color: white !important;
+}
+
+.tabs button:hover:not(.active) {
+  background: var(--border-color) !important;
+}
+
+.filters-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.search-box {
+  flex: 1;
+  max-width: 400px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 10px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 14px;
+  background: var(--card) !important;
+  color: var(--text-color) !important;
+}
+
+.search-box input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.category-filter {
+  padding: 10px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--card) !important;
+  color: var(--text-color) !important;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.incomes-content {
+  background: var(--card) !important;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 150px);
+}
+
+.incomes-summary {
+  padding: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.incomes-summary h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-color) !important;
+  margin: 0 0 8px 0;
+}
+
+.incomes-summary p {
+  color: var(--text-secondary) !important;
+  margin: 0;
+  font-size: 14px;
+}
+
+.incomes-table {
+  flex: 1;
+  min-height: 500px;
+  background: var(--card) !important;
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: 120px 1fr 150px 120px;
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--bg-secondary) !important;
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 600;
+  color: var(--text-color) !important;
+  font-size: 14px;
+}
+
+.table-body {
+  min-height: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+  background: var(--card) !important;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 120px 1fr 150px 120px;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+  align-items: center;
+  transition: background-color 0.2s;
+  color: var(--text-color) !important;
+}
+
+.table-row:hover {
+  background: var(--bg-secondary) !important;
+}
+
+.category-tag {
+  background: #d1fae5;
+  color: #065f46;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  width: fit-content;
+}
+
+.value {
+  font-weight: 600;
+  color: #10b981;
+}
+
+.no-incomes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: var(--text-secondary) !important;
+  font-size: 16px;
+  background: var(--card) !important;
+}
+
+.incomes-footer {
+  padding: 16px 20px;
+  background: var(--bg-secondary) !important;
+  border-top: 1px solid var(--border-color);
+  color: var(--text-secondary) !important;
+  font-size: 14px;
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .filters-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .search-box {
+    max-width: none;
+  }
+  
+  .table-header,
+  .table-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .table-header span,
+  .table-row span {
+    padding: 4px 0;
+  }
+}

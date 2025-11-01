@@ -1,0 +1,202 @@
+@keyframes gradiente {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.brand-name{
+  color: #00ffc8;
+  text-decoration: none;
+}
+
+.login-card { 
+  width: 380px;
+  margin: 100px auto;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(15px);
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  color: #fff;
+  text-align: center;
+}
+
+.login-card h2 {
+  font-size: 28px;
+  margin-bottom: 10px;
+}
+
+.login-card h2 span {
+  color: #00ffc8;
+}
+
+.login-card p {
+  font-size: 14px;
+  margin-bottom: 30px;
+  color: #cfcfcf;
+}
+
+.login-form label {
+  display: block;
+  text-align: left;
+  margin: 10px 0 5px;
+  font-size: 14px;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background: #f0f0f0;
+  margin-bottom: 15px;
+}
+
+/* Campo de senha com botão interno */
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+/* Input de senha com espaço pro botão */
+.password-wrapper input {
+  width: 100%;
+  padding: 10px 40px 10px 10px; /* padding right maior para o botão */
+  border: none;
+  border-radius: 8px;
+  background: #f0f0f0;
+  margin-bottom: 15px;
+  box-sizing: border-box;
+}
+
+/* Botão de mostrar/ocultar senha */
+.botao {
+  position: absolute;
+  top: 15%;
+  right: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.Teste  {
+  width: 15px;
+  opacity: 0.7;
+
+}
+
+/* Ícone do olho */
+
+.icone-olho {
+  width: 18px;
+  height: 18px;
+  opacity: 0.7;
+  pointer-events: none; /* evita conflito de clique no ícone */
+}
+
+.login-btn {
+  width: 100%;
+  background: #00ffc8;
+  color: #000;
+  font-weight: bold;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  transition: 0.3s;
+  cursor: pointer;
+} 
+
+.login-btn:hover {
+  background: #00d5a8;
+}
+
+.footer-links {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.footer-links a {
+  color: #b5f7ee;
+  text-decoration: none;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+}
+
+/* Divisor "ou" */
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+  color: #cfcfcf;
+  font-size: 14px;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #cfcfcf;
+  opacity: 0.3;
+}
+
+.divider span {
+  padding: 0 15px;
+}
+
+/* Botão do Google */
+.google-login-btn {
+  width: 100%;
+  background: #fff;
+  color: #333;
+  font-weight: 500;
+  padding: 12px;
+  border: 1px solid #dadce0;
+  border-radius: 10px;
+  transition: 0.3s;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.google-login-btn:hover {
+  background: #f8f9fa;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.google-login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.google-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: #b5f7ee;
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 0;
+}
+
+.link-btn:hover {
+  text-decoration: underline;
+}

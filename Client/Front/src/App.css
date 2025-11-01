@@ -1,0 +1,121 @@
+:root {
+    --primary-color: #2563eb;
+    --primary-hover: #1d4ed8;
+    --primary-light: rgba(37, 99, 235, 0.08);
+    --background-light: #f8fafc;
+    --text-color: #1e293b;
+    --text-secondary: #64748b;
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8fafc;
+    --border-color: #e2e8f0;
+    --box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    --accent-color: #10b981;
+    --accent-hover: #059669;
+    --neutral-50: #f8fafc;
+    --neutral-100: #f1f5f9;
+    --neutral-200: #e2e8f0;
+    --neutral-300: #cbd5e1;
+    --neutral-400: #94a3b8;
+    --neutral-500: #64748b;
+    --neutral-600: #475569;
+    --neutral-700: #334155;
+    --neutral-800: #1e293b;
+    --neutral-900: #0f172a;
+}
+
+.sys-layout[data-theme="dark"] {
+    --text-color: #f9fafb !important;
+    --text-secondary: #9ca3af !important;
+    --bg-primary: #1f2937 !important;
+    --bg-secondary: #374151 !important;
+    --border-color: #4b5563 !important;
+    --background-light: #1f2937 !important;
+}
+
+[data-color-scheme="purple"] {
+    --primary-color: #8b5cf6;
+    --primary-hover: #7c3aed;
+    --primary-light: rgba(139, 92, 246, 0.1);
+}
+
+.sys-layout[data-color-scheme="blue"] {
+    --primary-color: #3b82f6 !important;
+    --primary-hover: #2563eb !important;
+    --primary-light: rgba(59, 130, 246, 0.1) !important;
+}
+
+.sys-layout[data-color-scheme="green"] {
+    --primary-color: #10b981 !important;
+    --primary-hover: #059669 !important;
+    --primary-light: rgba(16, 185, 129, 0.1) !important;
+}
+
+.sys-layout[data-color-scheme="pink"] {
+    --primary-color: #ec4899 !important;
+    --primary-hover: #db2777 !important;
+    --primary-light: rgba(236, 72, 153, 0.1) !important;
+}
+
+.sys-layout[data-font="Inter"],
+.sys-layout[data-font="Inter"] * {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+.sys-layout[data-font="Poppins"],
+.sys-layout[data-font="Poppins"] * {
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+.sys-layout[data-font="Open Sans"],
+.sys-layout[data-font="Open Sans"] * {
+    font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+.sys-layout[data-font="Roboto"],
+.sys-layout[data-font="Roboto"] * {
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+.sys-layout[data-font-size="small"] * {
+    font-size: 0.85em !important;
+}
+
+.sys-layout[data-font-size="medium"] * {
+    font-size: 1em !important;
+}
+
+.sys-layout[data-font-size="large"] * {
+    font-size: 1.05em !important;
+}
+
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    margin: 0;
+    font-family: 'Roboto', Arial, sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
+* {
+    font-family: inherit !important;
+}
+
+
+.background {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(120deg, #25434e 0%, #234652 100%);
+  z-index: 0;
+}
+
+input[type="email"] {
+    width: 100%;
+}

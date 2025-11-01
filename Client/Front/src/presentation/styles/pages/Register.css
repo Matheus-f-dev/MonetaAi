@@ -1,0 +1,156 @@
+ #mensagem {
+  margin-top: 15px;
+  font-weight: bold;
+  padding: 10px;
+  border-radius: 6px;
+  display: none;
+}
+
+#mensagem.sucesso {
+  color: #155724;
+  background-color: #d4edda;
+  border: 1px solid #c3e6cb;
+}
+
+#mensagem.erro {
+  color: #721c24;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+}
+
+
+
+.brand-name {
+  color: #00ffc8;
+  text-decoration: none;
+}
+
+.background {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+   background: linear-gradient(-45deg, #0f2027, #203a43, #2c5364, #00ffc8);
+  background-size: 400% 400%;
+  animation: gradiente 15s ease infinite;
+}
+
+.login-card {
+  width: 420px;           /* um pouquinho mais largo como no mock */
+  margin: 80px auto;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(15px);
+  padding: 40px;
+  border-radius: 18px;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+  color: #fff;
+  text-align: center;
+}
+
+
+.login-card h2 {
+  font-size: 26px;
+  margin-bottom: 8px;
+}
+
+.login-card h2 span {
+  color: #00ffc8;
+}
+
+.login-card p {
+  font-size: 14px;
+  margin-bottom: 25px;
+  color: #cfcfcf;
+}
+
+.login-form label {
+  display: block;
+  text-align: left;
+  margin: 12px 0 6px;
+  font-size: 14px;
+}
+
+/* ===== Inputs: tamanho consistente ===== */
+.login-form input {
+  width: 100%;
+  height: 48px;           /* altura fixa */
+  font-size: 16px;        /* texto maior e uniforme */
+  padding: 0 14px;
+  border: none;
+  border-radius: 10px;
+  background: #f0f0f0;
+  margin-bottom: 12px;
+  outline: none;
+}
+.login-form input:focus {
+  box-shadow: 0 0 0 2px rgba(0,255,200,.35);
+}
+
+.password-wrapper {
+  position: relative;
+}
+
+
+.password-wrapper input {
+  padding-right: 44px;    /* espaço pro botão do olho */
+}
+
+.password-wrapper button {
+  position: absolute;
+  top:15%;
+  right: 12px; /* centraliza no eixo Y */
+  width: 28px;
+  height: 28px;
+  display: grid;                /* centraliza o ícone no botão */
+  place-items: center;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* tamanho do ícone do olho */
+.password-wrapper img {
+  width: 20px;
+  height: 20px;
+  opacity: 0.8;
+  pointer-events: none; /* evita pegar clique no ícone em vez do botão */
+}
+.login-btn {
+  width: 100%;
+  background: #00ffc8;
+  color: #000;
+  font-weight: bold;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  transition: 0.3s;
+  cursor: pointer;
+  margin-top: 15px;
+}
+
+.login-btn:hover {
+  background: #00d5a8;
+}
+
+.footer-links {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.footer-links a {
+  color: #b5f7ee;
+  text-decoration: none;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+}
+
+@keyframes gradiente {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+} 

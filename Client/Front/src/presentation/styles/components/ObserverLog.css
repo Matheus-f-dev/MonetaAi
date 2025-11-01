@@ -1,0 +1,209 @@
+.observer-log {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+/* Tema Escuro */
+.observer-log[data-theme="dark"] {
+  background: #1f2937;
+  color: #f9fafb;
+}
+
+.observer-log[data-theme="dark"] .observer-header {
+  border-bottom-color: #374151;
+}
+
+.observer-log[data-theme="dark"] .observer-header h3 {
+  color: #f9fafb;
+}
+
+.observer-log[data-theme="dark"] .category-spending h4,
+.observer-log[data-theme="dark"] .activity-log h4 {
+  color: #e5e7eb;
+}
+
+.observer-log[data-theme="dark"] .spending-item {
+  background: #374151;
+}
+
+.observer-log[data-theme="dark"] .log-item {
+  background: #374151;
+}
+
+.observer-log[data-theme="dark"] .category-name {
+  color: #e5e7eb;
+}
+
+.observer-log[data-theme="dark"] .log-action {
+  color: #f9fafb;
+}
+
+.observer-log[data-theme="dark"] .log-description {
+  color: #d1d5db;
+}
+
+/* Esquemas de Cores */
+.observer-log[data-color-scheme="blue"] .log-item {
+  border-left-color: #3b82f6;
+}
+
+.observer-log[data-color-scheme="green"] .log-item {
+  border-left-color: #10b981;
+}
+
+.observer-log[data-color-scheme="purple"] .log-item {
+  border-left-color: #8b5cf6;
+}
+
+.observer-log[data-color-scheme="red"] .log-item {
+  border-left-color: #ef4444;
+}
+
+/* Fontes */
+.observer-log[data-font="Arial"] {
+  font-family: Arial, sans-serif;
+}
+
+.observer-log[data-font="Roboto"] {
+  font-family: 'Roboto', sans-serif;
+}
+
+.observer-log[data-font="Open Sans"] {
+  font-family: 'Open Sans', sans-serif;
+}
+
+/* Tamanhos de Fonte */
+.observer-log[data-font-size="small"] {
+  font-size: 14px;
+}
+
+.observer-log[data-font-size="medium"] {
+  font-size: 16px;
+}
+
+.observer-log[data-font-size="large"] {
+  font-size: 18px;
+}
+
+.observer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.observer-header h3 {
+  margin: 0;
+  color: #1f2937;
+}
+
+.clear-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.clear-btn:hover {
+  background: #dc2626;
+}
+
+.observer-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.category-spending h4,
+.activity-log h4 {
+  margin: 0 0 15px 0;
+  color: #374151;
+  font-size: 16px;
+}
+
+.spending-list,
+.log-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.spending-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  background: #f9fafb;
+  border-radius: 4px;
+}
+
+.category-name {
+  font-weight: 500;
+  color: #374151;
+}
+
+.category-value {
+  font-weight: 600;
+  color: #059669;
+}
+
+.category-value.high-spending {
+  color: #dc2626;
+}
+
+.warning {
+  margin-left: 5px;
+}
+
+.log-item {
+  padding: 10px;
+  margin-bottom: 8px;
+  background: #f3f4f6;
+  border-radius: 4px;
+  border-left: 3px solid #3b82f6;
+}
+
+.log-timestamp {
+  font-size: 11px;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.log-action {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 2px;
+}
+
+.log-description {
+  color: #374151;
+  font-size: 14px;
+}
+
+.log-category {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.no-data {
+  color: #6b7280;
+  font-style: italic;
+  text-align: center;
+  padding: 20px;
+}
+
+@media (max-width: 768px) {
+  .observer-content {
+    grid-template-columns: 1fr;
+  }
+}

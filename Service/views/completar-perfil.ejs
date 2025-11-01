@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Completar Perfil</title>
+  <link rel="stylesheet" href="/css/cadastro.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="cards">
+      <h1>Complete seu <span>Perfil</span></h1>
+      <p>Para finalizar, informe sua média salarial mensal.</p>
+
+      <form action="/completar-perfil" method="POST">
+        <label for="salario">Média Salarial Mensal (R$)</label>
+        <input
+          type="number"
+          id="salario"
+          name="salario"
+          placeholder="Ex: 3000"
+          required
+          min="0"
+          step="0.01"
+        />
+
+        <button type="submit">Finalizar Cadastro</button>
+
+        <% if (erro) { %>
+          <p style="color: red; text-align: center; margin-top: 10px;"><%= erro %></p>
+        <% } %>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

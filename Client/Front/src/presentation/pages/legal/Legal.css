@@ -1,0 +1,47 @@
+.legal-container {
+  min-height: 100vh;
+  padding: 2rem;
+  background-color: #f8f9fa;
+}
+
+.legal-content {
+  max-width: 800px;
+  margin: 0 auto;
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.legal-content h1 {
+  color: #000;
+  margin-bottom: 2rem;
+  text-align: center;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 1rem;
+}
+
+.legal-text {
+  line-height: 1.6;
+  color: #000;
+}
+
+.legal-text h2 {
+  color: #000;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+.legal-text p {
+  margin-bottom: 1rem;
+  color: #000;
+}
+
+.legal-text ul {
+  margin-left: 2rem;
+  margin-bottom: 1rem;
+}
+
+.legal-text li {
+  margin-bottom: 0.5rem;
+}

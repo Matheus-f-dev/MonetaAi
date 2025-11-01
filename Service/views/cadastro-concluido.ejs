@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro Concluído</title>
+  <link rel="stylesheet" href="/css/cadastro-concluido.css" />
+</head>
+<body>
+    <p class="mensagem">✅ Cadastro concluído com sucesso!</p>
+    <p class="mensagem">📧 Link de verificação enviado para seu e-mail</p>
+    <p class="contador">Redirecionando para login em <span id="tempo">5</span> segundos...</p>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      let segundos = 5;
+      const contador = document.getElementById('tempo');
+
+      const intervalo = setInterval(() => {
+        segundos--;
+        contador.textContent = segundos;
+
+        if (segundos <= 0) {
+          clearInterval(intervalo);
+          window.location.href = '/login';
+        }
+      }, 1000);
+    });
+  </script>
+
+</body>
+</html>
