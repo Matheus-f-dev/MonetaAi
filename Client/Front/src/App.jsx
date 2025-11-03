@@ -30,6 +30,24 @@ function AppRouter() {
     
     if (currentPath === '/') return <LandingPage />;
     
+    // Rotas diretas
+    switch (currentPath) {
+      case '/login': return <LoginCard />;
+      case '/cadastro': return <Cadastro />;
+      case '/esqueci-senha': return <RedefinirSenha />;
+      case '/system': return <System />;
+      case '/expenses': return <Expenses />;
+      case '/incomes': return <Incomes />;
+      case '/profile': return <Profile />;
+      case '/alerts': return <Alerts />;
+      case '/reports': return <Reports />;
+      case '/analytics': return <Analytics />;
+      case '/impacto-financeiro': return <ImpactoFinanceiro />;
+      case '/auth/callback': return <AuthCallback />;
+      case '/privacy-policy': return <PrivacyPolicy />;
+      case '/terms-of-service': return <TermsOfService />;
+    }
+    
     if (currentPath.startsWith('/app/')) {
       const decryptedRoute = decryptRoute(currentPath);
       

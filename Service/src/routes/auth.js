@@ -8,16 +8,10 @@ router.get('/google/callback',
   passport.authenticate('google', { failureRedirect: 'http://localhost:5173/login' }),
   async (req, res) => {
     try {
+      console.log('Google callback executado com sucesso');
+      console.log('Usuário:', req.user);
+      
       req.session.userId = req.user.uid;
-      const db = req.app.locals.db;
-      
-      // Verificar se o perfil está completo
-      const userDoc = await db.collection('usuarios').doc(req.user.uid).get();
-      const userData = userDoc.data();
-      
-      if (!userData.perfilCompleto || !userData.salario) {
-        return res.redirect('/completar-perfil');
-      }
       
       // Criar token JWT para o usuário
       const jwt = require('jsonwebtoken');
@@ -27,12 +21,16 @@ router.get('/google/callback',
         { expiresIn: '24h' }
       );
       
-      // Redirecionar para o frontend com o token
-      res.redirect(`http://localhost:5173/auth/callback?token=${token}&user=${encodeURIComponent(JSON.stringify({
+      const userData = {
         uid: req.user.uid,
         email: req.user.email,
         nome: req.user.displayName
-      }))}`);
+      };
+      
+      console.log('Redirecionando para:', `http://localhost:5173/system?token=${token}&user=${encodeURIComponent(JSON.stringify(userData))}`);
+      
+      // Redirecionar com token e dados do usuário
+      res.redirect(`http://localhost:5173/system?token=${token}&user=${encodeURIComponent(JSON.stringify(userData))}`);
     } catch (error) {
       console.error('Erro no callback do Google:', error);
       res.redirect('http://localhost:5173/login?error=auth_failed');

@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import "../styles/pages/System.css";
 import "../styles/components/TransactionModal.css";
 import "../styles/components/ActivityHistory.css";
@@ -52,8 +53,35 @@ ChartJS.register(
 export default function System() {
   useTheme();
   const { addToast } = useToast();
+  const [searchParams] = useSearchParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
+  
+  // Capturar token e dados do usuário da URL se existirem
+  useEffect(() => {
+    const token = searchParams.get('token');
+    const userParam = searchParams.get('user');
+    
+    if (token) {
+      localStorage.setItem('token', token);
+      console.log('Token salvo:', token);
+    }
+    
+    if (userParam) {
+      try {
+        const userData = JSON.parse(decodeURIComponent(userParam));
+        localStorage.setItem('user', JSON.stringify(userData));
+        console.log('Dados do usuário salvos:', userData);
+      } catch (error) {
+        console.error('Erro ao processar dados do usuário:', error);
+      }
+    }
+    
+    if (token || userParam) {
+      // Remover parâmetros da URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [searchParams]);
   
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const userName = user.nome || user.displayName || "Usuário";
