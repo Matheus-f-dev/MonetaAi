@@ -8,9 +8,6 @@ router.get('/google/callback',
   passport.authenticate('google', { failureRedirect: 'http://localhost:5173/login' }),
   async (req, res) => {
     try {
-      console.log('Google callback executado com sucesso');
-      console.log('Usuário:', req.user);
-      
       req.session.userId = req.user.uid;
       
       // Criar token JWT para o usuário
@@ -26,8 +23,6 @@ router.get('/google/callback',
         email: req.user.email,
         nome: req.user.displayName
       };
-      
-      console.log('Redirecionando para:', `http://localhost:5173/system?token=${token}&user=${encodeURIComponent(JSON.stringify(userData))}`);
       
       // Redirecionar com token e dados do usuário
       res.redirect(`http://localhost:5173/system?token=${token}&user=${encodeURIComponent(JSON.stringify(userData))}`);

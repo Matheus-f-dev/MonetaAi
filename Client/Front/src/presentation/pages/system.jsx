@@ -64,14 +64,12 @@ export default function System() {
     
     if (token) {
       localStorage.setItem('token', token);
-      console.log('Token salvo:', token);
     }
     
     if (userParam) {
       try {
         const userData = JSON.parse(decodeURIComponent(userParam));
         localStorage.setItem('user', JSON.stringify(userData));
-        console.log('Dados do usuário salvos:', userData);
       } catch (error) {
         console.error('Erro ao processar dados do usuário:', error);
       }
