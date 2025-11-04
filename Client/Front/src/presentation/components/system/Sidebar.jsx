@@ -1,7 +1,7 @@
 import { SideItem } from './SideItem';
 import { 
   HomeIcon, BagIcon, WalletIcon, ChartIcon, DocIcon, 
-  PlanIcon, BellIcon, BotIcon, GearIcon, 
+  BellIcon, BotIcon, 
   UserIcon, ExitIcon 
 } from './Icons';
 import { useSecureNavigation } from '../../hooks/useSecureNavigation';
@@ -27,11 +27,9 @@ export function Sidebar() {
           <SideItem label="Receitas" icon={<WalletIcon />} onClick={() => secureNavigate('/incomes')} />
           <SideItem label="Análises" icon={<ChartIcon />} onClick={() => secureNavigate('/analytics')} />
           <SideItem label="Relatórios" icon={<DocIcon />} onClick={() => secureNavigate('/reports')} />
-          <SideItem label="Planejamento" icon={<PlanIcon />} />
           <SideItem label="Alertas" icon={<BellIcon />} onClick={() => secureNavigate('/alerts')} />
           <SideItem label="Impacto Financeiro" icon={<ChartIcon />} onClick={() => secureNavigate('/impacto-financeiro')} />
           <SideItem label="Perfil" icon={<UserIcon />} onClick={() => secureNavigate('/profile')} />
-          <SideItem label="Configurações" icon={<GearIcon />} />
         </nav>
       </div>
 

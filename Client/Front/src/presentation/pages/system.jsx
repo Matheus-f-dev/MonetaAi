@@ -124,11 +124,7 @@ export default function System() {
     return { income, expenses, balance };
   }, [transactions]);
 
-  const bills = [
-    { name: "Netflix",  due: "25/07", amount: 39.90 },
-    { name: "Aluguel",  due: "10/07", amount: 850.00 },
-    { name: "Internet", due: "15/07", amount: 119.90 },
-  ];
+
 
   const recentTransactions = useMemo(() => {
     return transactions
@@ -244,7 +240,7 @@ export default function System() {
                     }}
                   />
                 )}
-                <SidePanel progress={progress} salary={userSalary} monthlyExpenses={monthlyExpenses} bills={bills} />
+                <SidePanel progress={progress} salary={userSalary} monthlyExpenses={monthlyExpenses} />
               </div>
               
               <TransactionsTable transactions={recentTransactions} />
