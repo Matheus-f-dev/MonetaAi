@@ -11,9 +11,8 @@ import '../styles/pages/Analytics.css';
 
 export default function Analytics() {
   useTheme();
-  const [selectedPeriod, setSelectedPeriod] = useState('Este Mês');
   const [activeTab, setActiveTab] = useState('visao-geral');
-  const [refreshKey, setRefreshKey] = useState(0);
+  const selectedPeriod = 'Este Mês';
 
   const userId = useMemo(() => {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -67,19 +66,7 @@ export default function Analytics() {
       <main className="analytics-main">
         <div className="analytics-container">
           <div className="analytics-header">
-            <h1>Análises Financeiras</h1>
-            <select 
-              value={selectedPeriod} 
-              onChange={(e) => {
-                setSelectedPeriod(e.target.value);
-                setRefreshKey(prev => prev + 1);
-              }}
-              className="period-select"
-            >
-              <option>Este Mês</option>
-              <option>Últimos 3 Meses</option>
-              <option>Este Ano</option>
-            </select>
+            <h1>Análises Financeiras - Este Mês</h1>
           </div>
 
           <div className="analytics-tabs">
