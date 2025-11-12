@@ -139,13 +139,13 @@ export function FutureBalance({ transactions, userSalary }) {
     <div className="future-balance-container">
       <div className="future-balance-header">
         <div>
-          <h1>📈 Projeção de Saldo Futuro</h1>
+          <h1>Projeção de Saldo Futuro</h1>
           <p className="subtitle">Como seu saldo pode evoluir baseado no padrão atual</p>
         </div>
         <button className={`btn-trend ${trend}`}>
-          {trend === 'crescendo' && '📈 Crescendo'}
-          {trend === 'decaindo' && '📉 Decaindo'}
-          {trend === 'estável' && '➡️ Estável'}
+          {trend === 'crescendo' && 'Crescendo'}
+          {trend === 'decaindo' && 'Decaindo'}
+          {trend === 'estável' && 'Estável'}
         </button>
       </div>
 
@@ -173,7 +173,7 @@ export function FutureBalance({ transactions, userSalary }) {
 
               }}
             >
-              📈 Otimista
+              Otimista
             </button>
             <button 
               className={`scenario-btn ${activeScenario === 'realistic' ? 'active' : ''}`}
@@ -182,7 +182,7 @@ export function FutureBalance({ transactions, userSalary }) {
 
               }}
             >
-              🎯 Realista
+              Realista
             </button>
             <button 
               className={`scenario-btn ${activeScenario === 'pessimistic' ? 'active' : ''}`}
@@ -191,7 +191,7 @@ export function FutureBalance({ transactions, userSalary }) {
 
               }}
             >
-              📉 Pessimista
+              Pessimista
             </button>
           </div>
         </div>
@@ -209,7 +209,7 @@ export function FutureBalance({ transactions, userSalary }) {
         <div className="balance-card">
           <div className="card-label">Variação Total</div>
           <div className={`card-value ${totalVariation >= 0 ? 'positive' : 'negative'}`}>
-            {totalVariation >= 0 ? '📈' : '📉'} {formatCurrency(Math.abs(totalVariation))}
+            {formatCurrency(Math.abs(totalVariation))}
           </div>
         </div>
       </div>
