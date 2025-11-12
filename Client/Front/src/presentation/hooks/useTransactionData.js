@@ -45,7 +45,8 @@ export const useTransactionData = (userId) => {
         setError(data.message || 'Erro ao buscar transações');
       }
     } catch (error) {
-      setError('Erro ao conectar com o servidor');
+      console.error('Erro ao conectar com o servidor:', error);
+      setError('Erro ao conectar com o servidor'); // nao sei ce é pra deixar esse 
     } finally {
       setLoading(false);
     }
@@ -81,6 +82,7 @@ export const useTransactionData = (userId) => {
       
       return result;
     } catch (error) {
+      console.error('Erro na exclusão:', error);
       const errorMsg = 'Erro ao conectar com o servidor';
       setError(errorMsg);
       return { success: false, message: errorMsg };
@@ -93,7 +95,7 @@ export const useTransactionData = (userId) => {
     if (userId) {
       fetchTransactions();
     }
-  }, [userId]);
+  }, [fetchTransactions, userId]);
 
   const fetchChartData = async (filter = 'month') => {
     if (!userId) return null;
@@ -107,6 +109,7 @@ export const useTransactionData = (userId) => {
       }
       return null;
     } catch (error) {
+      console.error('Erro ao buscar dados do gráfico:', error);
       // Erro silencioso
       return null;
     }
