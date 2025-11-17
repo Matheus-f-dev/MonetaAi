@@ -4,6 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { ValidationContext, EmailValidation, PasswordValidation, AmountValidation } from '../../core/services/ValidationStrategy';
 import { useToast } from '../hooks/useToast';
+import { useTerms } from '../hooks/useTerms';
+import TermsModal from '../components/TermsModal';
 
 export default function Cadastro() {
   const [nome, setNome] = useState('');
@@ -17,6 +19,7 @@ export default function Cadastro() {
   const navigate = useNavigate();
   const { loading, message, register, verifyEmail } = useAuth();
   const { addToast } = useToast();
+  const { termsAccepted, showTermsModal, acceptTerms, declineTerms, showTerms } = useTerms();
 
   async function verificarEmail(email) {
     if (!email || !email.includes('@')) return;
@@ -27,6 +30,11 @@ export default function Cadastro() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+
+    if (!termsAccepted) {
+      showTerms();
+      return;
+    }
 
     // Strategy - validações múltiplas
     const emailValidator = new ValidationContext(new EmailValidation());
@@ -76,6 +84,12 @@ export default function Cadastro() {
 
 
   return (
+    <div>
+      <TermsModal 
+        isOpen={showTermsModal} 
+        onAccept={acceptTerms} 
+        onDecline={declineTerms} 
+      />
       <div className="login-card animate__animated animate__fadeInDown">
         <h2>
           Crie sua conta na <span><Link to="/" className="brand-name">Moneta</Link></span>
@@ -207,6 +221,7 @@ export default function Cadastro() {
       <div className="footer-links">
         <Link to="/login">Já tenho uma conta</Link>
         <Link to="/">Voltar para o início</Link>
+      </div>
       </div>
     </div>
   );

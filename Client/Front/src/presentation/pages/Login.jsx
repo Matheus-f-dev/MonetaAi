@@ -5,6 +5,8 @@ import { useAuth } from '../hooks/useAuth';
 import { useSecureNavigation } from '../hooks/useSecureNavigation';
 import { ValidationContext, EmailValidation, PasswordValidation } from '../../core/services/ValidationStrategy';
 import { useToast } from '../hooks/useToast';
+import { useTerms } from '../hooks/useTerms';
+import TermsModal from '../components/TermsModal';
 
 export default function LoginCard() {
   const [email, setEmail] = useState('');
@@ -14,6 +16,7 @@ export default function LoginCard() {
   const [searchParams] = useSearchParams();
   const { loading, message, login, googleLogin } = useAuth();
   const { addToast } = useToast();
+  const { termsAccepted, showTermsModal, acceptTerms, declineTerms, showTerms } = useTerms();
 
   useEffect(() => {
     const error = searchParams.get('error');
@@ -24,6 +27,11 @@ export default function LoginCard() {
 
   async function handleSubmit(e) {
     e.preventDefault();
+    
+    if (!termsAccepted) {
+      showTerms();
+      return;
+    }
     
     // Strategy - validar email e senha
     const emailValidator = new ValidationContext(new EmailValidation());
@@ -53,6 +61,11 @@ export default function LoginCard() {
 
   return (
     <div>
+      <TermsModal 
+        isOpen={showTermsModal} 
+        onAccept={acceptTerms} 
+        onDecline={declineTerms} 
+      />
       <div className="login-card animate__animated animate__fadeInDown">
         <h2>
           Bem-vindo à <span><Link to="/" className="brand-name">Moneta</Link></span>

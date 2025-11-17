@@ -1,10 +1,13 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { decryptRoute } from '../../shared/urlCrypto';
+import { useTerms } from '../hooks/useTerms';
+import TermsModal from './TermsModal';
 
 export function ProtectedRoute({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { termsAccepted } = useTerms();
 
   useEffect(() => {
     const currentPath = location.pathname;
@@ -16,6 +19,11 @@ export function ProtectedRoute({ children }) {
       '/analytics', '/impacto-financeiro', '/auth/callback',
       '/privacy-policy', '/terms-of-service'
     ];
+    
+    // Rotas que não precisam de termos aceitos
+    const publicRoutes = ['/', '/privacy-policy', '/terms-of-service'];
+    
+
     
     // Se é uma rota direta permitida, não fazer nada
     if (allowedDirectRoutes.includes(currentPath)) {
