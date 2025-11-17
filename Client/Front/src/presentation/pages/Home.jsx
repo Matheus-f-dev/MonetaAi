@@ -46,7 +46,7 @@ export default function LandingPage() {
 
       <section className="hero">
         <div className="hero-content">
-          <span className="badge">✨ Gestão Financeira com IA</span>
+          <span className="badge"> Gestão Financeira com IA</span>
           <h1>
             Transforme sua relação com o dinheiro.<br />
             <span className="gradient-text">Conquiste sua liberdade financeira.</span>
@@ -55,13 +55,11 @@ export default function LandingPage() {
             Mais de <strong>10.000 usuários</strong> já descobriram como economizar até <strong>30% mais</strong> usando nossa IA que aprende seus hábitos e otimiza seus gastos automaticamente.
           </p>
           <div className="hero-buttons">
-            <button onClick={() => secureNavigate('/cadastro')} className="btn-primary">🚀 Começar Grátis Agora</button>
-            <a href="#funcionalidades" className="btn-outline">📊 Ver Como Funciona</a>
+            <button onClick={() => secureNavigate('/cadastro')} className="btn-primary"> Começar Grátis Agora</button>
+            <a href="#funcionalidades" className="btn-outline"> Ver Como Funciona</a>
           </div>
           <div className="trust-indicators">
-            <div className="indicator">⭐ 4.9/5 - Mais de 2.500 avaliações</div>
-            <div className="indicator">🔒 Dados protegidos com criptografia bancária</div>
-            <div className="indicator">📱 Integração WhatsApp em 30 segundos</div>
+            <div className="indicator"> Integração WhatsApp em 30 segundos</div>
           </div>
         </div>
         <div className="hero-image-container">
@@ -70,14 +68,7 @@ export default function LandingPage() {
       </section>
 
       <section className="features" id="funcionalidades">
-        <div className="features-header">
-          <span className="badge">🎯 Resultados Comprovados</span>
-          <h2>Por que mais de 10.000 pessoas escolheram a <span className="gradient-text">Moneta?</span></h2>
-          <p>
-            Nossa IA analisa seus padrões de gastos e identifica oportunidades de economia que você nem sabia que existiam.<br />
-            <strong>Resultado médio: R$ 847 economizados por mês.</strong>
-          </p>
-        </div>
+     
 
         <div className="features-grid">
           <div className="feature-card">
@@ -85,11 +76,7 @@ export default function LandingPage() {
             <h3>ChatBot no WhatsApp</h3>
             <p>Registre gastos e receba insights diretamente pelo WhatsApp. Simples, rápido e sem complicações.</p>
           </div>
-          <div className="feature-card">
-            <div className="icon">📊</div>
-            <h3>Modo viagem</h3>
-            <p>Integre suas viagens e tenha o total controle sobre seus gastos.</p>
-          </div>
+         
           <div className="feature-card">
             <div className="icon">🗂️</div>
             <h3>Categorização Automática</h3>
@@ -103,12 +90,12 @@ export default function LandingPage() {
           <div className="feature-card">
             <div className="icon">🔔</div>
             <h3>Alertas Inteligentes</h3>
-            <p>Receba alertas automáticos sobre vencimentos, gastos excessivos e oportunidades de economia.</p>
+            <p>Receba alertas automáticos sobre gastos excessivos .</p>
           </div>
           <div className="feature-card">
             <div className="icon">🔒</div>
             <h3>Segurança Avançada</h3>
-            <p>Todos os dados são criptografados com protocolos de segurança bancária para proteger sua privacidade.</p>
+            <p>Todos os dados são criptografados para proteger sua privacidade.</p>
           </div>
         </div>
       </section>
@@ -183,12 +170,12 @@ export default function LandingPage() {
             R$ ?? <span>/mês</span>
           </div>
           <ul className="beneficios">
-            <li><span>✅</span> ChatBot WhatsApp avançado</li>
-            <li><span>✅</span> Categorização automática</li>
-            <li className="destaque azul"><span>🌐</span> Modo viagem ✨</li>
-            <li><span>✅</span> Relatórios semanais detalhados</li>
-            <li><span>✅</span> Planejamento de orçamento</li>
-            <li className="destaque roxo"><span>🛡️</span> seu controle em multi-lugares✨</li>
+            <li><span></span> ChatBot WhatsApp avançado</li>
+            <li><span></span> Categorização automática</li>
+            <li className="destaque azul"><span></span> Modo viagem </li>
+            <li><span></span> Relatórios semanais detalhados</li>
+            <li><span></span> Planejamento de orçamento</li>
+            <li className="destaque roxo"><span></span> seu controle em multi-lugares</li>
           </ul>
           <button onClick={() => secureNavigate('/cadastro')} className="botao-assinar animar-botao">Assinar Agora</button>
           <p className="observacao">* Sem taxas ocultas. Cancele quando quiser.</p>
@@ -207,9 +194,8 @@ export default function LandingPage() {
             <button onClick={() => secureNavigate('/cadastro')} className="botao-principal">Começar agora mesmo</button>
           </div>
           <div className="beneficios">
-            <div className="beneficio"><span>⭐</span> Avaliação 4.9/5</div>
-            <div className="beneficio"><span>🔒</span> Dados protegidos</div>
-            <div className="beneficio"><span>🚀</span> Configuração rápida</div>
+            <div className="beneficio"><span></span> Dados protegidos</div>
+            <div className="beneficio"><span></span> Configuração rápida</div>
           </div>
         </div>
       </section>
