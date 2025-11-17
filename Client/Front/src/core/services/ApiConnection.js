@@ -7,7 +7,7 @@ class ApiConnection {
       return ApiConnection.instance;
     }
     
-    this.baseURL = 'http://localhost:3000';
+    this.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
     this.headers = {
       'Content-Type': 'application/json'
     };

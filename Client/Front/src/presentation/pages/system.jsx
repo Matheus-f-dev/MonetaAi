@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import "../styles/pages/System.css";
+import "../styles/pages/system.css";
 import "../styles/components/TransactionModal.css";
 import "../styles/components/ActivityHistory.css";
 import "../styles/components/ObserverLog.css";
