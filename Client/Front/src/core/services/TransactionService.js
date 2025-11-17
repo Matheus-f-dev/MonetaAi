@@ -2,7 +2,7 @@ import { Transaction } from '../../domain/Transaction';
 
 export class TransactionService {
   constructor() {
-    this.baseUrl = 'http://localhost:3000/api/transactions';
+    this.baseUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/transactions`;
   }
 
   async getUserTransactions(userId) {

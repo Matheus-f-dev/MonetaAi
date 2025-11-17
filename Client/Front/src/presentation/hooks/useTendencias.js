@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 export function useTendencias(selectedPeriod, userId) {
   const [tendenciasData, setTendenciasData] = useState({
     dadosMensais: [],
@@ -22,7 +24,7 @@ export function useTendencias(selectedPeriod, userId) {
       
       setLoading(true);
       try {
-        const response = await fetch(`http://localhost:3000/api/tendencias/${userId}?period=${selectedPeriod}`);
+        const response = await fetch(`${API_URL}/api/tendencias/${userId}?period=${selectedPeriod}`);
         const result = await response.json();
         
         if (result.success) {

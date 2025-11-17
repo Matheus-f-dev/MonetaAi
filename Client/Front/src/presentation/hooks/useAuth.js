@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 export const useAuth = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -9,7 +11,7 @@ export const useAuth = () => {
     setMessage('');
     
     try {
-      const response = await fetch('http://localhost:3000/api/login', {
+      const response = await fetch(`${API_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, senha })
@@ -38,7 +40,7 @@ export const useAuth = () => {
     setMessage('');
     
     try {
-      const response = await fetch('http://localhost:3000/api/cadastro', {
+      const response = await fetch(`${API_URL}/api/cadastro`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData)
@@ -61,7 +63,7 @@ export const useAuth = () => {
     setMessage('');
     
     try {
-      const response = await fetch('http://localhost:3000/api/esqueci-senha', {
+      const response = await fetch(`${API_URL}/api/esqueci-senha`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
@@ -81,7 +83,7 @@ export const useAuth = () => {
 
   const verifyEmail = async (email) => {
     try {
-      const response = await fetch('http://localhost:3000/api/verificar-email', {
+      const response = await fetch(`${API_URL}/api/verificar-email`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
@@ -94,7 +96,7 @@ export const useAuth = () => {
   };
 
   const googleLogin = () => {
-    window.location.href = 'http://localhost:3000/auth/google';
+    window.location.href = `${API_URL}/auth/google`;
   };
 
   return {

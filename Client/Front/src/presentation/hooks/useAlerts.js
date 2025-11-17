@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 export const useAlerts = (userId = null) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -15,7 +17,7 @@ export const useAlerts = (userId = null) => {
     setLoading(true);
     
     try {
-      const url = `http://localhost:3000/api/alerts/${userId}`;
+      const url = `${API_URL}/api/alerts/${userId}`;
 
       
       const response = await fetch(url);
@@ -47,7 +49,7 @@ export const useAlerts = (userId = null) => {
     setMessage('');
     
     try {
-      const response = await fetch('http://localhost:3000/api/alerts', {
+      const response = await fetch(`${API_URL}/api/alerts`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(alertData)
@@ -73,7 +75,7 @@ export const useAlerts = (userId = null) => {
   const updateAlert = async (alertId, alertData) => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:3000/api/alerts/${alertId}`, {
+      const response = await fetch(`${API_URL}/api/alerts/${alertId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(alertData)
@@ -96,7 +98,7 @@ export const useAlerts = (userId = null) => {
   const deleteAlert = async (alertId) => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:3000/api/alerts/${alertId}`, {
+      const response = await fetch(`${API_URL}/api/alerts/${alertId}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId })

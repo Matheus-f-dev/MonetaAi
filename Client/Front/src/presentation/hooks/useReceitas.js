@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 export function useReceitas(selectedPeriod, userId) {
   const [receitasData, setReceitasData] = useState({
     totalReceitas: 0,
@@ -17,7 +19,7 @@ export function useReceitas(selectedPeriod, userId) {
       
       setLoading(true);
       try {
-        const response = await fetch(`http://localhost:3000/api/receitas/${userId}?period=${selectedPeriod}`);
+        const response = await fetch(`${API_URL}/api/receitas/${userId}?period=${selectedPeriod}`);
         const result = await response.json();
         
         if (result.success) {

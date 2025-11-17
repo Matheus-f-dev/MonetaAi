@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 export const useSystemSimple = (userId) => {
   const [userSalary, setUserSalary] = useState(0);
   const [chartFilter, setChartFilter] = useState('month');
@@ -7,7 +9,7 @@ export const useSystemSimple = (userId) => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/user/${userId}`);
+        const response = await fetch(`${API_URL}/api/user/${userId}`);
         
         if (!response.ok) {
           const user = JSON.parse(localStorage.getItem('user') || '{}');

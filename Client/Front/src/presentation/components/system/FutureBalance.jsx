@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Line } from 'react-chartjs-2';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 export function FutureBalance({ transactions, userSalary }) {
   const [period, setPeriod] = useState(12);
   const [projectionData, setProjectionData] = useState([]);
@@ -32,7 +34,7 @@ export function FutureBalance({ transactions, userSalary }) {
     }
     
     try {
-      const res = await fetch(`http://localhost:3000/api/projecao-saldo/${period}`, {
+      const res = await fetch(`${API_URL}/api/projecao-saldo/${period}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ transactions })

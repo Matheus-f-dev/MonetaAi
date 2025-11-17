@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useToast } from './useToast';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 export const useAlertNotifications = (userId) => {
   const [notifications, setNotifications] = useState([]);
   const { addToast } = useToast();
@@ -9,7 +11,7 @@ export const useAlertNotifications = (userId) => {
     if (!userId) return;
 
     try {
-      const response = await fetch(`http://localhost:3000/api/notifications/${userId}`);
+      const response = await fetch(`${API_URL}/api/notifications/${userId}`);
       const data = await response.json();
       
       if (data.success) {

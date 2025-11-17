@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 export const useImpactoFinanceiro = () => {
   const [loading, setLoading] = useState(false);
   const [analise, setAnalise] = useState(null);
@@ -18,7 +20,7 @@ export const useImpactoFinanceiro = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:3000/api/impacto-financeiro', {
+      const response = await fetch(`${API_URL}/api/impacto-financeiro`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, produto, valor })

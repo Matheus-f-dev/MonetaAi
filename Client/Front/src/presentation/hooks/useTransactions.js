@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import observerService from '../../core/services/ObserverService';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
 // Hook integrado com Observer Pattern
 export function useTransactions() {
   const [transactions, setTransactions] = useState([]);
@@ -12,7 +14,7 @@ export function useTransactions() {
       const user = JSON.parse(localStorage.getItem('user') || '{}');
       const userId = user.uid || 'default-user';
       
-      const response = await fetch(`http://localhost:3000/api/transactions/${userId}`);
+      const response = await fetch(`${API_URL}/api/transactions/${userId}`);
       const data = await response.json();
       
       if (data.success) {
