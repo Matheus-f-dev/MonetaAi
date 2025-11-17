@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from 'react';
-import '../../debug.js';
 import { useSearchParams } from 'react-router-dom';
 import "../styles/pages/system.css";
 import "../styles/components/TransactionModal.css";
