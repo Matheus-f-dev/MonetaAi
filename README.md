@@ -19,9 +19,7 @@ MonetaAi/
 │   │   │       ├── components/   # Estilos de componentes
 │   │   │       └── pages/        # Estilos de páginas
 │   │   ├── core/                 # Business Logic Layer
-│   │   │   ├── entities/         # Models (Entidades)
 │   │   │   ├── services/         # Services (API calls)
-│   │   │   ├── usecases/         # Use Cases
 │   │   │   └── validators/       # Validadores
 │   │   ├── domain/               # Domain Models
 │   │   ├── infrastructure/       # Infrastructure Layer
