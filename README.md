@@ -9,19 +9,28 @@ O sistema permite que usuários organizem suas finanças de maneira simples e ef
 MonetaAi/
 ├── Client/Front/                 # Frontend React (MVC Adaptado)
 │   ├── src/
-│   │   ├── presentation/
+│   │   ├── presentation/         # Views Layer
 │   │   │   ├── pages/            # Views (Páginas React)
 │   │   │   ├── components/       # Componentes reutilizáveis
+│   │   │   │   └── system/       # Componentes do sistema
 │   │   │   ├── hooks/            # Controllers (Custom Hooks)
-│   │   │   └── styles/           # Estilos CSS
-│   │   ├── core/
+│   │   │   └── styles/           # Estilos CSS organizados
+│   │   │       ├── base/         # Estilos base
+│   │   │       ├── components/   # Estilos de componentes
+│   │   │       └── pages/        # Estilos de páginas
+│   │   ├── core/                 # Business Logic Layer
 │   │   │   ├── entities/         # Models (Entidades)
 │   │   │   ├── services/         # Services (API calls)
 │   │   │   ├── usecases/         # Use Cases
 │   │   │   └── validators/       # Validadores
 │   │   ├── domain/               # Domain Models
-│   │   ├── infrastructure/       # Infraestrutura
-│   │   └── shared/               # Utilitários compartilhados
+│   │   ├── infrastructure/       # Infrastructure Layer
+│   │   │   ├── api/              # Configurações de API
+│   │   │   ├── mocks/            # Dados mockados
+│   │   │   └── storage/          # Gerenciamento de storage
+│   │   ├── shared/               # Utilitários compartilhados
+│   │   ├── assets/               # Recursos estáticos
+│   │   └── App.jsx               # Componente principal
 │   └── package.json
 ├── Service/                      # Backend Node.js (MVC Completo)
 │   ├── src/
@@ -32,14 +41,23 @@ MonetaAi/
 │   │   ├── repositories/         # Data Access Layer
 │   │   ├── routes/               # Rotas da API
 │   │   ├── middleware/           # Middlewares
-│   │   └── config/               # Configurações
+│   │   ├── config/               # Configurações
+│   │   └── app.js                # Aplicação principal
 │   ├── views/                    # Views (Templates EJS)
 │   ├── public/                   # Arquivos estáticos
 │   └── package.json
-└── bot_moneta_ai/                # Chatbot Python
+└── MonetaAi_bot/                 # Chatbot Python
     ├── services/                 # Services do bot
+    │   ├── conversation_service.py
+    │   ├── openai_client.py
+    │   ├── sns_event_parser.py
+    │   └── whatsapp_service.py
     ├── utils/                    # Utilitários
-    └── app.py                    # Aplicação principal
+    │   └── models.py
+    ├── app.py                    # Aplicação principal
+    ├── firebase_manager.py       # Gerenciador Firebase
+    ├── dynamodb_manager.py       # Gerenciador DynamoDB
+    └── requirements.txt          # Dependências Python
 ```
 
 ## 🚀 Como Executar o Projeto
