@@ -5,7 +5,7 @@ const router = express.Router();
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 router.get('/google/callback',
-  passport.authenticate('google', { failureRedirect: 'http://localhost:5173/login' }),
+  passport.authenticate('google', { failureRedirect: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/login` }),
   async (req, res) => {
     try {
       req.session.userId = req.user.uid;
@@ -25,10 +25,10 @@ router.get('/google/callback',
       };
       
       // Redirecionar com token e dados do usuário
-      res.redirect(`http://localhost:5173/system?token=${token}&user=${encodeURIComponent(JSON.stringify(userData))}`);
+      res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/system?token=${token}&user=${encodeURIComponent(JSON.stringify(userData))}`);
     } catch (error) {
       console.error('Erro no callback do Google:', error);
-      res.redirect('http://localhost:5173/login?error=auth_failed');
+      res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/login?error=auth_failed`);
     }
   }
 );
