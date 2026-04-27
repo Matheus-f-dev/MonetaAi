@@ -18,6 +18,7 @@ import Alerts from './presentation/pages/Alerts';
 import Reports from './presentation/pages/Reports';
 import Analytics from './presentation/pages/Analytics';
 import ImpactoFinanceiro from './presentation/pages/ImpactoFinanceiro';
+import Agent from './presentation/pages/Agent';
 import AuthCallback from './presentation/pages/AuthCallback';
 import PrivacyPolicy from './presentation/pages/legal/PrivacyPolicy';
 import TermsOfService from './presentation/pages/legal/TermsOfService';
@@ -43,6 +44,7 @@ function AppRouter() {
       case '/reports': return <Reports />;
       case '/analytics': return <Analytics />;
       case '/impacto-financeiro': return <ImpactoFinanceiro />;
+      case '/agent': return <Agent />;
       case '/auth/callback': return <AuthCallback />;
       case '/privacy-policy': return <PrivacyPolicy />;
       case '/terms-of-service': return <TermsOfService />;
@@ -63,6 +65,7 @@ function AppRouter() {
         case '/reports': return <Reports />;
         case '/analytics': return <Analytics />;
         case '/impacto-financeiro': return <ImpactoFinanceiro />;
+        case '/agent': return <Agent />;
         case '/auth/callback': return <AuthCallback />;
         case '/privacy-policy': return <PrivacyPolicy />;
         case '/terms-of-service': return <TermsOfService />;

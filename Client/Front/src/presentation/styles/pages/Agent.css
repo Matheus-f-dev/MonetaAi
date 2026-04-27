@@ -1,0 +1,56 @@
+/* Agent.css — Layout da página do agente */
+
+.agent-page {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg-primary, #0f0f1a);
+}
+
+.agent-page__main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 32px 28px;
+  gap: 24px;
+  overflow: hidden;
+}
+
+.agent-page__header {
+  flex-shrink: 0;
+}
+
+.agent-page__title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-primary, #f1f5f9);
+  margin: 0 0 6px;
+  background: linear-gradient(135deg, #6366f1, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.agent-page__subtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary, #94a3b8);
+  margin: 0;
+  max-width: 560px;
+  line-height: 1.5;
+}
+
+.agent-page__chat-wrapper {
+  flex: 1;
+  min-height: 0;
+  max-width: 760px;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .agent-page__main {
+    padding: 16px 12px;
+  }
+
+  .agent-page__chat-wrapper {
+    max-width: 100%;
+  }
+}

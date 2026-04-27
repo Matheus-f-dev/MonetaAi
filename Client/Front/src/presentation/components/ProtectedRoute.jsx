@@ -16,7 +16,7 @@ export function ProtectedRoute({ children }) {
     const allowedDirectRoutes = [
       '/', '/login', '/cadastro', '/esqueci-senha', '/system', 
       '/expenses', '/incomes', '/profile', '/alerts', '/reports', 
-      '/analytics', '/impacto-financeiro', '/auth/callback',
+      '/analytics', '/impacto-financeiro', '/agent', '/auth/callback',
       '/privacy-policy', '/terms-of-service'
     ];
     

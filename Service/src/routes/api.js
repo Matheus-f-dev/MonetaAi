@@ -8,6 +8,7 @@ const ImpactoFinanceiroController = require('../controllers/ImpactoFinanceiroCon
 const ReceitasController = require('../controllers/ReceitasController');
 const EconomiasController = require('../controllers/EconomiasController');
 const TendenciasController = require('../controllers/TendenciasController');
+const AgentController = require('../agent/AgentController');
 
 const router = express.Router();
 
@@ -51,6 +52,9 @@ router.get('/economias/:userId', EconomiasController.obterAnaliseEconomias);
 
 // Rotas de tendências
 router.get('/tendencias/:userId', TendenciasController.obterAnaliseTendencias);
+
+// Rota do agente Moneta AI
+router.post('/agent/chat', AgentController.chat);
 
 // Debug route
 router.get('/test', (req, res) => {

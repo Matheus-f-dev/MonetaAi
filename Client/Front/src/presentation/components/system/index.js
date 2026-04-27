@@ -12,3 +12,4 @@ export { FutureBalance } from './FutureBalance';
 export { Toast } from './Toast';
 export { ToastContainer } from './ToastContainer';
 export * from './Icons';
+export { default as AgentChat } from './AgentChat';

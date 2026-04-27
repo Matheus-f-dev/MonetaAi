@@ -29,6 +29,7 @@ export function Sidebar() {
           <SideItem label="Relatórios" icon={<DocIcon />} onClick={() => secureNavigate('/reports')} />
           <SideItem label="Alertas" icon={<BellIcon />} onClick={() => secureNavigate('/alerts')} />
           <SideItem label="Impacto Financeiro" icon={<ChartIcon />} onClick={() => secureNavigate('/impacto-financeiro')} />
+          <SideItem label="Moneta AI" icon={<BotIcon />} onClick={() => secureNavigate('/agent')} />
           <SideItem label="Perfil" icon={<UserIcon />} onClick={() => secureNavigate('/profile')} />
         </nav>
       </div>

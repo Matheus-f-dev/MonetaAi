@@ -16,6 +16,7 @@ const ROUTE_MAP = {
   '/reports': 'data',
   '/analytics': 'stats',
   '/impacto-financeiro': 'impact',
+  '/agent': 'chat',
   '/auth/callback': 'callback',
   '/privacy-policy': 'privacy',
   '/terms-of-service': 'terms'
