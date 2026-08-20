@@ -1,10 +1,10 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
-// Cena 3D leve: moedas de latão e cédulas (com textura desenhada na hora,
-// sem asset externo) flutuam no hero, giram devagar e reagem ao mouse.
-// Posições calculadas à mão pra nunca deixar duas peças se cruzarem —
-// ver comentário de distância mínima logo abaixo.
+// Cena 3D leve: moeda, cédula e duas medalhas ($ e ₿) — tudo com textura
+// desenhada na hora em canvas, sem asset externo — flutuam no hero, giram
+// devagar e reagem ao mouse. Posições calculadas à mão pra nunca deixar
+// duas peças se cruzarem — ver comentário de distância mínima logo abaixo.
 export default function CoinScene() {
   const mountRef = useRef(null);
 
@@ -127,33 +127,65 @@ export default function CoinScene() {
       return new THREE.Mesh(billGeo, [sideMat, capMat]);
     };
 
+    // ─────────────────── medalha de símbolo ($ / ₿) ───────────────────
+    // Reaproveita a mesma geometria da moeda — só troca a textura da face.
+    function makeSymbolTexture(ink, glyph) {
+      const c = document.createElement('canvas');
+      c.width = 512; c.height = 512;
+      const ctx = c.getContext('2d');
+      ctx.clearRect(0, 0, c.width, c.height);
+
+      ctx.beginPath();
+      ctx.arc(256, 256, 240, 0, Math.PI * 2);
+      ctx.strokeStyle = ink; ctx.globalAlpha = 0.85; ctx.lineWidth = 10; ctx.stroke();
+      ctx.globalAlpha = 1;
+
+      ctx.fillStyle = ink;
+      ctx.font = '700 320px "Hanken Grotesk", Arial, sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(glyph, 256, 280);
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.anisotropy = 4;
+      return tex;
+    }
+
+    const makeSymbolCoin = (metalColor, ink, glyph, roughness) => {
+      const tex = makeSymbolTexture(ink, glyph);
+      disposables.push(tex);
+      const capMat = new THREE.MeshPhysicalMaterial({ color: metalColor, map: tex, metalness: 0.82, roughness, clearcoat: 0.3, clearcoatRoughness: 0.25 });
+      const sideMat = new THREE.MeshPhysicalMaterial({ color: metalColor, metalness: 0.88, roughness: 0.35 });
+      return new THREE.Mesh(coinGeo, [sideMat, capMat]);
+    };
+
     const group = new THREE.Group();
 
     // ── posições: distância entre centros sempre > soma dos raios + 0.4
-    // (coinA r≈1.7, coinB r≈1.15, billA/B r≈1.32×escala — ver cálculo no PR) ──
-    const coinA = makeCoin(0xd9a441, 0.32);
+    // (coinA r≈1.7, bill r≈1.52, $ r≈1.05, ₿ r≈0.9 — cálculo no PR) ──
+    const coinA = makeCoin(0xd9a441, 0.32); // moeda-âncora, lisa
     coinA.scale.setScalar(1.7);
-    coinA.position.set(0.6, 0.2, 2.6);
+    coinA.position.set(0.5, 0.1, 2.6);
     coinA.rotation.set(0.15, 0.4, 0.08);
     group.add(coinA);
 
-    const coinB = makeCoin(0xb9862f, 0.4);
-    coinB.scale.setScalar(1.15);
-    coinB.position.set(-2.0, -1.3, -3.2);
-    coinB.rotation.set(0.3, 1.1, -0.2);
-    group.add(coinB);
+    const nota = makeBill('#4B2E83', '#F6F1E4', '50'); // a "nota", virada quase de frente
+    nota.scale.setScalar(1.15);
+    nota.position.set(-2.1, 1.5, -1.2);
+    nota.rotation.set(0.18, 0.35, 0.06);
+    group.add(nota);
 
-    const billA = makeBill('#4B2E83', '#F6F1E4', '50');
-    billA.scale.setScalar(1.3);
-    billA.position.set(-2.0, 1.6, -1.5);
-    billA.rotation.set(0.5, 0.9, 0.15);
-    group.add(billA);
+    const dollarCoin = makeSymbolCoin(0xd9a441, '#2e1b54', '$', 0.3); // medalha $
+    dollarCoin.scale.setScalar(1.05);
+    dollarCoin.position.set(-1.8, -1.6, -2.8);
+    dollarCoin.rotation.set(0.25, 0.7, -0.1);
+    group.add(dollarCoin);
 
-    const billB = makeBill('#C68A2E', '#1B1730', '10');
-    billB.scale.setScalar(1.0);
-    billB.position.set(1.6, -1.7, -1.0);
-    billB.rotation.set(-0.3, -0.6, -0.1);
-    group.add(billB);
+    const bitcoinCoin = makeSymbolCoin(0xd88a3f, '#3a1f08', '₿', 0.34); // medalha ₿
+    bitcoinCoin.scale.setScalar(0.9);
+    bitcoinCoin.position.set(2.4, -1.3, 0.5);
+    bitcoinCoin.rotation.set(-0.2, -0.5, 0.15);
+    group.add(bitcoinCoin);
 
     scene.add(group);
 
@@ -196,7 +228,7 @@ export default function CoinScene() {
     // ── loop ──
     const clock = new THREE.Clock();
     let raf;
-    const pieces = [coinA, coinB, billA, billB];
+    const pieces = [coinA, nota, dollarCoin, bitcoinCoin];
     const spins = [0.006, -0.0045, 0.0035, -0.005];
     const bobPhase = [0, 1.5, 3, 4.5];
     const bobBase = pieces.map((p) => p.position.y);
@@ -224,7 +256,7 @@ export default function CoinScene() {
       ro.disconnect();
       window.removeEventListener('pointermove', onMove);
       disposables.forEach((d) => d.dispose());
-      [coinA, coinB, billA, billB].forEach((mesh) => {
+      [coinA, nota, dollarCoin, bitcoinCoin].forEach((mesh) => {
         (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).forEach((m) => m.dispose());
       });
       renderer.dispose();
