@@ -50,8 +50,11 @@ class ApiConnection {
     });
   }
   
-  async delete(endpoint) {
-    return this.request(endpoint, { method: 'DELETE' });
+  async delete(endpoint, data) {
+    return this.request(endpoint, {
+      method: 'DELETE',
+      ...(data ? { body: JSON.stringify(data) } : {})
+    });
   }
 }
 

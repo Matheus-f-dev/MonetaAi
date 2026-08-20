@@ -42,6 +42,14 @@ export const useReports = (userId, selectedPeriod) => {
 
   const filteredTransactions = transactions;
 
+  // Transferência entre contas move dinheiro, não é receita nem despesa —
+  // usada em vez de `transactions` em todo cálculo agregado (gráfico, totais,
+  // categorias). A listagem crua (`filteredTransactions`) continua mostrando tudo.
+  const naoTransferencia = useMemo(
+    () => transactions.filter(t => !t.isTransferencia),
+    [transactions]
+  );
+
   const generateChartData = (transactionsList) => {
     const monthlyData = {};
     const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
@@ -126,32 +134,32 @@ export const useReports = (userId, selectedPeriod) => {
   };
 
   useEffect(() => {
-    if (transactions.length > 0) {
-      const data = generateChartData(transactions);
+    if (naoTransferencia.length > 0) {
+      const data = generateChartData(naoTransferencia);
       setChartData(data);
     }
-  }, [transactions, selectedPeriod]);
+  }, [naoTransferencia, selectedPeriod]);
 
   const totals = useMemo(() => {
-    const income = transactions
+    const income = naoTransferencia
       .filter(t => t.tipo?.toLowerCase() === 'receita')
       .reduce((sum, t) => sum + Math.abs(t.valor || 0), 0);
-      
-    const expenses = transactions
+
+    const expenses = naoTransferencia
       .filter(t => t.tipo?.toLowerCase() === 'despesa')
       .reduce((sum, t) => sum + Math.abs(t.valor || 0), 0);
-      
+
     const balance = income - expenses;
 
     return { income, expenses, balance };
-  }, [transactions]);
+  }, [naoTransferencia]);
 
   const getCategoriesData = () => {
     const categories = {};
     const { expenses: totalDespesas } = totals;
-    
+
     // Processar apenas despesas
-    transactions
+    naoTransferencia
       .filter(t => t.tipo?.toLowerCase() === 'despesa')
       .forEach(transaction => {
         const category = transaction.categoria || 'Outros';

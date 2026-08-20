@@ -11,9 +11,9 @@ class TransactionController {
       // Singleton Pattern - Conexão única com banco
       const dbConnection = new DatabaseConnection();
       const db = dbConnection.getFirestore();
-      
+
       const transactionData = req.body;
-      
+
       // Factory Method Pattern - Criar transação baseada no tipo
       const transactionType = transactionData.tipo?.toLowerCase() === 'receita' ? 'income' : 'expense';
       const factoryTransaction = TransactionFactory.createTransaction(transactionType, {
@@ -22,12 +22,46 @@ class TransactionController {
         category: transactionData.categoria,
         date: transactionData.dataHora
       });
-      
 
-      
+
       const transactionService = new TransactionService();
+      const parcelas = parseInt(transactionData.parcelas, 10) || 1;
+
+      // Compra parcelada no cartão: gera uma transação por mês, todas ligadas por compraId
+      if (parcelas > 1 && transactionData.cardId) {
+        const compraId = db.collection('_ids').doc().id;
+        const valorParcela = parseFloat(transactionData.valor) / parcelas;
+        const [dia, mes, ano] = (transactionData.dataHora || '').split(', ')[0]?.split('/') || [];
+        const baseDate = dia ? new Date(ano, mes - 1, dia) : new Date();
+
+        const created = [];
+        for (let i = 0; i < parcelas; i++) {
+          const parcelaDate = new Date(baseDate.getFullYear(), baseDate.getMonth() + i, baseDate.getDate());
+          const dataHora = `${String(parcelaDate.getDate()).padStart(2, '0')}/${String(parcelaDate.getMonth() + 1).padStart(2, '0')}/${parcelaDate.getFullYear()}, ${new Date().toLocaleTimeString('pt-BR')}`;
+
+          const transaction = await transactionService.createTransaction({
+            ...transactionData,
+            valor: valorParcela,
+            dataHora,
+            compraId,
+            parcelaAtual: i + 1,
+            parcelaTotal: parcelas
+          });
+          created.push(transaction);
+        }
+
+        transactionSubject.notify(transactionData);
+
+        return res.status(201).json({
+          success: true,
+          message: `Compra parcelada em ${parcelas}x criada com sucesso!`,
+          transaction: created[0],
+          installments: created
+        });
+      }
+
       const transaction = await transactionService.createTransaction(transactionData);
-      
+
       // Notificar observers sobre a nova transação
       transactionSubject.notify(transactionData);
 
@@ -49,14 +83,15 @@ class TransactionController {
     try {
       const transactionService = new TransactionService();
       const { userId } = req.params;
-      const { filter, startDate, endDate, category, type } = req.query;
-      
+      const { filter, startDate, endDate, category, type, accountId } = req.query;
+
       const transactions = await transactionService.getUserTransactions(userId, {
         filter,
         startDate,
         endDate,
         category,
-        type
+        type,
+        accountId
       });
 
       res.json({
@@ -145,9 +180,13 @@ class TransactionController {
     try {
       const transactionService = new TransactionService();
       const { id } = req.params;
-      const updateData = req.body;
+      const { userId, ...updateData } = req.body;
 
-      const transaction = await transactionService.updateTransaction(id, updateData);
+      if (!userId) {
+        return res.status(400).json({ success: false, message: 'userId é obrigatório' });
+      }
+
+      const transaction = await transactionService.updateTransaction(userId, id, updateData);
 
       res.json({
         success: true,
@@ -167,7 +206,13 @@ class TransactionController {
     try {
       const transactionService = new TransactionService();
       const { id } = req.params;
-      await transactionService.deleteTransaction(id);
+      const { userId } = req.body;
+
+      if (!userId) {
+        return res.status(400).json({ success: false, message: 'userId é obrigatório' });
+      }
+
+      await transactionService.deleteTransaction(userId, id);
 
       res.json({
         success: true,

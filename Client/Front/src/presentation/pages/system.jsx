@@ -11,6 +11,9 @@ import { useSystemSimple } from '../hooks/useSystemSimple';
 import { useTransactions } from '../hooks/useTransactions';
 import { useToast } from '../hooks/useToast';
 import { useAlertNotifications } from '../hooks/useAlertNotifications';
+import { useCards } from '../hooks/useCards';
+import { usePeople } from '../hooks/usePeople';
+import { useAccounts } from '../hooks/useAccounts';
 
 import {
   Chart as ChartJS,
@@ -89,6 +92,9 @@ export default function System() {
   useAlertNotifications(userId);
   
   const { transactions, createTransaction, fetchTransactions, fetchChartData } = useTransactionData(userId);
+  const { cards } = useCards(userId);
+  const { people } = usePeople(userId);
+  const { accounts } = useAccounts(userId);
   const { userSalary, chartFilter, setChartFilter } = useSystemSimple(userId);
   const { notifyNewTransaction } = useTransactions();
   const [chartData, setChartData] = useState(null);
@@ -111,16 +117,19 @@ export default function System() {
     }
   }, [isModalOpen, fetchTransactions]);
   const totals = useMemo(() => {
-    const income = transactions
+    // Transferência entre contas move dinheiro, não é receita nem despesa
+    const naoTransferencia = transactions.filter(t => !t.isTransferencia);
+
+    const income = naoTransferencia
       .filter(t => t.tipo?.toLowerCase() === 'receita')
       .reduce((sum, t) => sum + Math.abs(t.valor || 0), 0);
-      
-    const expenses = transactions
+
+    const expenses = naoTransferencia
       .filter(t => t.tipo?.toLowerCase() === 'despesa')
       .reduce((sum, t) => sum + Math.abs(t.valor || 0), 0);
-      
+
     const balance = income - expenses;
-    
+
     return { income, expenses, balance };
   }, [transactions]);
 
@@ -201,9 +210,13 @@ export default function System() {
       valor: parseFloat(transactionData.valor),
       descricao: transactionData.descricao,
       categoria: transactionData.categoria,
-      dataHora: formattedDate
+      dataHora: formattedDate,
+      ...(transactionData.accountId ? { accountId: transactionData.accountId } : {}),
+      ...(transactionData.cardId ? { cardId: transactionData.cardId } : {}),
+      ...(transactionData.parcelas ? { parcelas: transactionData.parcelas } : {}),
+      ...(transactionData.split ? { split: transactionData.split } : {})
     };
-    
+
     const result = await createTransaction(payload);
     
     if (result.success) {
@@ -260,10 +273,13 @@ export default function System() {
         </section>
       </main>
       
-      <TransactionModal 
+      <TransactionModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleSubmitTransaction}
+        cards={cards}
+        accounts={accounts}
+        knownNames={people.map(p => p.nome)}
       />
     </div>
   );

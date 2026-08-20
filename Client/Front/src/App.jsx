@@ -13,6 +13,10 @@ import RedefinirSenha from './presentation/pages/ChangePassword';
 import System from './presentation/pages/system';
 import Expenses from './presentation/pages/Expenses';
 import Incomes from './presentation/pages/Incomes';
+import Cards from './presentation/pages/Cards';
+import FixedExpenses from './presentation/pages/FixedExpenses';
+import People from './presentation/pages/People';
+import Contas from './presentation/pages/Contas';
 import Profile from './presentation/pages/Profile';
 import Alerts from './presentation/pages/Alerts';
 import Reports from './presentation/pages/Reports';
@@ -39,6 +43,10 @@ function AppRouter() {
       case '/system': return <System />;
       case '/expenses': return <Expenses />;
       case '/incomes': return <Incomes />;
+      case '/cartoes': return <Cards />;
+      case '/gastos-fixos': return <FixedExpenses />;
+      case '/pessoas': return <People />;
+      case '/contas': return <Contas />;
       case '/profile': return <Profile />;
       case '/alerts': return <Alerts />;
       case '/reports': return <Reports />;
@@ -49,7 +57,7 @@ function AppRouter() {
       case '/privacy-policy': return <PrivacyPolicy />;
       case '/terms-of-service': return <TermsOfService />;
     }
-    
+
     if (currentPath.startsWith('/app/')) {
       const decryptedRoute = decryptRoute(currentPath);
       
@@ -60,6 +68,10 @@ function AppRouter() {
         case '/system': return <System />;
         case '/expenses': return <Expenses />;
         case '/incomes': return <Incomes />;
+        case '/cartoes': return <Cards />;
+        case '/gastos-fixos': return <FixedExpenses />;
+        case '/pessoas': return <People />;
+        case '/contas': return <Contas />;
         case '/profile': return <Profile />;
         case '/alerts': return <Alerts />;
         case '/reports': return <Reports />;

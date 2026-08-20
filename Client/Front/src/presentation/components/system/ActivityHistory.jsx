@@ -1,34 +1,39 @@
 import { useState } from 'react';
 import { useTransactionData } from '../../hooks/useTransactionData';
+import { useToast } from '../../hooks/useToast';
+import { TransactionModal } from './TransactionModal';
 
 export function ActivityHistory() {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const userId = user.uid || 'default-user';
-  const { transactions: rawTransactions, loading, fetchTransactions } = useTransactionData(userId);
+  const { transactions: rawTransactions, loading, fetchTransactions, updateTransaction, deleteTransaction } = useTransactionData(userId);
+  const { addToast } = useToast();
   const [filters, setFilters] = useState({
     type: 'all',
     category: 'all',
     period: 'all'
   });
+  const [editingTransaction, setEditingTransaction] = useState(null);
 
   const transactions = rawTransactions
     .map(transaction => {
       const dateField = transaction.dataHora || transaction.data || transaction.criadoEm;
       let processedDate = dateField;
-      
+
       if (dateField && typeof dateField === 'string' && dateField.includes('/')) {
         const [datePart] = dateField.split(', ');
         const [day, month, year] = datePart.split('/');
         processedDate = new Date(year, month - 1, day);
       }
-      
+
       return {
         id: transaction.id || Math.random(),
         date: processedDate,
         description: transaction.descricao || 'Sem descrição',
         category: transaction.categoria || 'Outros',
         value: transaction.valor || 0,
-        type: (transaction.tipo || 'despesa').toLowerCase()
+        type: (transaction.tipo || 'despesa').toLowerCase(),
+        raw: transaction
       };
     })
     .sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -72,6 +77,24 @@ export function ActivityHistory() {
   // Obter categorias únicas para o filtro
   const uniqueCategories = [...new Set(transactions.map(t => t.category))];
 
+  const handleDelete = async (transactionId) => {
+    if (!window.confirm('Excluir esta transação? Essa ação não pode ser desfeita.')) return;
+
+    const result = await deleteTransaction(transactionId);
+    addToast(result.message || (result.success ? 'Transação excluída com sucesso!' : 'Erro ao excluir transação'), result.success ? 'success' : 'error');
+  };
+
+  const handleUpdateSubmit = async (transactionData) => {
+    const result = await updateTransaction(editingTransaction.id, {
+      tipo: transactionData.tipo,
+      valor: Math.abs(transactionData.valor),
+      descricao: transactionData.descricao,
+      categoria: transactionData.categoria
+    });
+
+    addToast(result.message || (result.success ? 'Transação atualizada com sucesso!' : 'Erro ao atualizar transação'), result.success ? 'success' : 'error');
+    setEditingTransaction(null);
+  };
 
   if (loading) {
     return <div className="activity-loading">Carregando histórico...</div>;
@@ -138,11 +161,31 @@ export function ActivityHistory() {
                   </span>
                 </div>
               </div>
-              <div className={`activity-value ${transaction.type}`}>
-                {transaction.type === 'receita' ? 
-                  `+R$ ${Math.abs(transaction.value).toFixed(2)}` : 
-                  `-R$ ${Math.abs(transaction.value).toFixed(2)}`
-                }
+              <div className="activity-right">
+                <div className={`activity-value ${transaction.type}`}>
+                  {transaction.type === 'receita' ?
+                    `+R$ ${Math.abs(transaction.value).toFixed(2)}` :
+                    `-R$ ${Math.abs(transaction.value).toFixed(2)}`
+                  }
+                </div>
+                <div className="activity-actions">
+                  <button
+                    type="button"
+                    className="activity-action-btn"
+                    onClick={() => setEditingTransaction(transaction.raw)}
+                    aria-label="Editar transação"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    type="button"
+                    className="activity-action-btn danger"
+                    onClick={() => handleDelete(transaction.raw.id)}
+                    aria-label="Excluir transação"
+                  >
+                    Excluir
+                  </button>
+                </div>
               </div>
             </div>
           ))
@@ -152,6 +195,13 @@ export function ActivityHistory() {
           </div>
         )}
       </div>
+
+      <TransactionModal
+        isOpen={Boolean(editingTransaction)}
+        onClose={() => setEditingTransaction(null)}
+        onSubmit={handleUpdateSubmit}
+        editingTransaction={editingTransaction}
+      />
     </div>
   );
 }

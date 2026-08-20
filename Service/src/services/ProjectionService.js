@@ -26,17 +26,18 @@ class ProjectionService {
   }
 
   static getCurrentBalance(transactions) {
-    return transactions.reduce((acc, t) => {
-      return acc + (t.tipo?.toLowerCase() === 'receita' ? 
-        Math.abs(parseFloat(t.valor) || 0) : 
+    // Transferência entre contas move dinheiro, não é receita nem despesa
+    return transactions.filter(t => !t.isTransferencia).reduce((acc, t) => {
+      return acc + (t.tipo?.toLowerCase() === 'receita' ?
+        Math.abs(parseFloat(t.valor) || 0) :
         -Math.abs(parseFloat(t.valor) || 0));
     }, 0);
   }
 
   static groupTransactionsByMonth(transactions) {
     const monthlyData = {};
-    const recent = transactions.slice(-90); // Últimos 90 dias mais relevantes
-    
+    const recent = transactions.filter(t => !t.isTransferencia).slice(-90); // Últimos 90 dias mais relevantes
+
     recent.forEach(t => {
       const month = this.extractMonth(t);
       if (!monthlyData[month]) {
@@ -68,7 +69,7 @@ class ProjectionService {
   }
 
   static getNetValue(transactions) {
-    return transactions.reduce((acc, t) => {
+    return transactions.filter(t => !t.isTransferencia).reduce((acc, t) => {
       return acc + (t.tipo?.toLowerCase() === 'receita' ? 
         Math.abs(parseFloat(t.valor) || 0) : 
         -Math.abs(parseFloat(t.valor) || 0));

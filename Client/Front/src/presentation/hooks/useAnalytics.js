@@ -116,6 +116,11 @@ export function useAnalytics(selectedPeriod, userId) {
   };
 
   const processAnalyticsData = (currentTransactions, period) => {
+    // Transferência entre contas move dinheiro, não é receita nem despesa —
+    // filtrada uma vez aqui pra todo o resto da função (categorias, evolução,
+    // dados diários...) herdar a exclusão automaticamente.
+    currentTransactions = currentTransactions.filter(t => !t.isTransferencia);
+
     const expenses = currentTransactions
       .filter(t => t.tipo?.toLowerCase() === 'despesa')
       .reduce((sum, t) => sum + Math.abs(t.valor || 0), 0);

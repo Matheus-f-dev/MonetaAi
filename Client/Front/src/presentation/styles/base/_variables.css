@@ -1,0 +1,98 @@
+/* ============================================================
+   Tokens de design — fonte única da paleta MonetaAi.
+   Importado uma vez em main.jsx, então vale para o app inteiro.
+
+   Este arquivo só ADICIONA aliases que várias páginas (Alerts,
+   Analytics, ActivityHistory...) já usavam sem eles existirem em
+   lugar nenhum — antes resolviam para o valor inicial do browser
+   (efetivamente "sem estilo"). As variáveis "canônicas" (--bg,
+   --card, --primary-color etc.) continuam sendo definidas em
+   system.css como já eram; não duplicamos os valores aqui para
+   não brigar de ordem de carregamento — só apontamos os nomes
+   legados para elas.
+   ============================================================ */
+
+:root {
+  /* --- paleta canônica (igual à já usada em system.css) --- */
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --line: #e2e8f0;
+  --text: #0f172a;
+  --muted: #64748b;
+  --muted2: #94a3b8;
+
+  --background: #f8fafc;
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  --card-background: #ffffff;
+  --border: #e2e8f0;
+  --input-background: #ffffff;
+  --primary: #8b5cf6;
+  --primary-dark: #7c3aed;
+  --primary-light: #f3f4f6;
+  --primary-color: #8b5cf6;
+  --secondary: #f1f5f9;
+  --secondary-dark: #e2e8f0;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --radius: 14px;
+  --sidebar-w: 200px;
+
+  /* --- semânticas de estado, usadas por chips/status --- */
+  --success: #16a34a;
+  --success-soft: #dcfce7;
+  --danger: #ef4444;
+  --danger-soft: #fee2e2;
+  --warning: #d97706;
+  --warning-soft: #fef3c7;
+
+  /* --- aliases legados (nomes usados por Alerts/Analytics/ActivityHistory) --- */
+  --text-color: var(--text-primary);
+  --background-color: var(--background);
+  --bg-primary: var(--card-background);
+  --bg-secondary: var(--background);
+  --bg-hover: var(--secondary);
+  --border-color: var(--border);
+  --box-shadow: var(--shadow);
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, .06);
+  --shadow-md: 0 4px 10px rgba(15, 23, 42, .08);
+  --shadow-lg: 0 10px 24px rgba(15, 23, 42, .12);
+  --primary-hover: var(--primary-dark);
+  --hover-color: var(--primary-dark);
+}
+
+[data-theme="dark"] {
+  --bg: #0f172a;
+  --card: #1e293b;
+  --line: #334155;
+  --text: #f1f5f9;
+  --muted: #94a3b8;
+  --muted2: #64748b;
+
+  --background: #0f172a;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --card-background: #1e293b;
+  --border: #334155;
+  --input-background: #1e293b;
+  --secondary: #334155;
+  --secondary-dark: #475569;
+  --shadow: 0 8px 24px rgba(0, 0, 0, .3);
+
+  --success: #4ade80;
+  --success-soft: #14321f;
+  --danger: #f87171;
+  --danger-soft: #3a1620;
+  --warning: #fbbf24;
+  --warning-soft: #3a2c10;
+
+  --text-color: var(--text-primary);
+  --background-color: var(--background);
+  --bg-primary: var(--card-background);
+  --bg-secondary: var(--background);
+  --bg-hover: var(--secondary);
+  --border-color: var(--border);
+  --box-shadow: var(--shadow);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .35);
+  --shadow-md: 0 4px 10px rgba(0, 0, 0, .4);
+  --shadow-lg: 0 10px 24px rgba(0, 0, 0, .5);
+}

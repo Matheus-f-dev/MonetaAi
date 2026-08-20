@@ -1,0 +1,202 @@
+.people-main {
+  flex: 1;
+  padding: 2rem;
+  background: var(--background);
+  min-height: 100vh;
+}
+
+.people-container {
+  width: 100%;
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+.people-page-header {
+  margin-bottom: 1.25rem;
+}
+
+.people-title {
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.35rem;
+}
+
+.people-subtitle {
+  color: var(--text-secondary);
+  margin: 0;
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.people-search {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--input-background);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+}
+
+.people-search:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.people-empty {
+  background: var(--card-background);
+  border: 1px dashed var(--border);
+  border-radius: 14px;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.people-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.people-card {
+  background: var(--card-background);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.people-card-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.9rem 1.1rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+}
+
+.people-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex: none;
+}
+
+.people-info {
+  flex: 1;
+  min-width: 100px;
+}
+
+.people-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.people-meta {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.people-amounts {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.people-amount.due { color: var(--danger); }
+.people-amount.paid { color: var(--success); }
+
+.people-chevron {
+  color: var(--text-secondary);
+  transition: transform 0.15s ease;
+  flex: none;
+}
+
+.people-chevron.open {
+  transform: rotate(180deg);
+}
+
+.people-items {
+  border-top: 1px solid var(--border);
+  padding: 0.5rem 1.1rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.people-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  flex-wrap: wrap;
+}
+
+.people-item-info {
+  flex: 1;
+  min-width: 120px;
+}
+
+.people-item-desc {
+  font-size: 0.88rem;
+  color: var(--text-primary);
+}
+
+.people-item-date {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+}
+
+.people-item-value {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.people-paid-toggle {
+  padding: 0.35rem 0.7rem;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.people-paid-toggle:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.people-paid-toggle.is-paid {
+  background: var(--success-soft);
+  border-color: transparent;
+  color: var(--success);
+}
+
+@media (max-width: 560px) {
+  .people-main { padding: 1.25rem; }
+  .people-amounts { align-items: flex-start; }
+}

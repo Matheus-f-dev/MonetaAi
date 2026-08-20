@@ -1,0 +1,261 @@
+.cards-main {
+  flex: 1;
+  padding: 2rem;
+  background: var(--background);
+  min-height: 100vh;
+}
+
+.cards-container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.cards-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.cards-title {
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.35rem;
+}
+
+.cards-subtitle {
+  color: var(--text-secondary);
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.cards-add-btn {
+  padding: 0.75rem 1.25rem;
+  background: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.cards-add-btn:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+.cards-empty {
+  background: var(--card-background);
+  border: 1px dashed var(--border);
+  border-radius: 14px;
+  padding: 3rem 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+/* ---- cartão de crédito visual ---- */
+.credit-card {
+  position: relative;
+  border-radius: 16px;
+  padding: 1.25rem 1.4rem 1.1rem;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  box-shadow: var(--shadow-md);
+  font-variant-numeric: tabular-nums;
+}
+
+.credit-card--roxo   { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+.credit-card--azul   { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+.credit-card--verde  { background: linear-gradient(135deg, #10b981, #047857); }
+.credit-card--grafite{ background: linear-gradient(135deg, #475569, #1e293b); }
+
+.credit-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.credit-card-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.credit-card-invoice {
+  font-size: 0.95rem;
+}
+
+.credit-card-bottom {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  opacity: 0.9;
+  gap: 0.5rem;
+}
+
+.credit-card-bar {
+  width: 100%;
+  height: 5px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.28);
+  overflow: hidden;
+}
+
+.credit-card-bar i {
+  display: block;
+  height: 100%;
+  background: #fff;
+}
+
+.credit-card-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+.credit-card-actions button {
+  flex: 1;
+  padding: 0.4rem 0.6rem;
+  border-radius: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.credit-card-actions button:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+/* ---- modal (namespace cx- para não colidir com outras telas) ---- */
+.cx-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 10vh;
+  z-index: 1000;
+}
+
+.cx-modal-content {
+  background: var(--card-background);
+  color: var(--text-primary);
+  padding: 1.5rem;
+  border-radius: 14px;
+  width: 92%;
+  max-width: 420px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+}
+
+.cx-modal-content h2 {
+  margin: 0 0 1.25rem;
+  font-size: 1.35rem;
+  color: var(--text-primary);
+}
+
+.cx-form-group { margin-bottom: 1rem; }
+.cx-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+.cx-form-group label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-weight: 500;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.cx-form-group input {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: var(--input-background);
+  color: var(--text-primary);
+}
+
+.cx-form-group input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.cx-color-swatches { display: flex; gap: 0.6rem; }
+
+.cx-swatch {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+}
+
+.cx-swatch--roxo    { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+.cx-swatch--azul    { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+.cx-swatch--verde   { background: linear-gradient(135deg, #10b981, #047857); }
+.cx-swatch--grafite { background: linear-gradient(135deg, #475569, #1e293b); }
+
+.cx-swatch.active { border-color: var(--text-primary); }
+
+.cx-modal-buttons {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.cx-btn-cancel, .cx-btn-submit {
+  flex: 1;
+  padding: 0.7rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.cx-btn-cancel {
+  background: var(--secondary);
+  color: var(--text-primary);
+}
+
+.cx-btn-cancel:hover { background: var(--secondary-dark); }
+
+.cx-btn-submit {
+  background: var(--primary-color);
+  color: #fff;
+}
+
+.cx-btn-submit:hover { background: var(--primary-dark); }
+.cx-btn-submit:disabled { opacity: 0.7; cursor: not-allowed; }
+
+@media (max-width: 560px) {
+  .cards-main { padding: 1.25rem; }
+  .cards-page-header { flex-direction: column; }
+}

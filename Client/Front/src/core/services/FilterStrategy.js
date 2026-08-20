@@ -51,6 +51,13 @@ class TypeFilter {
     }
 }
 
+class AccountFilter {
+    filter(transactions, { accountId }) {
+        if (!accountId) return transactions;
+        return transactions.filter(t => t.accountId === accountId);
+    }
+}
+
 class PeriodFilter {
     filter(transactions, { period }) {
         if (!period) return transactions;
@@ -90,4 +97,4 @@ class PeriodFilter {
     }
 }
 
-export { FilterContext, DateRangeFilter, CategoryFilter, TypeFilter, PeriodFilter };
+export { FilterContext, DateRangeFilter, CategoryFilter, TypeFilter, PeriodFilter, AccountFilter };

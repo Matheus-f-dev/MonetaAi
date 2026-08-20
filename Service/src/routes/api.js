@@ -9,6 +9,10 @@ const ReceitasController = require('../controllers/ReceitasController');
 const EconomiasController = require('../controllers/EconomiasController');
 const TendenciasController = require('../controllers/TendenciasController');
 const AgentController = require('../agent/AgentController');
+const CardController = require('../controllers/CardController');
+const FixedExpenseController = require('../controllers/FixedExpenseController');
+const SplitController = require('../controllers/SplitController');
+const AccountController = require('../controllers/AccountController');
 
 const router = express.Router();
 
@@ -52,6 +56,32 @@ router.get('/economias/:userId', EconomiasController.obterAnaliseEconomias);
 
 // Rotas de tendências
 router.get('/tendencias/:userId', TendenciasController.obterAnaliseTendencias);
+
+// Rotas de cartões
+router.post('/cards', CardController.create);
+router.get('/cards/:userId', CardController.getUserCards);
+router.get('/cards/:userId/:cardId/invoice', CardController.getInvoice);
+router.put('/cards/:cardId', CardController.update);
+router.delete('/cards/:cardId', CardController.delete);
+
+// Rotas de gastos fixos
+router.post('/fixed-expenses', FixedExpenseController.create);
+router.get('/fixed-expenses/:userId', FixedExpenseController.getUserFixedExpenses);
+router.put('/fixed-expenses/:fixedExpenseId', FixedExpenseController.update);
+router.delete('/fixed-expenses/:fixedExpenseId', FixedExpenseController.delete);
+router.post('/fixed-expenses/:fixedExpenseId/lancar', FixedExpenseController.lancar);
+
+// Rotas de divisão de despesas (split entre pessoas)
+router.get('/split/:userId/people', SplitController.getPeople);
+router.put('/split/transactions/:transactionId/participants/:participantIndex', SplitController.setParticipantPaid);
+
+// Rotas de contas e carteiras
+router.post('/accounts', AccountController.create);
+router.get('/accounts/:userId', AccountController.getUserAccounts);
+router.get('/accounts/:userId/resumo', AccountController.getResumo);
+router.post('/accounts/:userId/transfer', AccountController.transfer);
+router.put('/accounts/:accountId', AccountController.update);
+router.delete('/accounts/:accountId', AccountController.delete);
 
 // Rota do agente Moneta AI
 router.post('/agent/chat', AgentController.chat);

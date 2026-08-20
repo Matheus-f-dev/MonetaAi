@@ -119,3 +119,85 @@
 .btn-adicionar:hover {
   background: #2563eb;
 }
+
+/* ---- Divisão de despesa com outras pessoas ---- */
+.split-toggle {
+  display: flex !important;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-weight: 500 !important;
+}
+
+.split-toggle input {
+  width: auto !important;
+  accent-color: #8b5cf6;
+}
+
+.split-box {
+  margin-top: 0.75rem;
+  padding: 0.85rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #f9fafb !important;
+}
+
+.split-row {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr auto;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.split-row input {
+  padding: 0.55rem 0.65rem !important;
+  font-size: 0.9rem !important;
+}
+
+.split-remove {
+  width: 34px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: white !important;
+  color: #9ca3af !important;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.split-remove:hover:not(:disabled) {
+  border-color: #dc2626;
+  color: #dc2626 !important;
+}
+
+.split-remove:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.split-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.35rem;
+}
+
+.split-action-link {
+  border: none;
+  background: none !important;
+  color: #7c3aed !important;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.split-action-link:hover {
+  text-decoration: underline;
+}
+
+.split-hint {
+  margin: 0.6rem 0 0;
+  font-size: 0.78rem;
+  color: #6b7280 !important;
+  line-height: 1.4;
+}

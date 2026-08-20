@@ -1,8 +1,8 @@
 import { SideItem } from './SideItem';
-import { 
-  HomeIcon, BagIcon, WalletIcon, ChartIcon, DocIcon, 
-  BellIcon, BotIcon, 
-  UserIcon, ExitIcon 
+import {
+  HomeIcon, BagIcon, WalletIcon, ChartIcon, DocIcon,
+  BellIcon, BotIcon, CardIcon, RepeatIcon, PeopleIcon, BankIcon,
+  UserIcon, ExitIcon
 } from './Icons';
 import { useSecureNavigation } from '../../hooks/useSecureNavigation';
 
@@ -23,8 +23,12 @@ export function Sidebar() {
         <div className="sys-side-title">Menu Principal</div>
         <nav className="sys-side-nav">
           <SideItem label="Início" icon={<HomeIcon />} onClick={() => secureNavigate('/system')} />
+          <SideItem label="Contas" icon={<BankIcon />} onClick={() => secureNavigate('/contas')} />
           <SideItem label="Gastos" icon={<BagIcon />} onClick={() => secureNavigate('/expenses')} />
           <SideItem label="Receitas" icon={<WalletIcon />} onClick={() => secureNavigate('/incomes')} />
+          <SideItem label="Cartões" icon={<CardIcon />} onClick={() => secureNavigate('/cartoes')} />
+          <SideItem label="Gastos Fixos" icon={<RepeatIcon />} onClick={() => secureNavigate('/gastos-fixos')} />
+          <SideItem label="Pessoas" icon={<PeopleIcon />} onClick={() => secureNavigate('/pessoas')} />
           <SideItem label="Análises" icon={<ChartIcon />} onClick={() => secureNavigate('/analytics')} />
           <SideItem label="Relatórios" icon={<DocIcon />} onClick={() => secureNavigate('/reports')} />
           <SideItem label="Alertas" icon={<BellIcon />} onClick={() => secureNavigate('/alerts')} />

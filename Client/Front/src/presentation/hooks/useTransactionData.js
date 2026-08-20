@@ -89,6 +89,57 @@ export const useTransactionData = (userId) => {
     }
   };
 
+  const updateTransaction = async (transactionId, transactionData) => {
+    setLoading(true);
+    setError('');
+
+    try {
+      const apiConnection = new ApiConnection();
+      const result = await apiConnection.put(`/api/transactions/${transactionId}`, {
+        userId,
+        ...transactionData
+      });
+
+      if (result.success) {
+        await fetchTransactions();
+      } else {
+        setError(result.message || 'Erro ao atualizar transação');
+      }
+
+      return result;
+    } catch (error) {
+      const errorMsg = 'Erro ao conectar com o servidor';
+      setError(errorMsg);
+      return { success: false, message: errorMsg };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteTransaction = async (transactionId) => {
+    setLoading(true);
+    setError('');
+
+    try {
+      const apiConnection = new ApiConnection();
+      const result = await apiConnection.delete(`/api/transactions/${transactionId}`, { userId });
+
+      if (result.success) {
+        await fetchTransactions();
+      } else {
+        setError(result.message || 'Erro ao excluir transação');
+      }
+
+      return result;
+    } catch (error) {
+      const errorMsg = 'Erro ao conectar com o servidor';
+      setError(errorMsg);
+      return { success: false, message: errorMsg };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (userId) {
       fetchTransactions();
@@ -118,6 +169,8 @@ export const useTransactionData = (userId) => {
     error,
     fetchTransactions,
     createTransaction,
+    updateTransaction,
+    deleteTransaction,
     fetchChartData,
     observerService // Expor para uso externo se necessário
   };

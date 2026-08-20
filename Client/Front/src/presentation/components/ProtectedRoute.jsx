@@ -14,8 +14,8 @@ export function ProtectedRoute({ children }) {
     
     // Rotas permitidas diretamente
     const allowedDirectRoutes = [
-      '/', '/login', '/cadastro', '/esqueci-senha', '/system', 
-      '/expenses', '/incomes', '/profile', '/alerts', '/reports', 
+      '/', '/login', '/cadastro', '/esqueci-senha', '/system',
+      '/expenses', '/incomes', '/cartoes', '/gastos-fixos', '/pessoas', '/contas', '/profile', '/alerts', '/reports',
       '/analytics', '/impacto-financeiro', '/agent', '/auth/callback',
       '/privacy-policy', '/terms-of-service'
     ];

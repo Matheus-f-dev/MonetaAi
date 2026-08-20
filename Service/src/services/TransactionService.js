@@ -1,6 +1,6 @@
 const Transaction = require('../models/Transaction');
 const TransactionRepository = require('../repositories/TransactionRepository');
-const { FilterContext, DateRangeFilter, CategoryFilter, TypeFilter, PeriodFilter } = require('./FilterStrategy');
+const { FilterContext, DateRangeFilter, CategoryFilter, TypeFilter, PeriodFilter, AccountFilter } = require('./FilterStrategy');
 
 class TransactionService {
   constructor() {
@@ -62,7 +62,12 @@ class TransactionService {
       const filterContext = new FilterContext(new TypeFilter());
       transactions = filterContext.filter(transactions, filters);
     }
-    
+
+    if (filters.accountId) {
+      const filterContext = new FilterContext(new AccountFilter());
+      transactions = filterContext.filter(transactions, filters);
+    }
+
     return transactions;
   }
   
@@ -127,17 +132,6 @@ class TransactionService {
     return data ? Transaction.fromRepository(data) : null;
   }
 
-  // Métodos de compatibilidade para manter funcionamento
-  async updateTransaction(id, updateData) {
-    // Busca a transação primeiro para obter o userId
-    const allUsers = await this.repository.findByUserId('default-user'); // Simplificação
-    throw new Error('Método precisa ser atualizado para incluir userId');
-  }
-
-  async deleteTransaction(id) {
-    throw new Error('Método precisa ser atualizado para incluir userId');
-  }
-
   async updateTransaction(userId, transactionId, updateData) {
     const updatedData = await this.repository.update(userId, transactionId, updateData);
     return Transaction.fromRepository(updatedData);
@@ -149,15 +143,19 @@ class TransactionService {
 
   async getUserBalance(userId, filters = {}) {
     const transactions = await this.getUserTransactions(userId, filters);
-    
-    const receitas = transactions
+
+    // Transferência entre contas move dinheiro, não é receita nem despesa —
+    // excluída pra não inflar os totais.
+    const naoTransferencia = transactions.filter(t => !t.isTransferencia);
+
+    const receitas = naoTransferencia
       .filter(t => t.isReceita())
       .reduce((sum, t) => sum + t.valor, 0);
-    
-    const despesas = transactions
+
+    const despesas = naoTransferencia
       .filter(t => t.isDespesa())
       .reduce((sum, t) => sum + t.valor, 0);
-    
+
     return {
       receitas,
       despesas,
@@ -315,7 +313,8 @@ class TransactionService {
       valor: t.valor,
       categoria: t.categoria,
       descricao: t.descricao,
-      dataHora: t.dataHora
+      dataHora: t.dataHora,
+      isTransferencia: t.isTransferencia
     }));
   }
 }

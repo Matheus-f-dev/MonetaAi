@@ -3,26 +3,21 @@ import { useTheme } from '../hooks/useTheme';
 import { useAlerts } from '../hooks/useAlerts';
 import { Sidebar } from '../components/system';
 import { useToast } from '../hooks/useToast';
+import { CATEGORIES } from '../../shared/categories';
 import '../styles/pages/Alerts.css';
 
 export default function Alerts() {
   useTheme();
-  
+
   const [activeTab, setActiveTab] = useState('create');
   const [alertName, setAlertName] = useState('');
   const [condition, setCondition] = useState('Maior que');
   const [value, setValue] = useState('');
   const [category, setCategory] = useState('');
   const [editingAlert, setEditingAlert] = useState(null);
-  
-  const categories = [
-    'Alimentação', 'Transporte', 'Moradia', 'Saúde', 'Lazer', 'Educação',
-    'Vestuário', 'Tecnologia', 'Assinaturas e serviços', 'Impostos e taxas',
-    'Doações e caridade', 'Pets', 'Investimentos', 'Dívidas e financiamentos',
-    'Presentes e comemorações', 'Casa e decoração', 'Serviços domésticos',
-    'Trabalho / Renda extra', 'Salário / Provento fixo', 'Outros'
-  ];
-  
+
+  const categories = CATEGORIES;
+
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const userId = user.uid || null;
   
