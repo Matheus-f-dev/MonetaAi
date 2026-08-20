@@ -1,10 +1,10 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
-// Cena 3D leve: moeda, cédula e duas medalhas ($ e ₿) — tudo com textura
-// desenhada na hora em canvas, sem asset externo — flutuam no hero, giram
-// devagar e reagem ao mouse. Posições calculadas à mão pra nunca deixar
-// duas peças se cruzarem — ver comentário de distância mínima logo abaixo.
+// Cena 3D leve: moeda de Bitcoin (peça-âncora), cédula de R$200 e medalha
+// de $ — tudo com textura desenhada na hora em canvas, sem asset externo —
+// flutuam no hero, giram devagar e reagem ao mouse. Posições calculadas à
+// mão pra nunca deixar duas peças se cruzarem — ver comentário abaixo.
 export default function CoinScene() {
   const mountRef = useRef(null);
 
@@ -36,11 +36,6 @@ export default function CoinScene() {
     });
     coinGeo.center();
     disposables.push(coinGeo);
-
-    const makeCoin = (color, roughness) => new THREE.Mesh(
-      coinGeo,
-      new THREE.MeshPhysicalMaterial({ color, metalness: 0.88, roughness, clearcoat: 0.35, clearcoatRoughness: 0.25 })
-    );
 
     // ───────────────────── cédula ─────────────────────
     function roundedRectShape(w, h, r) {
@@ -86,9 +81,28 @@ export default function CoinScene() {
       }
       ctx.globalAlpha = 1;
 
-      // moldura
+      // moldura dupla
       ctx.strokeStyle = ink; ctx.lineWidth = 6;
       ctx.strokeRect(18, 18, c.width - 36, c.height - 36);
+      ctx.lineWidth = 1.5; ctx.globalAlpha = 0.5;
+      ctx.strokeRect(28, 28, c.width - 56, c.height - 56);
+      ctx.globalAlpha = 1;
+
+      // elemento de segurança: fileira de pontos finos
+      ctx.fillStyle = ink; ctx.globalAlpha = 0.35;
+      for (let x = 40; x < c.width - 40; x += 10) {
+        ctx.beginPath(); ctx.arc(x, c.height - 44, 1.4, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+
+      // valor repetido nos cantos, como cédula de verdade
+      ctx.fillStyle = ink; ctx.font = '700 34px "Zilla Slab", Georgia, serif';
+      ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+      ctx.fillText(value, 34, 30);
+      ctx.textAlign = 'right';
+      ctx.fillText(value, c.width - 34, 30);
+      ctx.textBaseline = 'bottom';
+      ctx.fillText(value, c.width - 34, c.height - 30);
 
       // medalhão com o valor
       ctx.beginPath();
@@ -98,7 +112,7 @@ export default function CoinScene() {
       ctx.arc(170, c.height / 2, 92, 0, Math.PI * 2);
       ctx.strokeStyle = base; ctx.lineWidth = 3; ctx.stroke();
       ctx.fillStyle = base;
-      ctx.font = '700 92px "Zilla Slab", Georgia, serif';
+      ctx.font = `700 ${value.length > 2 ? 68 : 92}px "Zilla Slab", Georgia, serif`;
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.fillText(value, 170, c.height / 2 + 6);
 
@@ -135,15 +149,29 @@ export default function CoinScene() {
       const ctx = c.getContext('2d');
       ctx.clearRect(0, 0, c.width, c.height);
 
-      ctx.beginPath();
-      ctx.arc(256, 256, 240, 0, Math.PI * 2);
-      ctx.strokeStyle = ink; ctx.globalAlpha = 0.85; ctx.lineWidth = 10; ctx.stroke();
+      // cunhagem: pequenas marcas radiais junto à borda
+      ctx.strokeStyle = ink; ctx.globalAlpha = 0.55; ctx.lineWidth = 3;
+      for (let a = 0; a < Math.PI * 2; a += (Math.PI * 2) / 90) {
+        const x1 = 256 + Math.cos(a) * 226, y1 = 256 + Math.sin(a) * 226;
+        const x2 = 256 + Math.cos(a) * 244, y2 = 256 + Math.sin(a) * 244;
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+      }
       ctx.globalAlpha = 1;
 
-      ctx.fillStyle = ink;
-      ctx.font = '700 320px "Hanken Grotesk", Arial, sans-serif';
+      // dois anéis de acabamento
+      ctx.beginPath(); ctx.arc(256, 256, 210, 0, Math.PI * 2);
+      ctx.strokeStyle = ink; ctx.globalAlpha = 0.85; ctx.lineWidth = 8; ctx.stroke();
+      ctx.beginPath(); ctx.arc(256, 256, 190, 0, Math.PI * 2);
+      ctx.globalAlpha = 0.4; ctx.lineWidth = 2; ctx.stroke();
+      ctx.globalAlpha = 1;
+
+      // símbolo em alto-relevo: sombra leve deslocada + traço mais claro por cima
+      ctx.font = '700 300px "Hanken Grotesk", Arial, sans-serif';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillText(glyph, 256, 280);
+      ctx.fillStyle = 'rgba(0,0,0,0.28)';
+      ctx.fillText(glyph, 260, 266);
+      ctx.fillStyle = ink;
+      ctx.fillText(glyph, 256, 260);
 
       const tex = new THREE.CanvasTexture(c);
       tex.colorSpace = THREE.SRGBColorSpace;
@@ -162,14 +190,14 @@ export default function CoinScene() {
     const group = new THREE.Group();
 
     // ── posições: distância entre centros sempre > soma dos raios + 0.4
-    // (coinA r≈1.7, bill r≈1.52, $ r≈1.05, ₿ r≈0.9 — cálculo no PR) ──
-    const coinA = makeCoin(0xd9a441, 0.32); // moeda-âncora, lisa
-    coinA.scale.setScalar(1.7);
-    coinA.position.set(0.5, 0.1, 2.6);
-    coinA.rotation.set(0.15, 0.4, 0.08);
-    group.add(coinA);
+    // (coinBTC r≈1.7, nota r≈1.52, $ r≈1.05 — cálculo no PR) ──
+    const coinBTC = makeSymbolCoin(0xd9a441, '#3a1f08', '₿', 0.3); // moeda-âncora = Bitcoin
+    coinBTC.scale.setScalar(1.7);
+    coinBTC.position.set(0.5, 0.1, 2.6);
+    coinBTC.rotation.set(0.15, 0.4, 0.08);
+    group.add(coinBTC);
 
-    const nota = makeBill('#4B2E83', '#F6F1E4', '50'); // a "nota", virada quase de frente
+    const nota = makeBill('#4B2E83', '#F6F1E4', '200'); // a "nota", virada quase de frente
     nota.scale.setScalar(1.15);
     nota.position.set(-2.1, 1.5, -1.2);
     nota.rotation.set(0.18, 0.35, 0.06);
@@ -180,12 +208,6 @@ export default function CoinScene() {
     dollarCoin.position.set(-1.8, -1.6, -2.8);
     dollarCoin.rotation.set(0.25, 0.7, -0.1);
     group.add(dollarCoin);
-
-    const bitcoinCoin = makeSymbolCoin(0xd88a3f, '#3a1f08', '₿', 0.34); // medalha ₿
-    bitcoinCoin.scale.setScalar(0.9);
-    bitcoinCoin.position.set(2.4, -1.3, 0.5);
-    bitcoinCoin.rotation.set(-0.2, -0.5, 0.15);
-    group.add(bitcoinCoin);
 
     scene.add(group);
 
@@ -228,9 +250,9 @@ export default function CoinScene() {
     // ── loop ──
     const clock = new THREE.Clock();
     let raf;
-    const pieces = [coinA, nota, dollarCoin, bitcoinCoin];
-    const spins = [0.006, -0.0045, 0.0035, -0.005];
-    const bobPhase = [0, 1.5, 3, 4.5];
+    const pieces = [coinBTC, nota, dollarCoin];
+    const spins = [0.006, -0.0045, 0.0035];
+    const bobPhase = [0, 1.5, 3];
     const bobBase = pieces.map((p) => p.position.y);
 
     const tick = () => {
@@ -256,7 +278,7 @@ export default function CoinScene() {
       ro.disconnect();
       window.removeEventListener('pointermove', onMove);
       disposables.forEach((d) => d.dispose());
-      [coinA, nota, dollarCoin, bitcoinCoin].forEach((mesh) => {
+      [coinBTC, nota, dollarCoin].forEach((mesh) => {
         (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).forEach((m) => m.dispose());
       });
       renderer.dispose();
