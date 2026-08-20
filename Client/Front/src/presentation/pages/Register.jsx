@@ -74,10 +74,13 @@ export default function Cadastro() {
     };
 
     const result = await register(dados);
-    
+
     if (result.success) {
       setTimeout(() => {
-        navigate('/login');
+        // Se o backend conseguiu logar automaticamente (token já salvo pelo
+        // useAuth), vai direto pro painel — sem sentido digitar tudo de
+        // novo na tela de login. Só cai no login manual como fallback.
+        navigate(result.token ? '/system' : '/login');
       }, 1200);
     }
   }

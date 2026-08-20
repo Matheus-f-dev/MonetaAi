@@ -36,10 +36,23 @@ class AuthController {
 
       const user = await AuthService.register({ nome, email, senha, salario: salarioNum });
 
+      // Auto-login: a conta acabou de ser criada com essa senha, não faz
+      // sentido mandar o usuário digitar tudo de novo na tela de login.
+      let session = null;
+      try {
+        session = await AuthService.login(email, senha);
+      } catch (loginErr) {
+        // Cadastro já foi feito com sucesso — se o login automático falhar
+        // (ex: FIREBASE_API_KEY ausente), não desfaz o cadastro, só avisa
+        // que vai precisar entrar manualmente.
+        console.error('[AuthController.register] Auto-login falhou:', loginErr.message);
+      }
+
       res.status(201).json({
         success: true,
         message: 'Cadastro realizado com sucesso!',
-        userId: user.uid
+        userId: user.uid,
+        ...(session ? { user: session.user, token: session.token } : {})
       });
 
     } catch (err) {
@@ -78,8 +91,19 @@ class AuthController {
       });
 
     } catch (err) {
+      // Erro de configuração do servidor (ex: FIREBASE_API_KEY ausente) não é
+      // a mesma coisa que senha errada — mascarar os dois com a mesma
+      // mensagem já custou tempo real de debug. Loga alto e distingue.
+      if (!err.response && err.message?.includes('FIREBASE_API_KEY')) {
+        console.error('[AuthController.login] Erro de configuração:', err.message);
+        return res.status(500).json({
+          success: false,
+          message: 'Erro de configuração do servidor. Contate o suporte.'
+        });
+      }
+
       let mensagemErro = "Email ou senha incorretos.";
-      
+
       if (err.response?.data?.error) {
         switch (err.response.data.error.message) {
           case 'EMAIL_NOT_FOUND':
@@ -92,6 +116,8 @@ class AuthController {
             mensagemErro = "Usuário desabilitado.";
             break;
         }
+      } else {
+        console.error('[AuthController.login] Erro inesperado:', err.message);
       }
 
       res.status(400).json({

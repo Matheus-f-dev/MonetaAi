@@ -45,8 +45,16 @@ export const useAuth = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData)
       });
-      
+
       const data = await response.json();
+
+      // Auto-login: o backend já devolve user+token quando consegue logar
+      // sozinho logo após criar a conta.
+      if (data.success && data.token && data.user) {
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('token', data.token);
+      }
+
       setMessage(data.message || (data.success ? 'Cadastro realizado com sucesso!' : 'Erro no cadastro'));
       return data;
     } catch (error) {
