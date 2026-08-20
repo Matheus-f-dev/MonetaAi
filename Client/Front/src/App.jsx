@@ -1,4 +1,5 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
+import { Suspense, lazy } from 'react';
 import './App.css';
 import './presentation/styles/pages/profile.css';
 import './presentation/styles/pages/system-hovers.css';
@@ -6,7 +7,9 @@ import { useTheme } from './presentation/hooks/useTheme';
 import { ProtectedRoute } from './presentation/components/ProtectedRoute';
 import { decryptRoute } from './shared/urlCrypto';
 import { ToastContainer } from './presentation/components/system/ToastContainer';
-import LandingPage from './presentation/pages/Home';
+// Lazy: a landing page carrega uma cena 3D (three.js) que não deve pesar
+// no bundle de quem só vai fazer login e usar o painel.
+const LandingPage = lazy(() => import('./presentation/pages/Home'));
 import LoginCard from './presentation/pages/Login';
 import Cadastro from './presentation/pages/Register';
 import RedefinirSenha from './presentation/pages/ChangePassword';
@@ -90,7 +93,9 @@ function AppRouter() {
   
   return (
     <ProtectedRoute>
-      {renderComponent()}
+      <Suspense fallback={null}>
+        {renderComponent()}
+      </Suspense>
     </ProtectedRoute>
   );
 }

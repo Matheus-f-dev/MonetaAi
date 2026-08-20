@@ -1,6 +1,7 @@
 import '../styles/pages/home.css';
 import { useEffect } from 'react';
 import { useSecureNavigation } from '../hooks/useSecureNavigation';
+import CoinScene from '../components/CoinScene';
 import {
   BagIcon, WalletIcon, CardIcon, RepeatIcon, PeopleIcon, ChartIcon, BellIcon, BotIcon
 } from '../components/system/Icons';
@@ -77,6 +78,7 @@ export default function LandingPage() {
 
       {/* ═══ HERO ═══ */}
       <section className="hero">
+        <CoinScene />
         <div className="hero-wrap">
           <div className="hero-copy">
             <div className="eyebrow r">Substitui sua planilha financeira</div>
@@ -98,38 +100,40 @@ export default function LandingPage() {
               <a className="cta-ghost" href="#how">Ver como funciona</a>
             </div>
           </div>
+        </div>
+      </section>
 
-          {/* Assinatura: planilha virando conversa */}
-          <div className="transform-demo r">
-            <div className="td-panel td-before">
-              <span className="td-label">antes</span>
-              <div className="ledger">
-                <div className="ledger-row ledger-head">
-                  <span>data</span><span>descrição</span><span>cat</span><span>valor</span>
-                </div>
-                {LEDGER_ROWS.map((row, i) => (
-                  <div className="ledger-row" key={i}>
-                    <span>{row.data}</span>
-                    <span>{row.desc}</span>
-                    <span className={!row.cat ? 'empty' : ''}>{row.cat || '—'}</span>
-                    <span className={row.broken ? 'broken' : ''}>{row.valor || '—'}</span>
-                  </div>
-                ))}
+      {/* ═══ ANTES/DEPOIS — assinatura da página ═══ */}
+      <section className="transform-sec">
+        <div className="transform-demo r">
+          <div className="td-panel td-before">
+            <span className="td-label">a planilha</span>
+            <div className="ledger">
+              <div className="ledger-row ledger-head">
+                <span>data</span><span>descrição</span><span>cat</span><span>valor</span>
               </div>
-            </div>
-
-            <div className="td-arrow">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 12h16M13 5l7 7-7 7" /></svg>
-            </div>
-
-            <div className="td-panel td-after">
-              <span className="td-label">depois</span>
-              <div className="chat-demo">
-                <div className="bubble out">Gastei 42,90 no mercado</div>
-                <div className="bubble in">
-                  Beleza! Registrei em <b>Alimentação</b>, saiu da Conta Principal.
-                  <span className="bubble-tag">Alimentação · R$ 42,90</span>
+              {LEDGER_ROWS.map((row, i) => (
+                <div className="ledger-row" key={i}>
+                  <span>{row.data}</span>
+                  <span>{row.desc}</span>
+                  <span className={!row.cat ? 'empty' : ''}>{row.cat || '—'}</span>
+                  <span className={row.broken ? 'broken' : ''}>{row.valor || '—'}</span>
                 </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="td-arrow">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 12h16M13 5l7 7-7 7" /></svg>
+          </div>
+
+          <div className="td-panel td-after">
+            <span className="td-label">a moneta</span>
+            <div className="chat-demo">
+              <div className="bubble out">Gastei 42,90 no mercado</div>
+              <div className="bubble in">
+                Beleza! Registrei em <b>Alimentação</b>, saiu da Conta Principal.
+                <span className="bubble-tag">Alimentação · R$ 42,90</span>
               </div>
             </div>
           </div>
