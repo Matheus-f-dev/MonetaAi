@@ -29,6 +29,15 @@ const STEPS = [
   { n: '03', title: 'O painel fica sempre atual', desc: 'Sem fórmula pra arrastar, sem coluna pra corrigir. O saldo já está certo quando você abre.' },
 ];
 
+const TRUST_POINTS = [
+  { q: 'Acesso aos dados', h: 'Cada conta é uma ilha', p: 'Seu histórico fica isolado por usuário no banco — ninguém, nem outro usuário, enxerga o extrato de ninguém.' },
+  { q: 'Integração', h: 'Um motor só, três portas', p: 'Site, WhatsApp e e-mail conversam com a mesma lógica de negócio por trás — não é gambiarra separada por canal.' },
+  { q: 'Controle de acesso', h: 'Sessão com validade', p: 'Login gera um token que expira. Sem token válido, sem rota protegida — nem digitando a URL na mão.' },
+  { q: 'Auditoria', h: 'Toda transferência deixa rastro', p: 'Mover dinheiro entre contas grava quem, quando, de onde pra onde e quanto — não é só um número que muda.' },
+  { q: 'Falha', h: 'Reenviar não duplica', p: 'Se a internet cair no meio de uma transferência e você reenviar, o sistema reconhece e ignora — nunca lança duas vezes.' },
+  { q: 'Segurança', h: 'Senha nunca em texto puro', p: 'Autenticação passa pelo Firebase Auth — a Moneta nunca guarda sua senha, só um hash que nem ela consegue reverter.' },
+];
+
 const FAQS = [
   { q: 'É de graça mesmo?', a: 'Sim. Sem plano pago, sem cartão de crédito pra cadastrar, sem limite de lançamentos.' },
   { q: 'Preciso instalar algo?', a: 'Não. O WhatsApp você já tem instalado. Pelo navegador, é só criar a conta.' },
@@ -183,6 +192,31 @@ export default function LandingPage() {
               <p>{s.desc}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ═══ RIGOR / CONFIANÇA ═══ */}
+      <section className="trust-sec">
+        <div className="trust-inner">
+          <div className="trust-head r">
+            <div className="tag">Por baixo do capô</div>
+            <h2>Prova de conceito é fácil. Isso aqui foi feito pra aguentar uso real.</h2>
+            <p>
+              Todo produto financeiro tem que responder as mesmas perguntas chatas antes de
+              qualquer coisa bonita: de onde vêm os dados, quem pode acessar, o que fica registrado
+              e o que acontece quando algo falha. Aqui está o que a Moneta responde hoje.
+            </p>
+          </div>
+
+          <div className="trust-grid r">
+            {TRUST_POINTS.map((t, i) => (
+              <div className="trust-item" key={i}>
+                <span className="trust-q">{t.q}</span>
+                <h4>{t.h}</h4>
+                <p>{t.p}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
