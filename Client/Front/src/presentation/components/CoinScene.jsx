@@ -138,7 +138,9 @@ export default function CoinScene() {
       disposables.push(tex);
       const capMat = new THREE.MeshPhysicalMaterial({ map: tex, roughness: 0.6, metalness: 0.04, clearcoat: 0.18, clearcoatRoughness: 0.4 });
       const sideMat = new THREE.MeshPhysicalMaterial({ color: base, roughness: 0.7, metalness: 0.04 });
-      return new THREE.Mesh(billGeo, [sideMat, capMat]);
+      // ExtrudeGeometry: grupo 0 = faces de topo/base (onde a textura precisa
+      // aparecer), grupo 1 = laterais finas — nessa ordem, não o contrário.
+      return new THREE.Mesh(billGeo, [capMat, sideMat]);
     };
 
     // ─────────────────── medalha de símbolo ($ / ₿) ───────────────────
@@ -184,28 +186,30 @@ export default function CoinScene() {
       disposables.push(tex);
       const capMat = new THREE.MeshPhysicalMaterial({ color: metalColor, map: tex, metalness: 0.82, roughness, clearcoat: 0.3, clearcoatRoughness: 0.25 });
       const sideMat = new THREE.MeshPhysicalMaterial({ color: metalColor, metalness: 0.88, roughness: 0.35 });
-      return new THREE.Mesh(coinGeo, [sideMat, capMat]);
+      // Mesma ordem de grupos do bill: 0 = face, 1 = lateral.
+      return new THREE.Mesh(coinGeo, [capMat, sideMat]);
     };
 
     const group = new THREE.Group();
 
     // ── posições: distância entre centros sempre > soma dos raios + 0.4
-    // (coinBTC r≈1.7, nota r≈1.52, $ r≈1.05 — cálculo no PR) ──
+    // (coinBTC r≈1.2, nota r≈0.99, $ r≈0.6 — escalas reduzidas: a versão
+    // anterior ocupava ~77% da altura do frame, gigante e cortada) ──
     const coinBTC = makeSymbolCoin(0xd9a441, '#3a1f08', '₿', 0.3); // moeda-âncora = Bitcoin
-    coinBTC.scale.setScalar(1.7);
-    coinBTC.position.set(0.5, 0.1, 2.6);
+    coinBTC.scale.setScalar(1.2);
+    coinBTC.position.set(0.3, 0.1, 1.8);
     coinBTC.rotation.set(0.15, 0.4, 0.08);
     group.add(coinBTC);
 
     const nota = makeBill('#4B2E83', '#F6F1E4', '200'); // a "nota", virada quase de frente
-    nota.scale.setScalar(1.15);
-    nota.position.set(-2.1, 1.5, -1.2);
+    nota.scale.setScalar(0.75);
+    nota.position.set(-1.9, 1.2, -0.8);
     nota.rotation.set(0.18, 0.35, 0.06);
     group.add(nota);
 
     const dollarCoin = makeSymbolCoin(0xd9a441, '#2e1b54', '$', 0.3); // medalha $
-    dollarCoin.scale.setScalar(1.05);
-    dollarCoin.position.set(-1.8, -1.6, -2.8);
+    dollarCoin.scale.setScalar(0.6);
+    dollarCoin.position.set(-1.1, -1.3, -1.8);
     dollarCoin.rotation.set(0.25, 0.7, -0.1);
     group.add(dollarCoin);
 

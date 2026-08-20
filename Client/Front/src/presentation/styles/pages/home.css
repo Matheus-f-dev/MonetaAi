@@ -114,7 +114,7 @@
 /* ═══ HERO ═══ */
 .hero { position: relative; padding: 180px 28px 60px; min-height: 92vh; display: flex; align-items: center; overflow: hidden; }
 
-.coin-scene { position: absolute; top: 0; right: 0; bottom: 0; width: 58%; pointer-events: none; }
+.coin-scene { position: absolute; top: 0; right: 0; bottom: 0; width: 58%; pointer-events: none; z-index: 5; }
 @media (max-width: 980px) { .coin-scene { width: 100%; opacity: .45; } }
 
 .hero-wrap { position: relative; z-index: 2; max-width: 1220px; margin: 0 auto; width: 100%; }
