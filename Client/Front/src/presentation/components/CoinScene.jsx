@@ -49,21 +49,24 @@ export default function CoinScene() {
 
     const group = new THREE.Group();
 
+    // Posições calculadas pra distância entre centros sempre superar a soma
+    // dos raios (1.9/1.3/0.95, já escalados) + margem — sem isso as moedas
+    // se cruzavam visivelmente durante a rotação.
     const coinA = makeCoin(0xd9a441, 0.32); // moeda principal, latão claro
     coinA.scale.setScalar(1.9);
-    coinA.position.set(0.4, 0.2, 0);
+    coinA.position.set(0.5, 0.1, 2.5);
     coinA.rotation.set(0.15, 0.4, 0.08);
     group.add(coinA);
 
     const coinB = makeCoin(0xb9862f, 0.4); // latão mais escuro, atrás
     coinB.scale.setScalar(1.3);
-    coinB.position.set(-1.6, -0.9, -1.4);
+    coinB.position.set(-2.2, -0.6, -1.8);
     coinB.rotation.set(0.3, 1.1, -0.2);
     group.add(coinB);
 
     const coinC = makeCoin(0xe6bb6a, 0.28); // menor, mais clara, à frente
     coinC.scale.setScalar(0.95);
-    coinC.position.set(-0.5, 1.5, 1.1);
+    coinC.position.set(-0.8, 1.9, -0.8);
     coinC.rotation.set(-0.2, 2.1, 0.3);
     group.add(coinC);
 

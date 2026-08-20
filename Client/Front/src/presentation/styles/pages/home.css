@@ -24,7 +24,7 @@
   --wine:       #7a2038;
   --wine-soft:  #f3ded7;
 
-  --font-display: 'Unbounded', 'Segoe UI', sans-serif;
+  --font-display: 'Instrument Serif', Georgia, serif;
   --font-body:    'Manrope', 'Segoe UI', sans-serif;
   --font-mono:    'Space Mono', ui-monospace, monospace;
 
@@ -45,9 +45,9 @@
 
 .site h1, .site h2, .site h3, .site h4 {
   font-family: var(--font-display);
-  font-weight: 600;
+  font-weight: 400;
   letter-spacing: -0.01em;
-  line-height: 1.12;
+  line-height: 1.08;
   color: var(--ink);
 }
 
@@ -81,13 +81,13 @@
   display: flex; align-items: center; justify-content: space-between; gap: 24px;
 }
 
-.brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; }
+.brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 400; font-size: 1.3rem; font-style: italic; }
 .brand-mark {
   width: 32px; height: 32px; border-radius: 50%;
   background: linear-gradient(155deg, var(--gold-bright), var(--gold) 60%, #9c6b1f);
   color: var(--ink);
   display: flex; align-items: center; justify-content: center;
-  font-family: var(--font-display); font-size: 1rem; font-weight: 700;
+  font-family: var(--font-display); font-size: 1.15rem; font-weight: 400;
   box-shadow: inset 0 -3px 5px rgba(0,0,0,.2), inset 0 2px 2px rgba(255,255,255,.5);
 }
 
@@ -150,7 +150,7 @@
   margin-bottom: 24px;
   text-wrap: balance;
 }
-.hero-h1 .strike { position: relative; color: var(--wine); }
+.hero-h1 .strike { position: relative; color: var(--wine); font-style: italic; }
 .hero-h1 .strike::after {
   content: ''; position: absolute; left: -2%; right: -2%; top: 56%;
   height: 3px; background: var(--wine); transform: rotate(-1.6deg);
@@ -255,7 +255,7 @@
   padding: 38px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
 }
 .proof-item { display: flex; flex-direction: column; gap: 4px; }
-.proof-num { font-family: var(--font-display); font-size: 2.2rem; font-weight: 700; color: var(--green); }
+.proof-num { font-family: var(--font-display); font-size: 2.6rem; font-weight: 400; color: var(--green); }
 .proof-label { font-size: 0.82rem; color: var(--ink-soft); }
 
 @media (max-width: 700px) { .proof-inner { grid-template-columns: 1fr 1fr; } }
@@ -290,7 +290,7 @@
   margin-bottom: 18px;
 }
 .feat-ico svg { width: 22px; height: 22px; }
-.feat-card h3 { font-size: 1.05rem; margin-bottom: 8px; font-weight: 600; }
+.feat-card h3 { font-size: 1.25rem; margin-bottom: 8px; font-weight: 400; }
 .feat-card p { font-size: 0.9rem; color: var(--ink-soft); line-height: 1.55; }
 
 /* ═══ COMO FUNCIONA ═══ */
@@ -309,7 +309,7 @@
   font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700;
   color: var(--gold); margin-bottom: 18px;
 }
-.step h3 { font-size: 1.1rem; margin-bottom: 9px; font-weight: 600; }
+.step h3 { font-size: 1.3rem; margin-bottom: 9px; font-weight: 400; }
 .step p { font-size: 0.9rem; color: var(--ink-soft); }
 
 /* ═══ WHATSAPP ═══ */
@@ -326,7 +326,7 @@
 .wpp-list { display: flex; flex-direction: column; gap: 20px; margin-bottom: 34px; }
 .wpp-item { display: flex; gap: 16px; align-items: flex-start; }
 .wpp-item svg { flex: none; color: var(--green); margin-top: 3px; }
-.wpp-item h4 { font-size: 0.96rem; margin-bottom: 4px; font-weight: 600; }
+.wpp-item h4 { font-family: var(--font-body); font-size: 0.96rem; margin-bottom: 4px; font-weight: 700; }
 .wpp-item p { font-size: 0.86rem; color: var(--ink-soft); }
 
 .wpp-phone { display: flex; justify-content: center; }
@@ -337,7 +337,7 @@
 .ph-bar { width: 56px; height: 4px; background: rgba(255,255,255,.2); border-radius: 99px; margin: 4px auto 8px; }
 .ph-screen { background: var(--paper); border-radius: 20px; overflow: hidden; }
 .ph-hdr { display: flex; align-items: center; gap: 10px; padding: 14px; background: var(--green); color: #fff; }
-.ph-av { width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.82rem; font-family: var(--font-display); }
+.ph-av { width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; font-weight: 400; font-size: 1rem; font-family: var(--font-display); }
 .ph-name { font-weight: 700; font-size: 0.86rem; }
 .ph-status { font-size: 0.7rem; opacity: 0.85; display: flex; align-items: center; gap: 5px; }
 .green-dot { width: 5px; height: 5px; border-radius: 50%; background: #d7f7a8; }
