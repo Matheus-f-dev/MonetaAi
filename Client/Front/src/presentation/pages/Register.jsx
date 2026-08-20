@@ -78,7 +78,7 @@ export default function Cadastro() {
     if (result.success) {
       setTimeout(() => {
         navigate('/login');
-      }, 2000);
+      }, 1200);
     }
   }
 

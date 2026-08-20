@@ -51,11 +51,9 @@ export default function LoginCard() {
     }
     
     const result = await login(email, senha);
-    
+
     if (result.success) {
-      setTimeout(() => {
-        secureNavigate('/system');
-      }, 1000);
+      secureNavigate('/system');
     }
   }
 
