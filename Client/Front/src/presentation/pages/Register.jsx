@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import '../styles/pages/Register.css';
+import '../styles/pages/Login.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { ValidationContext, EmailValidation, PasswordValidation, AmountValidation } from '../../core/services/ValidationStrategy';
@@ -87,18 +87,38 @@ export default function Cadastro() {
 
 
   return (
-    <div>
-      <TermsModal 
-        isOpen={showTermsModal} 
-        onAccept={acceptTerms} 
-        onDecline={declineTerms} 
+    <div className="auth-layout">
+      <TermsModal
+        isOpen={showTermsModal}
+        onAccept={acceptTerms}
+        onDecline={declineTerms}
       />
-      <div className="login-card animate__animated animate__fadeInDown">
+
+      <aside className="auth-visual">
+        <div className="auth-brand">
+          <span className="auth-brand-mark">M</span>
+          <span>Moneta</span>
+        </div>
+
+        <div className="auth-visual-copy">
+          <h1>Cadastre-se em menos de 2 minutos.</h1>
+          <p>Sem cartão, sem cobrança escondida — e depois de criar a conta, você já entra direto no painel.</p>
+        </div>
+
+        <div className="auth-visual-proof">
+          <div><b>9</b><span>áreas do produto</span></div>
+          <div><b>50+</b><span>funcionalidades</span></div>
+          <div><b>R$ 0</b><span>pra usar</span></div>
+        </div>
+      </aside>
+
+      <div className="auth-form-side">
+      <div className="login-card">
+        <Link to="/" className="back-link">← Voltar ao início</Link>
         <h2>
-          Crie sua conta na <span><Link to="/" className="brand-name">Moneta</Link></span>
+          Crie sua conta na <span className="brand-name">Moneta</span>
         </h2>
         <p>Controle sua vida financeira de forma inteligente.</p>
-      
 
       <form className="login-form" id="form-cadastro" onSubmit={handleSubmit}>
         <label>Nome completo</label>
@@ -214,16 +234,15 @@ export default function Cadastro() {
         <button type="submit" className="login-btn" disabled={loading}>
           {loading ? 'Cadastrando...' : 'Cadastrar'}
         </button>
-        <p id="mensagem" style={{ 
-          textAlign: 'center', 
-          marginTop: 10,
-          color: message.includes('sucesso') ? 'green' : 'red'
+        <p id="mensagem" style={{
+          color: message.includes('sucesso') ? '#1f6e46' : '#d2401f'
         }}>{message}</p>
       </form>
 
       <div className="footer-links">
         <Link to="/login">Já tenho uma conta</Link>
         <Link to="/">Voltar para o início</Link>
+      </div>
       </div>
       </div>
     </div>

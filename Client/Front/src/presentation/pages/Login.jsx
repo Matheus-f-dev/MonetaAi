@@ -58,15 +58,36 @@ export default function LoginCard() {
   }
 
   return (
-    <div>
-      <TermsModal 
-        isOpen={showTermsModal} 
-        onAccept={acceptTerms} 
-        onDecline={declineTerms} 
+    <div className="auth-layout">
+      <TermsModal
+        isOpen={showTermsModal}
+        onAccept={acceptTerms}
+        onDecline={declineTerms}
       />
-      <div className="login-card animate__animated animate__fadeInDown">
+
+      <aside className="auth-visual">
+        <div className="auth-brand">
+          <span className="auth-brand-mark">M</span>
+          <span>Moneta</span>
+        </div>
+
+        <div className="auth-visual-copy">
+          <h1>Sua vida financeira, sem abrir planilha.</h1>
+          <p>Registra pelo WhatsApp, categoriza sozinha e mantém o saldo de todas as suas contas e cartões sempre certo.</p>
+        </div>
+
+        <div className="auth-visual-proof">
+          <div><b>9</b><span>áreas do produto</span></div>
+          <div><b>50+</b><span>funcionalidades</span></div>
+          <div><b>R$ 0</b><span>pra usar</span></div>
+        </div>
+      </aside>
+
+      <div className="auth-form-side">
+      <div className="login-card">
+        <Link to="/" className="back-link">← Voltar ao início</Link>
         <h2>
-          Bem-vindo à <span><Link to="/" className="brand-name">Moneta</Link></span>
+          Bem-vindo à <span className="brand-name">Moneta</span>
         </h2>
         <p>Seu dinheiro no controle, sua vida no comando.</p>
 
@@ -128,10 +149,8 @@ export default function LoginCard() {
             Entrar com Google
           </button>
           
-          <p style={{ 
-            textAlign: 'center', 
-            marginTop: 10,
-            color: message.includes('sucesso') ? 'green' : 'red'
+          <p id="mensagem" style={{
+            color: message.includes('sucesso') ? '#1f6e46' : '#d2401f'
           }}>{message}</p>
         </form>
 
@@ -139,6 +158,7 @@ export default function LoginCard() {
           <button onClick={() => secureNavigate('/esqueci-senha')} className="link-btn">Esqueci minha senha</button>
           <button onClick={() => secureNavigate('/cadastro')} className="link-btn">Criar conta</button>
         </div>
+      </div>
       </div>
     </div>
   );

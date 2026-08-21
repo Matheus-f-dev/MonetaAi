@@ -1,202 +1,196 @@
-@keyframes gradiente {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+/* ═══════════════════════════════════════════════════
+   Login & Cadastro — mesma identidade visual da Home
+   (violeta/ouro/vermelho, Zilla Slab + Hanken Grotesk).
+   Compartilhado por Login.jsx e Register.jsx.
+═══════════════════════════════════════════════════ */
+
+:root {
+  --auth-paper:      #f6f1e4;
+  --auth-card:       #fffdf6;
+  --auth-ink:        #1b1730;
+  --auth-ink-soft:   #55506e;
+  --auth-ink-faint:  #8a84a0;
+  --auth-line:       rgba(27, 23, 48, .14);
+
+  --auth-indigo:      #4b2e83;
+  --auth-indigo-deep: #2e1b54;
+  --auth-indigo-soft: #e9e1f5;
+  --auth-gold:        #c68a2e;
+  --auth-gold-bright: #e0a83f;
+  --auth-vermelho:    #d2401f;
+
+  --auth-font-display: 'Zilla Slab', Georgia, serif;
+  --auth-font-body:    'Hanken Grotesk', 'Segoe UI', sans-serif;
+  --auth-font-mono:    'JetBrains Mono', ui-monospace, monospace;
+
+  --auth-shadow: 0 26px 60px rgba(27,23,48,.20);
 }
 
-.brand-name{
-  color: #00ffc8;
-  text-decoration: none;
+.auth-layout {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--auth-paper);
+  font-family: var(--auth-font-body);
 }
 
-.login-card { 
-  width: 380px;
-  margin: 100px auto;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(15px);
-  padding: 40px;
-  border-radius: 16px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+@media (max-width: 860px) {
+  .auth-layout { grid-template-columns: 1fr; }
+  .auth-visual { display: none; }
+}
+
+/* ── painel de marca (esquerda) ── */
+.auth-visual {
+  background: linear-gradient(155deg, var(--auth-indigo-deep), var(--auth-indigo) 70%);
   color: #fff;
-  text-align: center;
+  padding: 56px 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
 }
+
+.auth-visual::after {
+  content: '';
+  position: absolute; right: -120px; bottom: -120px;
+  width: 340px; height: 340px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(224,168,63,.35), transparent 70%);
+}
+
+.auth-brand {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--auth-font-display); font-style: italic; font-size: 1.3rem;
+  position: relative; z-index: 1;
+}
+.auth-brand-mark {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: linear-gradient(155deg, var(--auth-gold-bright), var(--auth-gold) 60%, #8a5c17);
+  color: var(--auth-indigo-deep);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--auth-font-display); font-style: normal; font-size: 1.15rem; font-weight: 700;
+}
+
+.auth-visual-copy { position: relative; z-index: 1; max-width: 40ch; }
+.auth-visual-copy h1 {
+  font-family: var(--auth-font-display); font-weight: 600; font-size: 2rem;
+  line-height: 1.15; margin: 0 0 14px; text-wrap: balance;
+}
+.auth-visual-copy p { color: rgba(255,255,255,.78); font-size: 1rem; line-height: 1.55; }
+
+.auth-visual-proof {
+  position: relative; z-index: 1;
+  display: flex; gap: 32px;
+  border-top: 1px solid rgba(255,255,255,.18);
+  padding-top: 24px;
+}
+.auth-visual-proof div { display: flex; flex-direction: column; gap: 2px; }
+.auth-visual-proof b { font-family: var(--auth-font-display); font-weight: 600; font-size: 1.5rem; color: var(--auth-gold-bright); }
+.auth-visual-proof span { font-size: 0.76rem; color: rgba(255,255,255,.7); }
+
+/* ── painel de formulário (direita) ── */
+.auth-form-side {
+  display: flex; align-items: center; justify-content: center;
+  padding: 40px 28px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--auth-card);
+  border: 1px solid var(--auth-line);
+  border-radius: 20px;
+  box-shadow: var(--auth-shadow);
+  padding: 40px;
+  color: var(--auth-ink);
+}
+
+.login-card .back-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 0.82rem; font-weight: 600; color: var(--auth-ink-faint);
+  margin-bottom: 20px;
+}
+.login-card .back-link:hover { color: var(--auth-indigo); }
 
 .login-card h2 {
-  font-size: 28px;
-  margin-bottom: 10px;
+  font-family: var(--auth-font-display); font-weight: 600; font-size: 1.7rem;
+  margin: 0 0 6px; color: var(--auth-ink); text-wrap: balance;
 }
+.login-card h2 .brand-name { color: var(--auth-indigo); font-style: italic; }
 
-.login-card h2 span {
-  color: #00ffc8;
-}
-
-.login-card p {
-  font-size: 14px;
-  margin-bottom: 30px;
-  color: #cfcfcf;
+.login-card > p {
+  font-size: 0.9rem; color: var(--auth-ink-soft); margin: 0 0 28px;
 }
 
 .login-form label {
-  display: block;
-  text-align: left;
-  margin: 10px 0 5px;
-  font-size: 14px;
+  display: block; font-size: 0.8rem; font-weight: 600;
+  color: var(--auth-ink-soft); margin: 16px 0 6px;
 }
+.login-form label:first-of-type { margin-top: 0; }
 
 .login-form input {
-  width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: 8px;
-  background: #f0f0f0;
-  margin-bottom: 15px;
+  width: 100%; height: 46px; font-size: 0.95rem;
+  padding: 0 14px; border: 1px solid var(--auth-line); border-radius: 10px;
+  background: #fff; color: var(--auth-ink); margin-bottom: 4px;
+  outline: none; box-sizing: border-box;
+  font-family: var(--auth-font-body);
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.login-form input:focus {
+  border-color: var(--auth-indigo);
+  box-shadow: 0 0 0 3px var(--auth-indigo-soft);
 }
 
-/* Campo de senha com botão interno */
-.password-wrapper {
-  position: relative;
-  width: 100%;
+.password-wrapper { position: relative; }
+.password-wrapper input { padding-right: 44px; }
+.password-wrapper button, .password-wrapper .botao {
+  position: absolute; top: 0; right: 4px; height: 46px;
+  width: 32px; display: grid; place-items: center;
+  background: transparent; border: none; cursor: pointer; padding: 0;
 }
-/* Input de senha com espaço pro botão */
-.password-wrapper input {
-  width: 100%;
-  padding: 10px 40px 10px 10px; /* padding right maior para o botão */
-  border: none;
-  border-radius: 8px;
-  background: #f0f0f0;
-  margin-bottom: 15px;
-  box-sizing: border-box;
-}
-
-/* Botão de mostrar/ocultar senha */
-.botao {
-  position: absolute;
-  top: 15%;
-  right: 10px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  margin: 0;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.Teste  {
-  width: 15px;
-  opacity: 0.7;
-
-}
-
-/* Ícone do olho */
-
-.icone-olho {
-  width: 18px;
-  height: 18px;
-  opacity: 0.7;
-  pointer-events: none; /* evita conflito de clique no ícone */
-}
+.password-wrapper img { width: 18px; height: 18px; opacity: 0.55; pointer-events: none; }
 
 .login-btn {
-  width: 100%;
-  background: #00ffc8;
-  color: #000;
-  font-weight: bold;
-  padding: 12px;
-  border: none;
-  border-radius: 10px;
-  transition: 0.3s;
-  cursor: pointer;
-} 
-
-.login-btn:hover {
-  background: #00d5a8;
+  width: 100%; margin-top: 20px;
+  background: var(--auth-indigo); color: #fff;
+  font-family: var(--auth-font-body); font-weight: 700; font-size: 0.95rem;
+  padding: 13px; border: none; border-radius: 10px;
+  cursor: pointer; transition: background .15s ease, transform .15s ease;
 }
+.login-btn:hover:not(:disabled) { background: var(--auth-indigo-deep); transform: translateY(-1px); }
+.login-btn:disabled { opacity: 0.65; cursor: not-allowed; }
+
+.divider {
+  display: flex; align-items: center; margin: 22px 0;
+  color: var(--auth-ink-faint); font-size: 0.82rem;
+}
+.divider::before, .divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--auth-line);
+}
+.divider span { padding: 0 14px; }
+
+.google-login-btn {
+  width: 100%; background: #fff; color: var(--auth-ink);
+  font-family: var(--auth-font-body); font-weight: 600; font-size: 0.92rem;
+  padding: 12px; border: 1px solid var(--auth-line); border-radius: 10px;
+  cursor: pointer; transition: all .15s ease;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+}
+.google-login-btn:hover:not(:disabled) { border-color: var(--auth-ink-faint); box-shadow: 0 2px 8px rgba(27,23,48,.08); }
+.google-login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.google-icon { width: 18px; height: 18px; }
 
 .footer-links {
-  margin-top: 20px;
-  display: flex;
-  justify-content: space-between;
-  font-size: 13px;
+  margin-top: 24px; display: flex; justify-content: space-between;
+  font-size: 0.82rem;
 }
-
-.footer-links a {
-  color: #b5f7ee;
-  text-decoration: none;
+.footer-links a, .link-btn {
+  color: var(--auth-indigo); text-decoration: none;
+  background: none; border: none; cursor: pointer; font-size: 0.82rem; padding: 0;
+  font-family: var(--auth-font-body); font-weight: 600;
 }
+.footer-links a:hover, .link-btn:hover { color: var(--auth-indigo-deep); text-decoration: underline; }
 
-.footer-links a:hover {
-  text-decoration: underline;
-}
-
-/* Divisor "ou" */
-.divider {
-  display: flex;
-  align-items: center;
-  margin: 20px 0;
-  color: #cfcfcf;
-  font-size: 14px;
-}
-
-.divider::before,
-.divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: #cfcfcf;
-  opacity: 0.3;
-}
-
-.divider span {
-  padding: 0 15px;
-}
-
-/* Botão do Google */
-.google-login-btn {
-  width: 100%;
-  background: #fff;
-  color: #333;
-  font-weight: 500;
-  padding: 12px;
-  border: 1px solid #dadce0;
-  border-radius: 10px;
-  transition: 0.3s;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.google-login-btn:hover {
-  background: #f8f9fa;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.google-login-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.google-icon {
-  width: 18px;
-  height: 18px;
-}
-
-.link-btn {
-  background: none;
-  border: none;
-  color: #b5f7ee;
-  text-decoration: none;
-  cursor: pointer;
-  font-size: 13px;
-  padding: 0;
-}
-
-.link-btn:hover {
-  text-decoration: underline;
+#mensagem {
+  margin-top: 14px; font-size: 0.85rem; text-align: center;
 }
