@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { getAuthHeaders } from '../../shared/authHeaders';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -12,7 +13,7 @@ export const useAccounts = (userId = null) => {
 
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/api/accounts/${userId}`);
+      const response = await fetch(`${API_URL}/api/accounts/${userId}`, { headers: getAuthHeaders() });
       const result = await response.json();
       setAccounts(result.success ? (result.accounts || []) : []);
     } catch (error) {
@@ -26,7 +27,7 @@ export const useAccounts = (userId = null) => {
     if (!userId) return null;
 
     try {
-      const response = await fetch(`${API_URL}/api/accounts/${userId}/resumo`);
+      const response = await fetch(`${API_URL}/api/accounts/${userId}/resumo`, { headers: getAuthHeaders() });
       const result = await response.json();
       if (result.success) {
         setResumo(result.resumo);
@@ -43,7 +44,7 @@ export const useAccounts = (userId = null) => {
     try {
       const response = await fetch(`${API_URL}/api/accounts`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ userId, ...data })
       });
       const result = await response.json();
@@ -64,7 +65,7 @@ export const useAccounts = (userId = null) => {
     try {
       const response = await fetch(`${API_URL}/api/accounts/${accountId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ userId, ...data })
       });
       const result = await response.json();
@@ -85,7 +86,7 @@ export const useAccounts = (userId = null) => {
     try {
       const response = await fetch(`${API_URL}/api/accounts/${accountId}`, {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ userId })
       });
       const result = await response.json();
@@ -107,7 +108,7 @@ export const useAccounts = (userId = null) => {
       const idempotencyKey = crypto.randomUUID();
       const response = await fetch(`${API_URL}/api/accounts/${userId}/transfer`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ fromAccountId, toAccountId, valor, descricao, idempotencyKey })
       });
       const result = await response.json();

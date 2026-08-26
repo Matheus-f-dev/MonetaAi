@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { getAuthHeaders } from '../../shared/authHeaders';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -22,7 +23,7 @@ export const useImpactoFinanceiro = () => {
     try {
       const response = await fetch(`${API_URL}/api/impacto-financeiro`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ userId, produto, valor })
       });
 

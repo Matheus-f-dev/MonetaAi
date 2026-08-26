@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTransactionData } from './useTransactionData';
+import { getAuthHeaders } from '../../shared/authHeaders';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -28,7 +29,7 @@ export function useAnalytics(selectedPeriod, userId) {
       await fetchTransactions(filters);
       
       try {
-        const response = await fetch(`${API_URL}/api/percentage-change/${userId}?period=${selectedPeriod}`);
+        const response = await fetch(`${API_URL}/api/percentage-change/${userId}?period=${selectedPeriod}`, { headers: getAuthHeaders() });
         const data = await response.json();
         if (data.success) {
           setPercentageChanges({

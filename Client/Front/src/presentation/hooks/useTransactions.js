@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import observerService from '../../core/services/ObserverService';
+import { getAuthHeaders } from '../../shared/authHeaders';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -14,7 +15,7 @@ export function useTransactions() {
       const user = JSON.parse(localStorage.getItem('user') || '{}');
       const userId = user.uid || 'default-user';
       
-      const response = await fetch(`${API_URL}/api/transactions/${userId}`);
+      const response = await fetch(`${API_URL}/api/transactions/${userId}`, { headers: getAuthHeaders() });
       const data = await response.json();
       
       if (data.success) {

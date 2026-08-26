@@ -1,8 +1,21 @@
-const { db } = require('../config/firebase');
+const { db } = require('../config/database');
 
 function currentCompetencia() {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+}
+
+function toApiShape(row) {
+  return {
+    id: row.id,
+    userId: row.user_id,
+    nome: row.nome,
+    valor: parseFloat(row.valor) || 0,
+    categoria: row.categoria,
+    diaVencimento: row.dia_vencimento,
+    icone: row.icone,
+    ativo: Boolean(row.ativo)
+  };
 }
 
 class FixedExpenseController {
@@ -17,22 +30,21 @@ class FixedExpenseController {
         });
       }
 
-      const fixedExpenseData = {
+      const [id] = await db('fixed_expenses').insert({
+        user_id: userId,
         nome,
         valor: parseFloat(valor) || 0,
         categoria: categoria || 'Outros',
-        diaVencimento: Math.min(28, Math.max(1, parseInt(diaVencimento, 10) || 1)),
-        icone: icone || '📌',
-        ativo: true,
-        criadoEm: new Date().toISOString()
-      };
+        dia_vencimento: Math.min(28, Math.max(1, parseInt(diaVencimento, 10) || 1)),
+        icone: icone || '📌'
+      });
 
-      const docRef = await db.collection('usuarios').doc(userId).collection('gastosFixos').add(fixedExpenseData);
+      const row = await db('fixed_expenses').where({ id }).first();
 
       res.status(201).json({
         success: true,
         message: 'Gasto fixo cadastrado com sucesso',
-        fixedExpense: { id: docRef.id, ...fixedExpenseData }
+        fixedExpense: toApiShape(row)
       });
 
     } catch (error) {
@@ -44,31 +56,24 @@ class FixedExpenseController {
   // (pago / a vencer / atrasado) — extraído como helper reutilizável (usado
   // também pelo resumo financeiro consolidado de contas).
   static async getActiveWithStatus(userId) {
-    const snapshot = await db.collection('usuarios').doc(userId).collection('gastosFixos')
-      .where('ativo', '==', true)
-      .get();
-
-    const fixedExpenses = [];
-    snapshot.forEach(doc => fixedExpenses.push({ id: doc.id, ...doc.data() }));
+    const fixedExpenses = await db('fixed_expenses').where({ user_id: userId, ativo: true });
 
     const competencia = currentCompetencia();
     const today = new Date().getDate();
 
     return Promise.all(fixedExpenses.map(async (item) => {
-      const launched = await db.collection('usuarios').doc(userId).collection('historico')
-        .where('recurrenceId', '==', item.id)
-        .where('competencia', '==', competencia)
-        .limit(1)
-        .get();
+      const launched = await db('transactions')
+        .where({ recurrence_id: item.id, competencia })
+        .first();
 
       let status = 'due';
-      if (!launched.empty) {
+      if (launched) {
         status = 'paid';
-      } else if (item.diaVencimento < today) {
+      } else if (item.dia_vencimento < today) {
         status = 'late';
       }
 
-      return { ...item, status, competencia };
+      return { ...toApiShape(item), status, competencia };
     }));
   }
 
@@ -98,13 +103,13 @@ class FixedExpenseController {
         return res.status(400).json({ success: false, message: 'Campos obrigatórios ausentes' });
       }
 
-      await db.collection('usuarios').doc(userId).collection('gastosFixos').doc(fixedExpenseId).update({
+      await db('fixed_expenses').where({ id: fixedExpenseId, user_id: userId }).update({
         nome,
         valor: parseFloat(valor) || 0,
         categoria: categoria || 'Outros',
-        diaVencimento: Math.min(28, Math.max(1, parseInt(diaVencimento, 10) || 1)),
+        dia_vencimento: Math.min(28, Math.max(1, parseInt(diaVencimento, 10) || 1)),
         icone: icone || '📌',
-        atualizadoEm: new Date().toISOString()
+        atualizado_em: db.fn.now()
       });
 
       res.json({ success: true, message: 'Gasto fixo atualizado com sucesso' });
@@ -123,9 +128,9 @@ class FixedExpenseController {
         return res.status(400).json({ success: false, message: 'fixedExpenseId e userId são obrigatórios' });
       }
 
-      await db.collection('usuarios').doc(userId).collection('gastosFixos').doc(fixedExpenseId).update({
+      await db('fixed_expenses').where({ id: fixedExpenseId, user_id: userId }).update({
         ativo: false,
-        removidoEm: new Date().toISOString()
+        removido_em: db.fn.now()
       });
 
       res.json({ success: true, message: 'Gasto fixo removido com sucesso' });
@@ -145,43 +150,48 @@ class FixedExpenseController {
         return res.status(400).json({ success: false, message: 'fixedExpenseId e userId são obrigatórios' });
       }
 
-      const doc = await db.collection('usuarios').doc(userId).collection('gastosFixos').doc(fixedExpenseId).get();
-      if (!doc.exists) {
+      const fixedExpense = await db('fixed_expenses').where({ id: fixedExpenseId, user_id: userId }).first();
+      if (!fixedExpense) {
         return res.status(404).json({ success: false, message: 'Gasto fixo não encontrado' });
       }
-      const fixedExpense = doc.data();
       const competencia = currentCompetencia();
 
-      const already = await db.collection('usuarios').doc(userId).collection('historico')
-        .where('recurrenceId', '==', fixedExpenseId)
-        .where('competencia', '==', competencia)
-        .limit(1)
-        .get();
+      const already = await db('transactions')
+        .where({ recurrence_id: fixedExpenseId, competencia })
+        .first();
 
-      if (!already.empty) {
+      if (already) {
         return res.status(409).json({ success: false, message: 'Este gasto fixo já foi lançado neste mês' });
       }
 
       const now = new Date();
       const dataHora = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}, ${now.toLocaleTimeString('pt-BR')}`;
 
-      const transactionData = {
+      const [transactionId] = await db('transactions').insert({
+        user_id: userId,
         tipo: 'despesa',
         valor: fixedExpense.valor,
         descricao: fixedExpense.nome,
         categoria: fixedExpense.categoria || 'Outros',
-        dataHora,
-        recurrenceId: fixedExpenseId,
-        competencia,
-        criadoEm: new Date().toISOString()
-      };
-
-      const docRef = await db.collection('usuarios').doc(userId).collection('historico').add(transactionData);
+        data_hora: dataHora,
+        recurrence_id: fixedExpenseId,
+        competencia
+      });
 
       res.status(201).json({
         success: true,
         message: 'Gasto fixo lançado com sucesso',
-        transaction: { id: docRef.id, userId, ...transactionData }
+        transaction: {
+          id: transactionId,
+          userId,
+          tipo: 'despesa',
+          valor: parseFloat(fixedExpense.valor),
+          descricao: fixedExpense.nome,
+          categoria: fixedExpense.categoria || 'Outros',
+          dataHora,
+          recurrenceId: fixedExpenseId,
+          competencia
+        }
       });
 
     } catch (error) {

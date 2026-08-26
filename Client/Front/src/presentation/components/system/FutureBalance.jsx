@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Line } from 'react-chartjs-2';
+import { getAuthHeaders } from '../../../shared/authHeaders';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -36,7 +37,7 @@ export function FutureBalance({ transactions, userSalary }) {
     try {
       const res = await fetch(`${API_URL}/api/projecao-saldo/${period}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ transactions })
       });
       

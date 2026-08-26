@@ -1,4 +1,4 @@
-const { db } = require('../config/firebase');
+const { db } = require('../config/database');
 
 class SplitController {
   // Agrega, por pessoa, tudo que ela deve/já pagou em despesas divididas
@@ -9,38 +9,35 @@ class SplitController {
         return res.status(400).json({ success: false, message: 'ID do usuário é obrigatório' });
       }
 
-      // Busca todo o histórico e filtra em memória — evita depender de índice
-      // composto do Firestore para um campo opcional (split pode nem existir).
-      const snapshot = await db.collection('usuarios').doc(userId).collection('historico').get();
+      const rows = await db('split_participants as sp')
+        .join('transactions as t', 't.id', 'sp.transaction_id')
+        .where('t.user_id', userId)
+        .orderBy('sp.id', 'asc')
+        .select('sp.id as participant_id', 'sp.transaction_id', 'sp.nome', 'sp.valor', 'sp.pago', 'sp.pago_em', 't.descricao', 't.data_hora');
 
       const peopleMap = {};
 
-      snapshot.forEach(doc => {
-        const transaction = doc.data();
-        const participantes = transaction.split?.participantes || [];
-        if (participantes.length === 0) return;
+      rows.forEach((row) => {
+        const key = row.nome.trim().toLowerCase();
+        if (!peopleMap[key]) {
+          peopleMap[key] = { nome: row.nome.trim(), totalDevido: 0, totalPago: 0, itens: [] };
+        }
 
-        participantes.forEach((p, index) => {
-          const key = p.nome.trim().toLowerCase();
-          if (!peopleMap[key]) {
-            peopleMap[key] = { nome: p.nome.trim(), totalDevido: 0, totalPago: 0, itens: [] };
-          }
+        const valor = parseFloat(row.valor) || 0;
+        if (row.pago) {
+          peopleMap[key].totalPago += valor;
+        } else {
+          peopleMap[key].totalDevido += valor;
+        }
 
-          if (p.pago) {
-            peopleMap[key].totalPago += p.valor;
-          } else {
-            peopleMap[key].totalDevido += p.valor;
-          }
-
-          peopleMap[key].itens.push({
-            transactionId: doc.id,
-            participantIndex: index,
-            descricao: transaction.descricao,
-            valor: p.valor,
-            pago: Boolean(p.pago),
-            pagoEm: p.pagoEm || null,
-            data: transaction.dataHora
-          });
+        peopleMap[key].itens.push({
+          transactionId: row.transaction_id,
+          participantId: row.participant_id,
+          descricao: row.descricao,
+          valor,
+          pago: Boolean(row.pago),
+          pagoEm: row.pago_em,
+          data: row.data_hora
         });
       });
 
@@ -53,7 +50,11 @@ class SplitController {
     }
   }
 
-  // Marca (ou desmarca) um participante de uma transação como pago
+  // Marca (ou desmarca) um participante de uma transação como pago.
+  // A rota ainda recebe `participantIndex` (posição, herdada de quando o
+  // split era um array dentro do documento Firestore) — traduzimos pra o
+  // registro real ordenando por id de inserção, assim o contrato da API
+  // não muda e o frontend não precisa saber que virou uma tabela própria.
   static async setParticipantPaid(req, res) {
     try {
       const { transactionId, participantIndex } = req.params;
@@ -63,28 +64,23 @@ class SplitController {
         return res.status(400).json({ success: false, message: 'userId é obrigatório' });
       }
 
-      const docRef = db.collection('usuarios').doc(userId).collection('historico').doc(transactionId);
-      const doc = await docRef.get();
-
-      if (!doc.exists) {
+      const transaction = await db('transactions').where({ id: transactionId, user_id: userId }).first();
+      if (!transaction) {
         return res.status(404).json({ success: false, message: 'Transação não encontrada' });
       }
 
-      const transaction = doc.data();
-      const participantes = transaction.split?.participantes || [];
+      const participantes = await db('split_participants').where({ transaction_id: transactionId }).orderBy('id', 'asc');
       const idx = parseInt(participantIndex, 10);
+      const alvo = participantes[idx];
 
-      if (!participantes[idx]) {
+      if (!alvo) {
         return res.status(404).json({ success: false, message: 'Participante não encontrado' });
       }
 
-      participantes[idx] = {
-        ...participantes[idx],
+      await db('split_participants').where({ id: alvo.id }).update({
         pago: Boolean(pago),
-        pagoEm: pago ? new Date().toISOString() : null
-      };
-
-      await docRef.update({ 'split.participantes': participantes });
+        pago_em: pago ? db.fn.now() : null
+      });
 
       res.json({ success: true, message: pago ? 'Marcado como pago' : 'Marcado como pendente' });
 

@@ -32,6 +32,13 @@
   grid-template-columns: 1fr 1fr;
   background: var(--auth-paper);
   font-family: var(--auth-font-body);
+  /* App.jsx renderiza um <div class="background"> fixo (z-index:0) atrás de
+     toda rota. Sem posição própria aqui, .auth-layout fica "static" e esse
+     overlay fixo passa a receber os cliques por cima do formulário (o botão
+     "Entrar" nunca disparava o submit). position+z-index cria um contexto de
+     empilhamento acima do overlay. */
+  position: relative;
+  z-index: 1;
 }
 
 @media (max-width: 860px) {

@@ -58,11 +58,12 @@ class Account {
     };
   }
 
+  // Formato de linha da tabela `accounts` (snake_case)
   toPersistence() {
     return {
       nome: this._nome,
       tipo: this._tipo,
-      saldoInicial: this._saldoInicial,
+      saldo_inicial: this._saldoInicial,
       instituicao: this._instituicao,
       cor: this._cor,
       liquidez: this._liquidez,

@@ -1,28 +1,36 @@
 // Singleton Pattern - Frontend API Connection
 class ApiConnection {
   static instance = null;
-  
+
   constructor() {
     if (ApiConnection.instance) {
       return ApiConnection.instance;
     }
-    
+
     this.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-    this.headers = {
-      'Content-Type': 'application/json'
-    };
-    
+
     ApiConnection.instance = this;
     return this;
   }
-  
+
+  // Lido a cada chamada (não guardado no construtor) — o singleton é criado
+  // uma vez só, muitas vezes antes do login acontecer; se o token ficasse
+  // congelado ali, todo request feito depois do login ainda sairia sem ele.
+  getHeaders() {
+    const token = localStorage.getItem('token');
+    return {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    };
+  }
+
   async request(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`;
     const config = {
-      headers: this.headers,
+      headers: this.getHeaders(),
       ...options
     };
-    
+
     try {
       const response = await fetch(url, config);
       return await response.json();
@@ -31,25 +39,25 @@ class ApiConnection {
       throw error;
     }
   }
-  
+
   async get(endpoint) {
     return this.request(endpoint, { method: 'GET' });
   }
-  
+
   async post(endpoint, data) {
     return this.request(endpoint, {
       method: 'POST',
       body: JSON.stringify(data)
     });
   }
-  
+
   async put(endpoint, data) {
     return this.request(endpoint, {
       method: 'PUT',
       body: JSON.stringify(data)
     });
   }
-  
+
   async delete(endpoint, data) {
     return this.request(endpoint, {
       method: 'DELETE',

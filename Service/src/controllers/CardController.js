@@ -1,4 +1,19 @@
-const { db } = require('../config/firebase');
+const { db } = require('../config/database');
+
+function toApiShape(row) {
+  return {
+    id: row.id,
+    userId: row.user_id,
+    nome: row.nome,
+    instituicao: row.instituicao,
+    final: row.final,
+    limite: parseFloat(row.limite) || 0,
+    diaFechamento: row.dia_fechamento,
+    diaVencimento: row.dia_vencimento,
+    cor: row.cor,
+    ativo: Boolean(row.ativo)
+  };
+}
 
 class CardController {
   static async create(req, res) {
@@ -12,24 +27,23 @@ class CardController {
         });
       }
 
-      const cardData = {
+      const [id] = await db('cards').insert({
+        user_id: userId,
         nome,
         instituicao: instituicao || '',
         final: (final || '').toString().slice(-4),
         limite: parseFloat(limite) || 0,
-        diaFechamento: parseInt(diaFechamento, 10) || 1,
-        diaVencimento: parseInt(diaVencimento, 10) || 10,
-        cor: cor || 'roxo',
-        ativo: true,
-        criadoEm: new Date().toISOString()
-      };
+        dia_fechamento: parseInt(diaFechamento, 10) || 1,
+        dia_vencimento: parseInt(diaVencimento, 10) || 10,
+        cor: cor || 'roxo'
+      });
 
-      const docRef = await db.collection('usuarios').doc(userId).collection('cartoes').add(cardData);
+      const row = await db('cards').where({ id }).first();
 
       res.status(201).json({
         success: true,
         message: 'Cartão cadastrado com sucesso',
-        card: { id: docRef.id, ...cardData }
+        card: toApiShape(row)
       });
 
     } catch (error) {
@@ -45,14 +59,8 @@ class CardController {
         return res.status(400).json({ success: false, message: 'ID do usuário é obrigatório' });
       }
 
-      const snapshot = await db.collection('usuarios').doc(userId).collection('cartoes')
-        .where('ativo', '==', true)
-        .get();
-
-      const cards = [];
-      snapshot.forEach(doc => cards.push({ id: doc.id, ...doc.data() }));
-
-      res.json({ success: true, cards });
+      const rows = await db('cards').where({ user_id: userId, ativo: true });
+      res.json({ success: true, cards: rows.map(toApiShape) });
 
     } catch (error) {
       res.status(500).json({ success: false, message: 'Erro interno do servidor', cards: [] });
@@ -68,18 +76,16 @@ class CardController {
         return res.status(400).json({ success: false, message: 'userId e nome do cartão são obrigatórios' });
       }
 
-      const cardData = {
+      await db('cards').where({ id: cardId, user_id: userId }).update({
         nome,
         instituicao: instituicao || '',
         final: (final || '').toString().slice(-4),
         limite: parseFloat(limite) || 0,
-        diaFechamento: parseInt(diaFechamento, 10) || 1,
-        diaVencimento: parseInt(diaVencimento, 10) || 10,
+        dia_fechamento: parseInt(diaFechamento, 10) || 1,
+        dia_vencimento: parseInt(diaVencimento, 10) || 10,
         cor: cor || 'roxo',
-        atualizadoEm: new Date().toISOString()
-      };
-
-      await db.collection('usuarios').doc(userId).collection('cartoes').doc(cardId).update(cardData);
+        atualizado_em: db.fn.now()
+      });
 
       res.json({ success: true, message: 'Cartão atualizado com sucesso' });
 
@@ -98,9 +104,9 @@ class CardController {
       }
 
       // Soft delete: mantém o histórico de transações já vinculadas ao cartão íntegro
-      await db.collection('usuarios').doc(userId).collection('cartoes').doc(cardId).update({
+      await db('cards').where({ id: cardId, user_id: userId }).update({
         ativo: false,
-        removidoEm: new Date().toISOString()
+        removido_em: db.fn.now()
       });
 
       res.json({ success: true, message: 'Cartão removido com sucesso' });
@@ -114,24 +120,22 @@ class CardController {
   // Extraído como helper reutilizável (usado também pelo resumo de contas) —
   // não é um handler de rota, recebe os dados já buscados pra evitar 2 leituras.
   static async computeInvoice(userId, cardId, card) {
-    const snapshot = await db.collection('usuarios').doc(userId).collection('historico')
-      .where('cardId', '==', cardId)
-      .get();
+    const rows = await db('transactions').where({ user_id: userId, card_id: cardId });
 
     let total = 0;
-    const transactions = [];
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      total += Math.abs(parseFloat(data.valor) || 0);
-      transactions.push({ id: doc.id, ...data });
+    const transactions = rows.map((row) => {
+      total += Math.abs(parseFloat(row.valor) || 0);
+      return row;
     });
+
+    const limite = parseFloat(card.limite) || 0;
 
     return {
       total,
-      limite: card.limite || 0,
-      usoPercentual: card.limite ? Math.min(100, Math.round((total / card.limite) * 100)) : 0,
-      diaFechamento: card.diaFechamento,
-      diaVencimento: card.diaVencimento,
+      limite,
+      usoPercentual: limite ? Math.min(100, Math.round((total / limite) * 100)) : 0,
+      diaFechamento: card.dia_fechamento ?? card.diaFechamento,
+      diaVencimento: card.dia_vencimento ?? card.diaVencimento,
       transactions
     };
   }
@@ -140,12 +144,12 @@ class CardController {
     try {
       const { userId, cardId } = req.params;
 
-      const cardDoc = await db.collection('usuarios').doc(userId).collection('cartoes').doc(cardId).get();
-      if (!cardDoc.exists) {
+      const card = await db('cards').where({ id: cardId, user_id: userId }).first();
+      if (!card) {
         return res.status(404).json({ success: false, message: 'Cartão não encontrado' });
       }
 
-      const invoice = await CardController.computeInvoice(userId, cardId, cardDoc.data());
+      const invoice = await CardController.computeInvoice(userId, cardId, card);
 
       res.json({ success: true, invoice });
 
@@ -157,15 +161,10 @@ class CardController {
   // Todos os cartões ativos do usuário já com a fatura calculada — usado pelo
   // resumo financeiro consolidado (limite de crédito disponível / comprometido).
   static async getActiveCardsWithInvoices(userId) {
-    const snapshot = await db.collection('usuarios').doc(userId).collection('cartoes')
-      .where('ativo', '==', true)
-      .get();
-
-    const cards = [];
-    snapshot.forEach(doc => cards.push({ id: doc.id, ...doc.data() }));
+    const cards = await db('cards').where({ user_id: userId, ativo: true });
 
     return Promise.all(cards.map(async (card) => ({
-      ...card,
+      ...toApiShape(card),
       invoice: await CardController.computeInvoice(userId, card.id, card)
     })));
   }

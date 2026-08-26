@@ -1,5 +1,5 @@
+const crypto = require('crypto');
 const TransactionService = require('../services/TransactionService');
-const DatabaseConnection = require('../config/DatabaseConnection');
 const TransactionFactory = require('../services/TransactionFactory');
 const { TransactionSubject } = require('../services/TransactionObserver');
 
@@ -8,10 +8,6 @@ const transactionSubject = new TransactionSubject();
 class TransactionController {
   static async create(req, res) {
     try {
-      // Singleton Pattern - Conexão única com banco
-      const dbConnection = new DatabaseConnection();
-      const db = dbConnection.getFirestore();
-
       const transactionData = req.body;
 
       // Factory Method Pattern - Criar transação baseada no tipo
@@ -29,7 +25,7 @@ class TransactionController {
 
       // Compra parcelada no cartão: gera uma transação por mês, todas ligadas por compraId
       if (parcelas > 1 && transactionData.cardId) {
-        const compraId = db.collection('_ids').doc().id;
+        const compraId = crypto.randomUUID();
         const valorParcela = parseFloat(transactionData.valor) / parcelas;
         const [dia, mes, ano] = (transactionData.dataHora || '').split(', ')[0]?.split('/') || [];
         const baseDate = dia ? new Date(ano, mes - 1, dia) : new Date();

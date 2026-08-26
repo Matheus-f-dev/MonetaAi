@@ -1,14 +1,10 @@
 const app = require('./src/app');
 const passport = require('passport');
-const { auth, db } = require('./src/config/firebase');
 
-// Inicializa passport com configurações antigas para compatibilidade
+// Sem mais Firebase por trás disso — auth própria (bcrypt + JWT), dados no
+// MySQL via Knex (config/database.js).
 const initializePassport = require('./src/config/passport-google-config');
-initializePassport(passport, auth, db);
-
-// Define variáveis globais para compatibilidade com rotas antigas
-app.locals.auth = auth;
-app.locals.db = db;
+initializePassport(passport);
 
 const PORT = process.env.PORT || 3000;
 

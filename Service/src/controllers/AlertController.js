@@ -1,4 +1,20 @@
-const { db } = require('../config/firebase');
+const { db } = require('../config/database');
+
+function toApiShape(row) {
+  return {
+    id: row.id,
+    userId: row.user_id,
+    nome: row.nome,
+    condicao: row.condicao,
+    valor: parseFloat(row.valor) || 0,
+    categoria: row.categoria,
+    ativo: Boolean(row.ativo)
+  };
+}
+
+function parseValorReais(valor) {
+  return parseFloat(valor.toString().replace('R$', '').replace(',', '.'));
+}
 
 class AlertController {
   static async create(req, res) {
@@ -12,21 +28,18 @@ class AlertController {
         });
       }
 
-      const alertData = {
+      const [id] = await db('alerts').insert({
+        user_id: userId,
         nome,
         condicao,
-        valor: parseFloat(valor.replace('R$', '').replace(',', '.')),
-        categoria,
-        criadoEm: new Date().toISOString(),
-        ativo: true
-      };
-
-      const docRef = await db.collection('usuarios').doc(userId).collection('alerta').add(alertData);
+        valor: parseValorReais(valor),
+        categoria
+      });
 
       res.status(201).json({
         success: true,
         message: 'Alerta criado com sucesso',
-        alertId: docRef.id
+        alertId: id
       });
 
     } catch (error) {
@@ -40,7 +53,7 @@ class AlertController {
   static async getUserAlerts(req, res) {
     try {
       const { userId } = req.params;
-      
+
       if (!userId) {
         return res.status(400).json({
           success: false,
@@ -48,21 +61,11 @@ class AlertController {
         });
       }
 
-      const snapshot = await db.collection('usuarios').doc(userId).collection('alerta')
-        .where('ativo', '==', true)
-        .get();
-
-      const alerts = [];
-      snapshot.forEach(doc => {
-        alerts.push({
-          id: doc.id,
-          ...doc.data()
-        });
-      });
+      const rows = await db('alerts').where({ user_id: userId, ativo: true });
 
       res.json({
         success: true,
-        alerts: alerts || []
+        alerts: rows.map(toApiShape)
       });
 
     } catch (error) {
@@ -86,15 +89,13 @@ class AlertController {
         });
       }
 
-      const alertData = {
+      await db('alerts').where({ id: alertId, user_id: userId }).update({
         nome,
         condicao,
-        valor: parseFloat(valor.toString().replace('R$', '').replace(',', '.')),
+        valor: parseValorReais(valor),
         categoria,
-        atualizadoEm: new Date().toISOString()
-      };
-
-      await db.collection('usuarios').doc(userId).collection('alerta').doc(alertId).update(alertData);
+        atualizado_em: db.fn.now()
+      });
 
       res.json({
         success: true,
@@ -121,7 +122,7 @@ class AlertController {
         });
       }
 
-      await db.collection('usuarios').doc(userId).collection('alerta').doc(alertId).delete();
+      await db('alerts').where({ id: alertId, user_id: userId }).del();
 
       res.json({
         success: true,
@@ -139,7 +140,7 @@ class AlertController {
   static async getNotifications(req, res) {
     try {
       const { userId } = req.params;
-      
+
       if (!userId) {
         return res.status(400).json({
           success: false,
@@ -147,22 +148,25 @@ class AlertController {
         });
       }
 
-      const snapshot = await db.collection('usuarios').doc(userId).collection('notificacoes')
-        .orderBy('disparadoEm', 'desc')
-        .limit(50)
-        .get();
-
-      const notifications = [];
-      snapshot.forEach(doc => {
-        notifications.push({
-          id: doc.id,
-          ...doc.data()
-        });
-      });
+      const rows = await db('notifications')
+        .where({ user_id: userId })
+        .orderBy('disparado_em', 'desc')
+        .limit(50);
 
       res.json({
         success: true,
-        notifications
+        notifications: rows.map((row) => ({
+          id: row.id,
+          userId: row.user_id,
+          alerteId: row.alert_id,
+          nomeAlerta: row.nome_alerta,
+          categoria: row.categoria,
+          limite: parseFloat(row.limite) || 0,
+          totalGasto: parseFloat(row.total_gasto) || 0,
+          condicao: row.condicao,
+          disparadoEm: row.disparado_em,
+          lido: Boolean(row.lido)
+        }))
       });
 
     } catch (error) {

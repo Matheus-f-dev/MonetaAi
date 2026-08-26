@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { getAuthHeaders } from '../../shared/authHeaders';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -11,7 +12,7 @@ export const usePeople = (userId = null) => {
 
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/api/split/${userId}/people`);
+      const response = await fetch(`${API_URL}/api/split/${userId}/people`, { headers: getAuthHeaders() });
       const result = await response.json();
       setPeople(result.success ? (result.people || []) : []);
     } catch (error) {
@@ -27,7 +28,7 @@ export const usePeople = (userId = null) => {
         `${API_URL}/api/split/transactions/${transactionId}/participants/${participantIndex}`,
         {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: getAuthHeaders(),
           body: JSON.stringify({ userId, pago })
         }
       );

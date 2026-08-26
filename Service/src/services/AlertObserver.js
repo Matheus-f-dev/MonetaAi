@@ -1,56 +1,40 @@
-const { db } = require('../config/firebase');
+const { db } = require('../config/database');
 
 class AlertObserver {
   async update(transaction) {
     if (transaction.tipo !== 'despesa') return;
-    
+
     try {
       const userId = transaction.userId;
       const categoria = transaction.categoria;
-      const valor = Math.abs(transaction.valor);
-      
+
       // Buscar alertas ativos para esta categoria
-      const alertsSnapshot = await db.collection('usuarios').doc(userId).collection('alerta')
-        .where('categoria', '==', categoria)
-        .where('ativo', '==', true)
-        .get();
-      
-      if (alertsSnapshot.empty) return;
-      
-      // Calcular total de gastos da categoria no mês atual
+      const alerts = await db('alerts').where({ user_id: userId, categoria, ativo: true });
+      if (alerts.length === 0) return;
+
+      // Calcular total de gastos da categoria no mês atual. Antes isso
+      // consultava uma coleção `transacoes` que nunca era escrita em lugar
+      // nenhum (todo o resto do app usa `historico`/`transactions`) — esse
+      // cálculo estava silenciosamente sempre zerado. Corrigido pra
+      // consultar a tabela certa.
       const now = new Date();
       const currentMonth = now.getMonth() + 1;
       const currentYear = now.getFullYear();
-      
-      const transactionsSnapshot = await db.collection('usuarios').doc(userId).collection('transacoes')
-        .where('categoria', '==', categoria)
-        .where('tipo', '==', 'despesa')
-        .get();
-      
-      let totalGastos = 0;
-      transactionsSnapshot.forEach(doc => {
-        const transactionData = doc.data();
-        const dateField = transactionData.dataHora;
-        
-        if (dateField && typeof dateField === 'string' && dateField.includes('/')) {
-          const [datePart] = dateField.split(', ');
-          const [day, month, year] = datePart.split('/');
-          
-          if (parseInt(month) === currentMonth && parseInt(year) === currentYear) {
-            totalGastos += Math.abs(transactionData.valor);
-          }
-        }
-      });
-      
-      // Verificar cada alerta
-      alertsSnapshot.forEach(alertDoc => {
-        const alert = { ...alertDoc.data(), id: alertDoc.id };
-        const limite = alert.valor;
-        const condicao = alert.condicao;
-        
+
+      const transacoesDoMes = await db('transactions')
+        .where({ user_id: userId, categoria, tipo: 'despesa' })
+        .whereRaw(
+          "MONTH(STR_TO_DATE(SUBSTRING_INDEX(data_hora, ',', 1), '%d/%m/%Y')) = ? AND YEAR(STR_TO_DATE(SUBSTRING_INDEX(data_hora, ',', 1), '%d/%m/%Y')) = ?",
+          [currentMonth, currentYear]
+        );
+
+      const totalGastos = transacoesDoMes.reduce((sum, t) => sum + Math.abs(parseFloat(t.valor) || 0), 0);
+
+      alerts.forEach((alert) => {
+        const limite = parseFloat(alert.valor);
         let alertTriggered = false;
-        
-        switch (condicao) {
+
+        switch (alert.condicao) {
           case 'Maior que':
             alertTriggered = totalGastos > limite;
             break;
@@ -61,32 +45,29 @@ class AlertObserver {
             alertTriggered = totalGastos === limite;
             break;
         }
-        
+
         if (alertTriggered) {
           this.triggerAlert(userId, alert, totalGastos);
         }
       });
-      
+
     } catch (error) {
       console.error('Erro no AlertObserver:', error);
     }
   }
-  
+
   async triggerAlert(userId, alert, totalGastos) {
-    const alertData = {
-      alerteId: alert.id,
-      nomeAlerta: alert.nome,
+    await db('notifications').insert({
+      user_id: userId,
+      alert_id: alert.id,
+      nome_alerta: alert.nome,
       categoria: alert.categoria,
       limite: alert.valor,
-      totalGasto: totalGastos,
+      total_gasto: totalGastos,
       condicao: alert.condicao,
-      disparadoEm: new Date().toISOString(),
       lido: false
-    };
-    
-    // Salvar notificação no banco
-    await db.collection('usuarios').doc(userId).collection('notificacoes').add(alertData);
-    
+    });
+
     console.log(`🚨 ALERTA DISPARADO: ${alert.nome} - ${alert.categoria} ${alert.condicao} R$ ${alert.valor}. Total atual: R$ ${totalGastos}`);
   }
 }

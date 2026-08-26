@@ -1,4 +1,4 @@
-const { db } = require('../config/firebase');
+const { db } = require('../config/database');
 const crypto = require('crypto');
 const Account = require('../models/Account');
 const TransactionFactory = require('../services/TransactionFactory');
@@ -13,46 +13,47 @@ function nowDataHora() {
 class AccountController {
   // Busca as contas ativas do usuário já com o saldo atual calculado
   // (saldoInicial + soma assinada das transações daquela conta). Transações
-  // sem accountId (histórico antigo, lançamentos do bot do WhatsApp) caem na
-  // conta principal — não existe migração manual, a conta principal absorve
-  // tudo que não tem dono explícito.
+  // sem account_id (histórico antigo, lançamentos do bot do WhatsApp) caem
+  // na conta principal — sem migração manual, ela absorve tudo que não tem
+  // dono explícito.
   static async getAccountsWithBalances(userId) {
-    const contasCol = db.collection('usuarios').doc(userId).collection('contas');
+    let accounts = await db('accounts').where({ user_id: userId, ativo: true });
 
-    let snapshot = await contasCol.where('ativo', '==', true).get();
-    let accounts = [];
-    snapshot.forEach(doc => accounts.push({ id: doc.id, ...doc.data() }));
-
-    // Nenhuma conta ainda: provisiona a Conta Principal automaticamente.
-    // Feito dentro de uma transação (checa de novo por dentro) pra não criar
-    // duas "Conta Principal" quando duas requisições chegam ao mesmo tempo
-    // (ex.: StrictMode do React disparando o efeito 2x, ou duas abas abertas).
+    // Nenhuma conta ainda: provisiona a Conta Principal. Feito dentro de uma
+    // transação (checa de novo por dentro) pra não criar duas "Conta
+    // Principal" quando duas requisições chegam ao mesmo tempo (o mesmo bug
+    // de corrida já resolvido uma vez na versão Firestore — mesma correção,
+    // agora com transação de banco de verdade).
     if (accounts.length === 0) {
-      accounts = await db.runTransaction(async (tx) => {
-        const recheck = await tx.get(contasCol.where('ativo', '==', true));
-        if (!recheck.empty) {
-          return recheck.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        }
+      accounts = await db.transaction(async (trx) => {
+        // Trava a própria linha do usuário primeiro — como o `accounts`
+        // ainda não tem a linha que a corrida está disputando, um SELECT...
+        // FOR UPDATE nele não travaria nada (não existe o que travar).
+        // Travando `users` (que já existe, garantido), a segunda
+        // requisição concorrente espera a primeira terminar e commitar
+        // antes de conferir de novo — aí já encontra a conta criada.
+        await trx('users').where({ id: userId }).forUpdate();
+
+        const recheck = await trx('accounts').where({ user_id: userId, ativo: true });
+        if (recheck.length > 0) return recheck;
 
         const principal = new Account({ userId, nome: 'Conta Principal', tipo: 'corrente', saldoInicial: 0, principal: true });
-        const ref = contasCol.doc();
-        tx.set(ref, principal.toPersistence());
-        return [{ id: ref.id, ...principal.toPersistence() }];
+        const [id] = await trx('accounts').insert({ user_id: userId, ...principal.toPersistence() });
+        return trx('accounts').where({ id });
       });
     }
 
-    const principalAccount = accounts.find(a => a.principal) || accounts[0];
+    const principalAccount = accounts.find((a) => a.principal) || accounts[0];
 
-    const historicoSnapshot = await db.collection('usuarios').doc(userId).collection('historico').get();
+    const transactions = await db('transactions').where({ user_id: userId });
     const byAccount = {};
-    historicoSnapshot.forEach(doc => {
-      const t = doc.data();
-      const key = t.accountId || '__sem_conta__';
+    transactions.forEach((t) => {
+      const key = t.account_id || '__sem_conta__';
       if (!byAccount[key]) byAccount[key] = [];
       byAccount[key].push(t);
     });
 
-    const withBalances = accounts.map(account => {
+    const withBalances = accounts.map((account) => {
       const own = byAccount[account.id] || [];
       const legacy = account.id === principalAccount.id ? (byAccount['__sem_conta__'] || []) : [];
       const sum = [...own, ...legacy].reduce((acc, t) => {
@@ -62,7 +63,7 @@ class AccountController {
         return acc;
       }, 0);
 
-      return { ...account, saldoAtual: (account.saldoInicial || 0) + sum };
+      return { ...toApiShape(account), saldoAtual: (parseFloat(account.saldo_inicial) || 0) + sum };
     });
 
     return { accounts: withBalances, principalAccountId: principalAccount.id };
@@ -76,19 +77,16 @@ class AccountController {
         return res.status(400).json({ success: false, message: 'userId e nome da conta são obrigatórios' });
       }
 
-      const existing = await db.collection('usuarios').doc(userId).collection('contas')
-        .where('ativo', '==', true)
-        .limit(1)
-        .get();
+      const existing = await db('accounts').where({ user_id: userId, ativo: true }).first();
+      const account = new Account({ userId, nome, tipo, saldoInicial, instituicao, cor, principal: !existing });
 
-      const account = new Account({ userId, nome, tipo, saldoInicial, instituicao, cor, principal: existing.empty });
-
-      const docRef = await db.collection('usuarios').doc(userId).collection('contas').add(account.toPersistence());
+      const [id] = await db('accounts').insert({ user_id: userId, ...account.toPersistence() });
+      const row = await db('accounts').where({ id }).first();
 
       res.status(201).json({
         success: true,
         message: 'Conta cadastrada com sucesso',
-        account: { id: docRef.id, ...account.toPersistence() }
+        account: toApiShape(row)
       });
 
     } catch (error) {
@@ -121,9 +119,9 @@ class AccountController {
       }
 
       const account = new Account({ userId, nome, tipo, saldoInicial, instituicao, cor });
-      await db.collection('usuarios').doc(userId).collection('contas').doc(accountId).update({
+      await db('accounts').where({ id: accountId, user_id: userId }).update({
         ...account.toPersistence(),
-        atualizadoEm: new Date().toISOString()
+        atualizado_em: db.fn.now()
       });
 
       res.json({ success: true, message: 'Conta atualizada com sucesso' });
@@ -142,32 +140,25 @@ class AccountController {
         return res.status(400).json({ success: false, message: 'accountId e userId são obrigatórios' });
       }
 
-      const snapshot = await db.collection('usuarios').doc(userId).collection('contas')
-        .where('ativo', '==', true)
-        .get();
-
-      const accounts = [];
-      snapshot.forEach(doc => accounts.push({ id: doc.id, ...doc.data() }));
+      const accounts = await db('accounts').where({ user_id: userId, ativo: true });
 
       if (accounts.length <= 1) {
         return res.status(400).json({ success: false, message: 'Você precisa ter ao menos uma conta ativa' });
       }
 
-      const target = accounts.find(a => a.id === accountId);
-      const batch = db.batch();
-      const targetRef = db.collection('usuarios').doc(userId).collection('contas').doc(accountId);
-      batch.update(targetRef, { ativo: false, removidoEm: new Date().toISOString() });
+      const target = accounts.find((a) => a.id === Number(accountId));
 
-      // Se a conta removida era a principal, promove outra pra assumir o papel
-      if (target?.principal) {
-        const promoted = accounts.find(a => a.id !== accountId);
-        if (promoted) {
-          const promotedRef = db.collection('usuarios').doc(userId).collection('contas').doc(promoted.id);
-          batch.update(promotedRef, { principal: true });
+      await db.transaction(async (trx) => {
+        await trx('accounts').where({ id: accountId }).update({ ativo: false, removido_em: trx.fn.now() });
+
+        // Se a conta removida era a principal, promove outra pra assumir o papel
+        if (target?.principal) {
+          const promoted = accounts.find((a) => a.id !== Number(accountId));
+          if (promoted) {
+            await trx('accounts').where({ id: promoted.id }).update({ principal: true });
+          }
         }
-      }
-
-      await batch.commit();
+      });
 
       res.json({ success: true, message: 'Conta removida com sucesso' });
 
@@ -176,9 +167,10 @@ class AccountController {
     }
   }
 
-  // Transferência entre contas — idempotente (idempotencyKey vindo do cliente)
-  // e atômica (as duas pernas + o log de idempotência são gravados juntos ou
-  // nenhum é gravado).
+  // Transferência entre contas — idempotente (idempotencyKey vindo do
+  // cliente) e atômica (as duas pernas + o log de idempotência são
+  // gravados juntos ou nenhum é gravado — db.transaction faz o papel do
+  // antigo db.runTransaction do Firestore).
   static async transfer(req, res) {
     try {
       const { userId } = req.params;
@@ -187,7 +179,7 @@ class AccountController {
       if (!userId || !fromAccountId || !toAccountId || !valor) {
         return res.status(400).json({ success: false, message: 'fromAccountId, toAccountId e valor são obrigatórios' });
       }
-      if (fromAccountId === toAccountId) {
+      if (String(fromAccountId) === String(toAccountId)) {
         return res.status(400).json({ success: false, message: 'Conta de origem e destino não podem ser a mesma' });
       }
       const valorNum = Math.abs(parseFloat(valor)) || 0;
@@ -206,60 +198,57 @@ class AccountController {
       });
 
       const key = idempotencyKey || crypto.randomUUID();
-      const userRef = db.collection('usuarios').doc(userId);
-      const logRef = userRef.collection('transferencias').doc(key);
-      const historicoCol = userRef.collection('historico');
 
-      const result = await db.runTransaction(async (tx) => {
-        const logDoc = await tx.get(logRef);
-        const fromRef = userRef.collection('contas').doc(fromAccountId);
-        const toRef = userRef.collection('contas').doc(toAccountId);
-        const fromDoc = await tx.get(fromRef);
-        const toDoc = await tx.get(toRef);
-
-        if (logDoc.exists) {
-          return { alreadyProcessed: true, transferId: key };
+      const result = await db.transaction(async (trx) => {
+        const existingLog = await trx('transfers').where({ idempotency_key: key }).first();
+        if (existingLog) {
+          return { alreadyProcessed: true };
         }
 
-        if (!fromDoc.exists || !toDoc.exists) {
+        const fromAccount = await trx('accounts').where({ id: fromAccountId, user_id: userId }).first();
+        const toAccount = await trx('accounts').where({ id: toAccountId, user_id: userId }).first();
+        if (!fromAccount || !toAccount) {
           throw new Error('Conta de origem ou destino não encontrada');
         }
 
         const dataHora = nowDataHora();
-        const criadoEm = new Date().toISOString();
-        const fromTxRef = historicoCol.doc();
-        const toTxRef = historicoCol.doc();
 
-        tx.set(fromTxRef, {
+        const [fromTransactionId] = await trx('transactions').insert({
+          user_id: userId,
           tipo: 'despesa',
           valor: valorNum,
-          descricao: descricao || `Transferência para ${toDoc.data().nome}`,
+          descricao: descricao || `Transferência para ${toAccount.nome}`,
           categoria: 'Transferência',
-          dataHora,
-          criadoEm,
-          accountId: fromAccountId,
-          isTransferencia: true,
-          transferId: key
+          data_hora: dataHora,
+          account_id: fromAccountId,
+          is_transferencia: true,
+          transfer_id: key
         });
 
-        tx.set(toTxRef, {
+        const [toTransactionId] = await trx('transactions').insert({
+          user_id: userId,
           tipo: 'receita',
           valor: valorNum,
-          descricao: descricao || `Transferência de ${fromDoc.data().nome}`,
+          descricao: descricao || `Transferência de ${fromAccount.nome}`,
           categoria: 'Transferência',
-          dataHora,
-          criadoEm,
-          accountId: toAccountId,
-          isTransferencia: true,
-          transferId: key
+          data_hora: dataHora,
+          account_id: toAccountId,
+          is_transferencia: true,
+          transfer_id: key
         });
 
-        tx.set(logRef, {
-          userId, fromAccountId, toAccountId, valor: valorNum, descricao: descricao || '',
-          criadoEm, fromTransactionId: fromTxRef.id, toTransactionId: toTxRef.id
+        await trx('transfers').insert({
+          user_id: userId,
+          idempotency_key: key,
+          from_account_id: fromAccountId,
+          to_account_id: toAccountId,
+          valor: valorNum,
+          descricao: descricao || '',
+          from_transaction_id: fromTransactionId,
+          to_transaction_id: toTransactionId
         });
 
-        return { alreadyProcessed: false, transferId: key };
+        return { alreadyProcessed: false };
       });
 
       res.status(result.alreadyProcessed ? 200 : 201).json({
@@ -267,7 +256,7 @@ class AccountController {
         message: result.alreadyProcessed
           ? 'Transferência já havia sido processada (reenvio ignorado)'
           : 'Transferência realizada com sucesso',
-        transferId: result.transferId
+        transferId: key
       });
 
     } catch (error) {
@@ -292,13 +281,13 @@ class AccountController {
       ]);
 
       const saldoTotal = accounts.reduce((sum, a) => sum + a.saldoAtual, 0);
-      const saldoDisponivel = accounts.filter(a => a.liquidez).reduce((sum, a) => sum + a.saldoAtual, 0);
+      const saldoDisponivel = accounts.filter((a) => a.liquidez).reduce((sum, a) => sum + a.saldoAtual, 0);
 
       const comprometidoCartoes = cardsWithInvoices.reduce((sum, c) => sum + (c.invoice?.total || 0), 0);
       const limiteCreditoDisponivel = cardsWithInvoices.reduce((sum, c) => sum + Math.max(0, (c.limite || 0) - (c.invoice?.total || 0)), 0);
 
       const comprometidoFixos = fixedExpenses
-        .filter(f => f.status !== 'paid')
+        .filter((f) => f.status !== 'paid')
         .reduce((sum, f) => sum + (f.valor || 0), 0);
 
       const saldoComprometido = comprometidoCartoes + comprometidoFixos;
@@ -320,6 +309,23 @@ class AccountController {
       res.status(500).json({ success: false, message: 'Erro interno do servidor' });
     }
   }
+}
+
+// Linhas do MySQL vêm em snake_case — a API sempre respondeu em camelCase
+// (contrato que o frontend já consome), então convertemos na borda.
+function toApiShape(row) {
+  return {
+    id: row.id,
+    userId: row.user_id,
+    nome: row.nome,
+    tipo: row.tipo,
+    saldoInicial: parseFloat(row.saldo_inicial) || 0,
+    instituicao: row.instituicao,
+    cor: row.cor,
+    liquidez: Boolean(row.liquidez),
+    principal: Boolean(row.principal),
+    ativo: Boolean(row.ativo)
+  };
 }
 
 module.exports = AccountController;

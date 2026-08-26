@@ -13,35 +13,44 @@ const CardController = require('../controllers/CardController');
 const FixedExpenseController = require('../controllers/FixedExpenseController');
 const SplitController = require('../controllers/SplitController');
 const AccountController = require('../controllers/AccountController');
+const { authenticateToken, ensureOwnUser } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Rotas de autenticação
+// ── Rotas públicas (sem token — é aqui que ele é obtido) ──
 router.post('/cadastro', AuthController.register);
 router.post('/login', AuthController.login);
-router.get('/user/:userId', AuthController.getUserById);
 router.post('/verificar-email', EmailController.verificarEmail);
-router.post('/esqueci-senha', EmailController.enviarLinkRedefinicao);
+router.post('/esqueci-senha', AuthController.esqueciSenha);
+router.post('/redefinir-senha', AuthController.redefinirSenha);
+router.get('/test', (req, res) => res.json({ message: 'API funcionando' }));
+
+// ── A partir daqui, toda rota exige um token válido. Antes nenhuma rota
+// exigia nada — qualquer request que soubesse um userId lia/escrevia os
+// dados dele. Isso fecha esse buraco. ──
+router.use(authenticateToken);
+
+router.get('/user/:userId', ensureOwnUser(), AuthController.getUserById);
 
 // Rotas de transações
 router.post('/transactions', TransactionController.create);
-router.get('/transactions/:userId', TransactionController.getUserTransactions);
-router.get('/balance/:userId', TransactionController.getUserBalance);
-router.get('/chart-data/:userId', TransactionController.getChartData);
-router.get('/percentage-change/:userId', TransactionController.getPercentageChange);
+router.get('/transactions/:userId', ensureOwnUser(), TransactionController.getUserTransactions);
+router.get('/balance/:userId', ensureOwnUser(), TransactionController.getUserBalance);
+router.get('/chart-data/:userId', ensureOwnUser(), TransactionController.getChartData);
+router.get('/percentage-change/:userId', ensureOwnUser(), TransactionController.getPercentageChange);
 router.put('/transactions/:id', TransactionController.update);
 router.delete('/transactions/:id', TransactionController.delete);
 
 // Rotas de alertas
 router.post('/alerts', AlertController.create);
-router.get('/alerts/:userId', AlertController.getUserAlerts);
+router.get('/alerts/:userId', ensureOwnUser(), AlertController.getUserAlerts);
 router.put('/alerts/:alertId', AlertController.update);
 router.delete('/alerts/:alertId', AlertController.delete);
-router.get('/notifications/:userId', AlertController.getNotifications);
+router.get('/notifications/:userId', ensureOwnUser(), AlertController.getNotifications);
 
 // Rotas de projeção de saldo
 router.get('/projecao-saldo', ProjecaoSaldoController.obterProjecaoSaldo);
-router.get('/projecao-saldo/:userId/:meses', ProjecaoSaldoController.calcularProjecao);
+router.get('/projecao-saldo/:userId/:meses', ensureOwnUser(), ProjecaoSaldoController.calcularProjecao);
 router.get('/projecao-saldo/:meses', ProjecaoSaldoController.calcularProjecao);
 router.post('/projecao-saldo/:meses', ProjecaoSaldoController.calcularProjecao);
 
@@ -49,46 +58,41 @@ router.post('/projecao-saldo/:meses', ProjecaoSaldoController.calcularProjecao);
 router.post('/impacto-financeiro', ImpactoFinanceiroController.calcularImpacto);
 
 // Rotas de receitas
-router.get('/receitas/:userId', ReceitasController.obterAnaliseReceitas);
+router.get('/receitas/:userId', ensureOwnUser(), ReceitasController.obterAnaliseReceitas);
 
 // Rotas de economias
-router.get('/economias/:userId', EconomiasController.obterAnaliseEconomias);
+router.get('/economias/:userId', ensureOwnUser(), EconomiasController.obterAnaliseEconomias);
 
 // Rotas de tendências
-router.get('/tendencias/:userId', TendenciasController.obterAnaliseTendencias);
+router.get('/tendencias/:userId', ensureOwnUser(), TendenciasController.obterAnaliseTendencias);
 
 // Rotas de cartões
 router.post('/cards', CardController.create);
-router.get('/cards/:userId', CardController.getUserCards);
-router.get('/cards/:userId/:cardId/invoice', CardController.getInvoice);
+router.get('/cards/:userId', ensureOwnUser(), CardController.getUserCards);
+router.get('/cards/:userId/:cardId/invoice', ensureOwnUser(), CardController.getInvoice);
 router.put('/cards/:cardId', CardController.update);
 router.delete('/cards/:cardId', CardController.delete);
 
 // Rotas de gastos fixos
 router.post('/fixed-expenses', FixedExpenseController.create);
-router.get('/fixed-expenses/:userId', FixedExpenseController.getUserFixedExpenses);
+router.get('/fixed-expenses/:userId', ensureOwnUser(), FixedExpenseController.getUserFixedExpenses);
 router.put('/fixed-expenses/:fixedExpenseId', FixedExpenseController.update);
 router.delete('/fixed-expenses/:fixedExpenseId', FixedExpenseController.delete);
 router.post('/fixed-expenses/:fixedExpenseId/lancar', FixedExpenseController.lancar);
 
 // Rotas de divisão de despesas (split entre pessoas)
-router.get('/split/:userId/people', SplitController.getPeople);
+router.get('/split/:userId/people', ensureOwnUser(), SplitController.getPeople);
 router.put('/split/transactions/:transactionId/participants/:participantIndex', SplitController.setParticipantPaid);
 
 // Rotas de contas e carteiras
 router.post('/accounts', AccountController.create);
-router.get('/accounts/:userId', AccountController.getUserAccounts);
-router.get('/accounts/:userId/resumo', AccountController.getResumo);
-router.post('/accounts/:userId/transfer', AccountController.transfer);
+router.get('/accounts/:userId', ensureOwnUser(), AccountController.getUserAccounts);
+router.get('/accounts/:userId/resumo', ensureOwnUser(), AccountController.getResumo);
+router.post('/accounts/:userId/transfer', ensureOwnUser(), AccountController.transfer);
 router.put('/accounts/:accountId', AccountController.update);
 router.delete('/accounts/:accountId', AccountController.delete);
 
 // Rota do agente Moneta AI
 router.post('/agent/chat', AgentController.chat);
-
-// Debug route
-router.get('/test', (req, res) => {
-  res.json({ message: 'API funcionando' });
-});
 
 module.exports = router;

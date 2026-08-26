@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getAuthHeaders } from '../../shared/authHeaders';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -20,7 +21,7 @@ export const useAlerts = (userId = null) => {
       const url = `${API_URL}/api/alerts/${userId}`;
 
       
-      const response = await fetch(url);
+      const response = await fetch(url, { headers: getAuthHeaders() });
 
       
       if (!response.ok) {
@@ -51,7 +52,7 @@ export const useAlerts = (userId = null) => {
     try {
       const response = await fetch(`${API_URL}/api/alerts`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(alertData)
       });
       
@@ -77,7 +78,7 @@ export const useAlerts = (userId = null) => {
     try {
       const response = await fetch(`${API_URL}/api/alerts/${alertId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(alertData)
       });
       
@@ -100,7 +101,7 @@ export const useAlerts = (userId = null) => {
     try {
       const response = await fetch(`${API_URL}/api/alerts/${alertId}`, {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ userId })
       });
       

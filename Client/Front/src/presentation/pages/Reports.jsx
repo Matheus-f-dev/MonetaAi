@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTheme } from '../hooks/useTheme';
+import { getAuthHeaders } from '../../shared/authHeaders';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 import { useTransactionData } from '../hooks/useTransactionData';
@@ -20,7 +21,7 @@ export default function Reports() {
   useEffect(() => {
     const fetchPercentageChange = async () => {
       try {
-        const response = await fetch(`${API_URL}/api/percentage-change/${userId}?period=${selectedPeriod}`);
+        const response = await fetch(`${API_URL}/api/percentage-change/${userId}?period=${selectedPeriod}`, { headers: getAuthHeaders() });
         const data = await response.json();
         if (data.success) {
           setPercentageChange(data.percentageChange);

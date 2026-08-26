@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getAuthHeaders } from '../../shared/authHeaders';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -24,7 +25,7 @@ export function useTendencias(selectedPeriod, userId) {
       
       setLoading(true);
       try {
-        const response = await fetch(`${API_URL}/api/tendencias/${userId}?period=${selectedPeriod}`);
+        const response = await fetch(`${API_URL}/api/tendencias/${userId}?period=${selectedPeriod}`, { headers: getAuthHeaders() });
         const result = await response.json();
         
         if (result.success) {

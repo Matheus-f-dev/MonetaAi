@@ -1,5 +1,6 @@
 // Service Layer - Observer Pattern
 import { useToast } from '../../presentation/hooks/useToast.js';
+import { getAuthHeaders } from '../../shared/authHeaders';
 
 class TransactionObserverService {
   constructor() {
@@ -33,7 +34,7 @@ class HighExpenseObserver {
       
       if (!userId) return;
       
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/alerts/${userId}`);
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/alerts/${userId}`, { headers: getAuthHeaders() });
       const data = await response.json();
       
       if (data.success) {
@@ -70,7 +71,7 @@ class HighExpenseObserver {
         const startOfMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
         const endOfMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()}`;
         
-        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/transactions/${userId}?startDate=${startOfMonth}&endDate=${endOfMonth}&category=${categoria}&type=despesa`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/transactions/${userId}?startDate=${startOfMonth}&endDate=${endOfMonth}&category=${categoria}&type=despesa`, { headers: getAuthHeaders() });
         const data = await response.json();
         
         if (data.success) {

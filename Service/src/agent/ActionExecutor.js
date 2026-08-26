@@ -2,13 +2,12 @@
  * ActionExecutor — Camada de execução de ações do agente.
  *
  * Recebe { acao, dados } interpretados pela IA e executa
- * as funções correspondentes no sistema real (Firebase/Firestore).
+ * as funções correspondentes no sistema real (MySQL, via TransactionService).
  *
  * Cada método retorna { sucesso, resultado, mensagem }.
  */
 
 const TransactionService = require('../services/TransactionService');
-const { db } = require('../config/firebase');
 
 class ActionExecutor {
   constructor(userId) {

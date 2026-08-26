@@ -1,6 +1,8 @@
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const AuthService = require('../services/AuthService');
+const User = require('../models/User');
 
-function initializePassport(passport, auth, db) {
+function initializePassport(passport) {
   // Login com Google é opcional em dev local — sem GOOGLE_CLIENT_ID/SECRET no
   // .env, só pula o registro da estratégia em vez de derrubar o servidor
   // inteiro (login por e-mail/senha e todo o resto da API continuam de pé).
@@ -11,24 +13,11 @@ function initializePassport(passport, auth, db) {
       callbackURL: process.env.GOOGLE_CALLBACK_URL || "/auth/google/callback"
     }, async (accessToken, refreshToken, profile, done) => {
       try {
-        // verifica se o usuário já existe no Firebase Auth
-        let user;
-        try {
-          user = await auth.getUserByEmail(profile.emails[0].value);
-        } catch (error) {
-          user = await auth.createUser({
-            email: profile.emails[0].value,
-            displayName: profile.displayName
-          });
-
-          await db.collection('usuarios').doc(user.uid).set({
-            nome: profile.displayName,
-            email: profile.emails[0].value,
-            perfilCompleto: false,
-            criadoEm: new Date()
-          });
-        }
-
+        const user = await AuthService.findOrCreateGoogleUser({
+          googleId: profile.id,
+          email: profile.emails[0].value,
+          nome: profile.displayName
+        });
         return done(null, user);
       } catch (err) {
         return done(err, null);
@@ -39,12 +28,12 @@ function initializePassport(passport, auth, db) {
   }
 
   passport.serializeUser((user, done) => {
-    done(null, user.uid);
+    done(null, user.id);
   });
 
-  passport.deserializeUser(async (uid, done) => {
+  passport.deserializeUser(async (id, done) => {
     try {
-      const user = await auth.getUser(uid);
+      const user = await User.findById(id);
       done(null, user);
     } catch (err) {
       done(err, null);

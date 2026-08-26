@@ -1,6 +1,6 @@
 const Transaction = require('../models/Transaction');
 const TransactionRepository = require('../repositories/TransactionRepository');
-const { FilterContext, DateRangeFilter, CategoryFilter, TypeFilter, PeriodFilter, AccountFilter } = require('./FilterStrategy');
+const { FilterContext, PeriodFilter } = require('./FilterStrategy');
 
 class TransactionService {
   constructor() {
@@ -10,7 +10,11 @@ class TransactionService {
   async createTransaction(transactionData) {
     try {
       const transaction = new Transaction(transactionData);
-      const savedData = await this.repository.create(transaction.userId, transaction.toPersistence());
+      const savedData = await this.repository.create(
+        transaction.userId,
+        transaction.toPersistence(),
+        transaction.split?.participantes
+      );
       return Transaction.fromRepository({ ...savedData, userId: transaction.userId });
     } catch (error) {
       throw new Error(`Erro ao criar transação: ${error.message}`);
@@ -19,21 +23,12 @@ class TransactionService {
 
   async getUserTransactions(userId, filters = {}) {
     if (!userId) throw new Error('UserId é obrigatório');
-    
-    try {
-      const data = await this.repository.findByUserId(userId);
-      let transactions = data.map(item => {
-        try {
-          return Transaction.fromRepository(item);
-        } catch (error) {
-          return null;
-        }
-      }).filter(t => t !== null);
-    } catch (error) {
-      return [];
-    }
-    
-    const data = await this.repository.findByUserId(userId);
+
+    // startDate/endDate, category, type e accountId já viram WHERE de
+    // verdade dentro do repository (antes era um scan completo filtrado em
+    // memória). Só "filter" (period relativo: week/month/year) continua
+    // aplicado aqui em cima do conjunto já filtrado pelo banco.
+    const data = await this.repository.findByUserId(userId, filters);
     let transactions = data.map(item => {
       try {
         return Transaction.fromRepository(item);
@@ -41,31 +36,10 @@ class TransactionService {
         return null;
       }
     }).filter(t => t !== null);
-    
-    // Strategy Pattern - Aplicar filtros no backend
+
     if (filters.filter) {
       const filterContext = new FilterContext(new PeriodFilter());
       transactions = filterContext.filter(transactions, { period: filters.filter });
-    }
-    
-    if (filters.startDate && filters.endDate) {
-      const filterContext = new FilterContext(new DateRangeFilter());
-      transactions = filterContext.filter(transactions, filters);
-    }
-    
-    if (filters.category) {
-      const filterContext = new FilterContext(new CategoryFilter());
-      transactions = filterContext.filter(transactions, filters);
-    }
-    
-    if (filters.type) {
-      const filterContext = new FilterContext(new TypeFilter());
-      transactions = filterContext.filter(transactions, filters);
-    }
-
-    if (filters.accountId) {
-      const filterContext = new FilterContext(new AccountFilter());
-      transactions = filterContext.filter(transactions, filters);
     }
 
     return transactions;

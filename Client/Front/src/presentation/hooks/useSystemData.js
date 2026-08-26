@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { getAuthHeaders } from '../../shared/authHeaders';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -9,7 +10,7 @@ export const useSystemData = (userId) => {
 
   const fetchUserData = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/user/${userId}`);
+      const response = await fetch(`${API_URL}/api/user/${userId}`, { headers: getAuthHeaders() });
       
       if (!response.ok) {
         const user = JSON.parse(localStorage.getItem('user') || '{}');

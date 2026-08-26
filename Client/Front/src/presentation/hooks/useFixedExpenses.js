@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { getAuthHeaders } from '../../shared/authHeaders';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -11,7 +12,7 @@ export const useFixedExpenses = (userId = null) => {
 
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/api/fixed-expenses/${userId}`);
+      const response = await fetch(`${API_URL}/api/fixed-expenses/${userId}`, { headers: getAuthHeaders() });
       const result = await response.json();
       setFixedExpenses(result.success ? (result.fixedExpenses || []) : []);
     } catch (error) {
@@ -26,7 +27,7 @@ export const useFixedExpenses = (userId = null) => {
     try {
       const response = await fetch(`${API_URL}/api/fixed-expenses`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ userId, ...data })
       });
       const result = await response.json();
@@ -44,7 +45,7 @@ export const useFixedExpenses = (userId = null) => {
     try {
       const response = await fetch(`${API_URL}/api/fixed-expenses/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ userId, ...data })
       });
       const result = await response.json();
@@ -62,7 +63,7 @@ export const useFixedExpenses = (userId = null) => {
     try {
       const response = await fetch(`${API_URL}/api/fixed-expenses/${id}`, {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ userId })
       });
       const result = await response.json();
@@ -80,7 +81,7 @@ export const useFixedExpenses = (userId = null) => {
     try {
       const response = await fetch(`${API_URL}/api/fixed-expenses/${id}/lancar`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ userId })
       });
       const result = await response.json();

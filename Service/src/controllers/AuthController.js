@@ -6,31 +6,31 @@ class AuthController {
       const { nome, email, senha, confirmar, salario } = req.body;
 
       if (!nome || !email || !senha || !confirmar || salario === '' || salario === null || salario === undefined) {
-        return res.status(400).json({ 
-          success: false, 
-          message: 'Preencha todos os campos.' 
+        return res.status(400).json({
+          success: false,
+          message: 'Preencha todos os campos.'
         });
       }
 
       if (senha.length < 6) {
-        return res.status(400).json({ 
-          success: false, 
-          message: 'A senha deve ter pelo menos 6 caracteres.' 
+        return res.status(400).json({
+          success: false,
+          message: 'A senha deve ter pelo menos 6 caracteres.'
         });
       }
 
       if (senha !== confirmar) {
-        return res.status(400).json({ 
-          success: false, 
-          message: 'As senhas não coincidem.' 
+        return res.status(400).json({
+          success: false,
+          message: 'As senhas não coincidem.'
         });
       }
 
       const salarioNum = Number(salario);
       if (isNaN(salarioNum) || salarioNum <= 0) {
-        return res.status(400).json({ 
-          success: false, 
-          message: 'Informe um salário válido e positivo.' 
+        return res.status(400).json({
+          success: false,
+          message: 'Informe um salário válido e positivo.'
         });
       }
 
@@ -42,9 +42,6 @@ class AuthController {
       try {
         session = await AuthService.login(email, senha);
       } catch (loginErr) {
-        // Cadastro já foi feito com sucesso — se o login automático falhar
-        // (ex: FIREBASE_API_KEY ausente), não desfaz o cadastro, só avisa
-        // que vai precisar entrar manualmente.
         console.error('[AuthController.register] Auto-login falhou:', loginErr.message);
       }
 
@@ -56,18 +53,13 @@ class AuthController {
       });
 
     } catch (err) {
-      let mensagemErro = "Erro ao cadastrar.";
-
-      if (err.code === "auth/email-already-exists") {
-        mensagemErro = "Este email já está em uso.";
-      } else if (err.code === "auth/invalid-email") {
-        mensagemErro = "Email inválido.";
+      if (err.code === 'JWT_SECRET_MISSING' || err.message?.includes('JWT_SECRET')) {
+        console.error('[AuthController.register] Erro de configuração:', err.message);
+        return res.status(500).json({ success: false, message: 'Erro de configuração do servidor. Contate o suporte.' });
       }
 
-      res.status(400).json({
-        success: false,
-        message: mensagemErro
-      });
+      const mensagemErro = err.code === 'EMAIL_IN_USE' ? err.message : 'Erro ao cadastrar.';
+      res.status(400).json({ success: false, message: mensagemErro });
     }
   }
 
@@ -76,9 +68,9 @@ class AuthController {
       const { email, senha } = req.body;
 
       if (!email || !senha) {
-        return res.status(400).json({ 
-          success: false, 
-          message: 'Email e senha são obrigatórios.' 
+        return res.status(400).json({
+          success: false,
+          message: 'Email e senha são obrigatórios.'
         });
       }
 
@@ -91,38 +83,28 @@ class AuthController {
       });
 
     } catch (err) {
-      // Erro de configuração do servidor (ex: FIREBASE_API_KEY ausente) não é
-      // a mesma coisa que senha errada — mascarar os dois com a mesma
-      // mensagem já custou tempo real de debug. Loga alto e distingue.
-      if (!err.response && err.message?.includes('FIREBASE_API_KEY')) {
+      // Erro de configuração do servidor (ex: JWT_SECRET ausente) não é a
+      // mesma coisa que senha errada — mascarar os dois com a mesma
+      // mensagem já custou tempo real de debug numa rodada anterior desse
+      // mesmo bug (só que com FIREBASE_API_KEY). Loga alto e distingue.
+      if (err.message?.includes('JWT_SECRET')) {
         console.error('[AuthController.login] Erro de configuração:', err.message);
-        return res.status(500).json({
-          success: false,
-          message: 'Erro de configuração do servidor. Contate o suporte.'
-        });
+        return res.status(500).json({ success: false, message: 'Erro de configuração do servidor. Contate o suporte.' });
       }
 
-      let mensagemErro = "Email ou senha incorretos.";
+      const mensagens = {
+        EMAIL_NOT_FOUND: 'Usuário não encontrado.',
+        INVALID_PASSWORD: 'Senha incorreta.',
+        NO_PASSWORD_SET: 'Esta conta usa login com Google — entre pelo botão do Google.'
+      };
 
-      if (err.response?.data?.error) {
-        switch (err.response.data.error.message) {
-          case 'EMAIL_NOT_FOUND':
-            mensagemErro = "Usuário não encontrado.";
-            break;
-          case 'INVALID_PASSWORD':
-            mensagemErro = "Senha incorreta.";
-            break;
-          case 'USER_DISABLED':
-            mensagemErro = "Usuário desabilitado.";
-            break;
-        }
-      } else {
+      if (!mensagens[err.code]) {
         console.error('[AuthController.login] Erro inesperado:', err.message);
       }
 
       res.status(400).json({
         success: false,
-        message: mensagemErro
+        message: mensagens[err.code] || 'Email ou senha incorretos.'
       });
     }
   }
@@ -130,9 +112,9 @@ class AuthController {
   static async getUserById(req, res) {
     try {
       const { userId } = req.params;
-      
+
       const user = await AuthService.getUserById(userId);
-      
+
       if (!user) {
         return res.status(404).json({
           success: false,
@@ -140,21 +122,55 @@ class AuthController {
         });
       }
 
-      res.status(200).json({
-        success: true,
-        user: {
-          uid: user.uid,
-          nome: user.nome,
-          email: user.email,
-          salario: user.salario
-        }
-      });
+      res.status(200).json({ success: true, user });
 
     } catch (err) {
       res.status(500).json({
         success: false,
         message: 'Erro interno do servidor.'
       });
+    }
+  }
+
+  static async esqueciSenha(req, res) {
+    try {
+      const { email } = req.body;
+      if (!email) {
+        return res.status(400).json({ success: false, message: 'Email é obrigatório.' });
+      }
+
+      const token = await AuthService.createPasswordResetToken(email);
+
+      const EmailService = require('../services/EmailService');
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      await new EmailService().enviarLinkRedefinicao(email, `${frontendUrl}/redefinir-senha?token=${token}`);
+
+      res.json({ success: true, message: 'Link de redefinição enviado para seu email.' });
+
+    } catch (err) {
+      if (err.code === 'EMAIL_NOT_FOUND') {
+        return res.status(404).json({ success: false, message: err.message });
+      }
+      console.error('[AuthController.esqueciSenha]', err.message);
+      res.status(500).json({ success: false, message: 'Erro ao enviar link de redefinição.' });
+    }
+  }
+
+  static async redefinirSenha(req, res) {
+    try {
+      const { token, novaSenha } = req.body;
+      if (!token || !novaSenha) {
+        return res.status(400).json({ success: false, message: 'Token e nova senha são obrigatórios.' });
+      }
+      if (novaSenha.length < 6) {
+        return res.status(400).json({ success: false, message: 'A senha deve ter pelo menos 6 caracteres.' });
+      }
+
+      await AuthService.resetPassword(token, novaSenha);
+      res.json({ success: true, message: 'Senha redefinida com sucesso!' });
+
+    } catch (err) {
+      res.status(400).json({ success: false, message: err.message || 'Não foi possível redefinir a senha.' });
     }
   }
 }

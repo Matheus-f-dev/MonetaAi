@@ -1,5 +1,6 @@
 const express = require('express');
 const passport = require('passport');
+const AuthService = require('../services/AuthService');
 const router = express.Router();
 
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
@@ -8,23 +9,20 @@ router.get('/google/callback',
   passport.authenticate('google', { failureRedirect: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/login` }),
   async (req, res) => {
     try {
-      req.session.userId = req.user.uid;
-      
-      // Criar token JWT para o usuário
-      const jwt = require('jsonwebtoken');
-      const token = jwt.sign(
-        { uid: req.user.uid, email: req.user.email },
-        process.env.JWT_SECRET || 'chave-super-secreta',
-        { expiresIn: '24h' }
-      );
-      
+      req.session.userId = req.user.id;
+
+      // req.user aqui é uma instância do model User (MySQL), não mais o
+      // UserRecord do Firebase — sem fallback hardcoded de JWT_SECRET, se
+      // faltar no .env é melhor falhar alto do que assinar com segredo
+      // previsível em produção.
+      const token = AuthService.issueTokenForUser(req.user);
+
       const userData = {
-        uid: req.user.uid,
+        uid: String(req.user.id),
         email: req.user.email,
-        nome: req.user.displayName
+        nome: req.user.nome
       };
-      
-      // Redirecionar com token e dados do usuário
+
       res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/system?token=${token}&user=${encodeURIComponent(JSON.stringify(userData))}`);
     } catch (error) {
       console.error('Erro no callback do Google:', error);
