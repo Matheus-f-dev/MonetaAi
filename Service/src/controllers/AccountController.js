@@ -71,7 +71,10 @@ class AccountController {
 
   static async create(req, res) {
     try {
-      const { userId, nome, tipo, saldoInicial, instituicao, cor } = req.body;
+      // userId sempre vem do token — nunca do body (senão dava pra criar
+      // conta em nome de outro usuário).
+      const userId = req.user.uid;
+      const { nome, tipo, saldoInicial, instituicao, cor } = req.body;
 
       if (!userId || !nome) {
         return res.status(400).json({ success: false, message: 'userId e nome da conta são obrigatórios' });
@@ -112,7 +115,9 @@ class AccountController {
   static async update(req, res) {
     try {
       const { accountId } = req.params;
-      const { userId, nome, tipo, saldoInicial, instituicao, cor } = req.body;
+      // userId vem do token — mesma razão do create() acima.
+      const userId = req.user.uid;
+      const { nome, tipo, saldoInicial, instituicao, cor } = req.body;
 
       if (!userId || !nome) {
         return res.status(400).json({ success: false, message: 'userId e nome da conta são obrigatórios' });
@@ -134,10 +139,14 @@ class AccountController {
   static async delete(req, res) {
     try {
       const { accountId } = req.params;
-      const { userId } = req.body;
+      // userId vem do token, não do body — e o próprio UPDATE abaixo agora
+      // exige user_id = userId, não só id = accountId (antes o WHERE real
+      // nem verificava dono nenhum: dava pra desativar a conta de qualquer
+      // pessoa só sabendo o id, sem nem precisar acertar o userId no body).
+      const userId = req.user.uid;
 
-      if (!accountId || !userId) {
-        return res.status(400).json({ success: false, message: 'accountId e userId são obrigatórios' });
+      if (!accountId) {
+        return res.status(400).json({ success: false, message: 'accountId é obrigatório' });
       }
 
       const accounts = await db('accounts').where({ user_id: userId, ativo: true });
@@ -148,8 +157,12 @@ class AccountController {
 
       const target = accounts.find((a) => a.id === Number(accountId));
 
+      if (!target) {
+        return res.status(404).json({ success: false, message: 'Conta não encontrada' });
+      }
+
       await db.transaction(async (trx) => {
-        await trx('accounts').where({ id: accountId }).update({ ativo: false, removido_em: trx.fn.now() });
+        await trx('accounts').where({ id: accountId, user_id: userId }).update({ ativo: false, removido_em: trx.fn.now() });
 
         // Se a conta removida era a principal, promove outra pra assumir o papel
         if (target?.principal) {

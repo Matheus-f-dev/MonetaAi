@@ -14,20 +14,24 @@ const FixedExpenseController = require('../controllers/FixedExpenseController');
 const SplitController = require('../controllers/SplitController');
 const AccountController = require('../controllers/AccountController');
 const { authenticateToken, ensureOwnUser } = require('../middleware/auth');
+const { authLimiter, apiLimiter } = require('../middleware/rateLimit');
 
 const router = express.Router();
 
-// ── Rotas públicas (sem token — é aqui que ele é obtido) ──
-router.post('/cadastro', AuthController.register);
-router.post('/login', AuthController.login);
-router.post('/verificar-email', EmailController.verificarEmail);
-router.post('/esqueci-senha', AuthController.esqueciSenha);
-router.post('/redefinir-senha', AuthController.redefinirSenha);
+// ── Rotas públicas (sem token — é aqui que ele é obtido). authLimiter é
+// bem mais apertado que o resto da API: são as rotas naturais de
+// brute-force/enumeração de e-mail (login, cadastro, reset de senha). ──
+router.post('/cadastro', authLimiter, AuthController.register);
+router.post('/login', authLimiter, AuthController.login);
+router.post('/verificar-email', authLimiter, EmailController.verificarEmail);
+router.post('/esqueci-senha', authLimiter, AuthController.esqueciSenha);
+router.post('/redefinir-senha', authLimiter, AuthController.redefinirSenha);
 router.get('/test', (req, res) => res.json({ message: 'API funcionando' }));
 
 // ── A partir daqui, toda rota exige um token válido. Antes nenhuma rota
 // exigia nada — qualquer request que soubesse um userId lia/escrevia os
 // dados dele. Isso fecha esse buraco. ──
+router.use(apiLimiter);
 router.use(authenticateToken);
 
 router.get('/user/:userId', ensureOwnUser(), AuthController.getUserById);

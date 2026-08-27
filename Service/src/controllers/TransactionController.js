@@ -8,7 +8,11 @@ const transactionSubject = new TransactionSubject();
 class TransactionController {
   static async create(req, res) {
     try {
-      const transactionData = req.body;
+      // userId sempre vem da identidade do token, nunca do corpo da
+      // requisição — senão qualquer usuário autenticado poderia gravar
+      // transações em nome de outro (bastava mandar o userId de outra
+      // pessoa no body).
+      const transactionData = { ...req.body, userId: req.user.uid };
 
       // Factory Method Pattern - Criar transação baseada no tipo
       const transactionType = transactionData.tipo?.toLowerCase() === 'receita' ? 'income' : 'expense';
@@ -176,11 +180,11 @@ class TransactionController {
     try {
       const transactionService = new TransactionService();
       const { id } = req.params;
-      const { userId, ...updateData } = req.body;
-
-      if (!userId) {
-        return res.status(400).json({ success: false, message: 'userId é obrigatório' });
-      }
+      // userId vem do token (req.user.uid), não do body — senão qualquer
+      // usuário autenticado poderia editar transação de outra pessoa
+      // (bastava mandar o userId da vítima no corpo da requisição).
+      const { userId: _ignored, ...updateData } = req.body;
+      const userId = req.user.uid;
 
       const transaction = await transactionService.updateTransaction(userId, id, updateData);
 
@@ -202,11 +206,8 @@ class TransactionController {
     try {
       const transactionService = new TransactionService();
       const { id } = req.params;
-      const { userId } = req.body;
-
-      if (!userId) {
-        return res.status(400).json({ success: false, message: 'userId é obrigatório' });
-      }
+      // userId vem do token, não do body — mesma razão do update() acima.
+      const userId = req.user.uid;
 
       await transactionService.deleteTransaction(userId, id);
 

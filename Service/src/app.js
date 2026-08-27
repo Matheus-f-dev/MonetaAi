@@ -1,4 +1,5 @@
 const express = require('express');
+const helmet = require('helmet');
 const session = require('express-session');
 const path = require('path');
 const bodyParser = require('body-parser');
@@ -13,6 +14,7 @@ const authRoutes = require('./routes/auth');
 const app = express();
 
 // Middlewares
+app.use(helmet());
 app.use(corsMiddleware);
 app.use(express.static(path.join(__dirname, '../public')));
 app.set('view engine', 'ejs');
@@ -20,11 +22,24 @@ app.set('views', path.join(__dirname, '../views'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Sem fallback hardcoded de propósito — mesmo raciocínio do JWT_SECRET
+// (Service/src/services/AuthService.js): um segredo de sessão previsível e
+// público (estava craveado no código, indo pro repo público) permite forjar
+// qualquer cookie de sessão.
+if (!process.env.SESSION_SECRET) {
+  throw new Error('SESSION_SECRET não configurada — defina no .env antes de subir o servidor.');
+}
+
 // Configurações de sessão
 app.use(session({
-  secret: 'chave-super-secreta',
+  secret: process.env.SESSION_SECRET,
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax'
+  }
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -41,6 +56,19 @@ app.use('/auth', authRoutes);
 // Página 404
 app.use((req, res) => {
   res.status(404).send('Página não encontrada');
+});
+
+// Error handler central — sem isso, o handler padrão do Express expõe
+// stack trace com caminho absoluto do servidor pra qualquer requisição que
+// dispare um erro (ex.: origem bloqueada pelo CORS) sempre que NODE_ENV
+// não for exatamente "production" (fácil de esquecer de configurar certo
+// num deploy real).
+app.use((err, req, res, next) => {
+  if (err.message === 'Not allowed by CORS') {
+    return res.status(403).json({ success: false, message: 'Origem não permitida.' });
+  }
+  console.error('Erro não tratado:', err);
+  res.status(500).json({ success: false, message: 'Erro interno do servidor.' });
 });
 
 module.exports = app;

@@ -58,11 +58,10 @@ class SplitController {
   static async setParticipantPaid(req, res) {
     try {
       const { transactionId, participantIndex } = req.params;
-      const { userId, pago } = req.body;
-
-      if (!userId) {
-        return res.status(400).json({ success: false, message: 'userId é obrigatório' });
-      }
+      // userId vem do token — nunca do body (senão dava pra marcar como
+      // pago/pendente um item de divisão de despesa de outra pessoa).
+      const userId = req.user.uid;
+      const { pago } = req.body;
 
       const transaction = await db('transactions').where({ id: transactionId, user_id: userId }).first();
       if (!transaction) {

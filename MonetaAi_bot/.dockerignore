@@ -41,3 +41,8 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Artefato de deploy (não é usado pelo Dockerfile, que builda direto do
+# código-fonte via COPY . . — copiar o zip pra dentro da imagem seria só
+# peso morto, e ele já teve um serviceAccountKey.json real dentro uma vez)
+*.zip

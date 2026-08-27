@@ -92,13 +92,17 @@ class AuthController {
         return res.status(500).json({ success: false, message: 'Erro de configuração do servidor. Contate o suporte.' });
       }
 
+      // EMAIL_NOT_FOUND e INVALID_PASSWORD respondem com a MESMA mensagem
+      // genérica de propósito — mensagens diferentes permitiam descobrir
+      // quais e-mails têm conta só de tentar logar (user enumeration).
+      // NO_PASSWORD_SET foge da regra: não é uma tentativa de adivinhar
+      // e-mail, é orientar quem já sabe que a conta existe a usar o botão certo.
       const mensagens = {
-        EMAIL_NOT_FOUND: 'Usuário não encontrado.',
-        INVALID_PASSWORD: 'Senha incorreta.',
         NO_PASSWORD_SET: 'Esta conta usa login com Google — entre pelo botão do Google.'
       };
 
-      if (!mensagens[err.code]) {
+      const codigosEsperados = ['EMAIL_NOT_FOUND', 'INVALID_PASSWORD', 'NO_PASSWORD_SET'];
+      if (!codigosEsperados.includes(err.code)) {
         console.error('[AuthController.login] Erro inesperado:', err.message);
       }
 
@@ -133,6 +137,12 @@ class AuthController {
   }
 
   static async esqueciSenha(req, res) {
+    // Resposta é SEMPRE a mesma, exista ou não o e-mail — um 404 diferente
+    // aqui era um jeito trivial de descobrir quais e-mails têm conta
+    // (user enumeration). O e-mail só é de fato enviado se a conta existir;
+    // quem não tem conta simplesmente não recebe nada, em silêncio.
+    const respostaGenerica = { success: true, message: 'Se esse email estiver cadastrado, enviamos um link de redefinição.' };
+
     try {
       const { email } = req.body;
       if (!email) {
@@ -145,11 +155,11 @@ class AuthController {
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
       await new EmailService().enviarLinkRedefinicao(email, `${frontendUrl}/redefinir-senha?token=${token}`);
 
-      res.json({ success: true, message: 'Link de redefinição enviado para seu email.' });
+      res.json(respostaGenerica);
 
     } catch (err) {
       if (err.code === 'EMAIL_NOT_FOUND') {
-        return res.status(404).json({ success: false, message: err.message });
+        return res.json(respostaGenerica);
       }
       console.error('[AuthController.esqueciSenha]', err.message);
       res.status(500).json({ success: false, message: 'Erro ao enviar link de redefinição.' });

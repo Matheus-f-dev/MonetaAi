@@ -1,4 +1,17 @@
-requests
-boto3
-firebase_admin
-matplotlib
+# Versões fixadas para build reproduzível (antes rodava sem nenhum pin).
+# Escolhidas como a versão mais recente de cada pacote que ainda suporta
+# Python 3.9 -- a imagem base do Dockerfile é public.ecr.aws/lambda/python:3.9.
+# requests>=2.33, boto3>=1.43 e matplotlib>=3.10 já exigem Python 3.10+;
+# subir essas versões exige primeiro trocar a imagem base da Lambda.
+#
+# pip-audit aponta 1 vulnerabilidade conhecida nesta versão do requests
+# (PYSEC-2026-2275, corrigida só na 2.33.0): exige um atacante LOCAL com
+# acesso prévio à máquina explorando um nome de arquivo temporário
+# previsível em requests.utils.extract_zipped_paths() -- função que este
+# bot não chama. Risco real desprezível numa Lambda (sem múltiplos
+# usuários locais); aceito conscientemente até a imagem base subir pra
+# Python 3.10+.
+requests==2.32.5
+boto3==1.42.97
+firebase_admin==7.5.0
+matplotlib==3.9.4
