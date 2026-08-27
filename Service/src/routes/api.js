@@ -13,6 +13,7 @@ const CardController = require('../controllers/CardController');
 const FixedExpenseController = require('../controllers/FixedExpenseController');
 const FixedIncomeController = require('../controllers/FixedIncomeController');
 const ReportExportController = require('../controllers/ReportExportController');
+const TransactionImportController = require('../controllers/TransactionImportController');
 const SplitController = require('../controllers/SplitController');
 const AccountController = require('../controllers/AccountController');
 const { authenticateToken, ensureOwnUser } = require('../middleware/auth');
@@ -46,6 +47,8 @@ router.get('/chart-data/:userId', ensureOwnUser(), TransactionController.getChar
 router.get('/percentage-change/:userId', ensureOwnUser(), TransactionController.getPercentageChange);
 router.put('/transactions/:id', TransactionController.update);
 router.delete('/transactions/:id', TransactionController.delete);
+router.post('/transactions/import/preview', TransactionImportController.preview);
+router.post('/transactions/import/confirm', TransactionImportController.confirm);
 
 // Rotas de alertas
 router.post('/alerts', AlertController.create);
