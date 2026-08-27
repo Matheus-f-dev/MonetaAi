@@ -6,6 +6,8 @@ const bodyParser = require('body-parser');
 const passport = require('passport');
 require('dotenv').config();
 
+const swaggerUi = require('swagger-ui-express');
+const openapiSpec = require('../openapi.json');
 const corsMiddleware = require('./middleware/cors');
 const apiRoutes = require('./routes/api');
 const viewRoutes = require('./routes/views');
@@ -52,6 +54,12 @@ app.use('/', viewRoutes);
 
 // Rotas de autenticação OAuth
 app.use('/auth', authRoutes);
+
+// Documentação interativa da API (Swagger/OpenAPI) -- gerada a partir de
+// todas as rotas em src/routes/. GET /api-docs
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapiSpec, {
+  customSiteTitle: 'Moneta API — Documentação'
+}));
 
 // Página 404
 app.use((req, res) => {
