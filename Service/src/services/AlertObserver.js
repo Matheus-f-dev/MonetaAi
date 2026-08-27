@@ -1,4 +1,5 @@
 const { db } = require('../config/database');
+const EmailService = require('./EmailService');
 
 class AlertObserver {
   async update(transaction) {
@@ -69,6 +70,19 @@ class AlertObserver {
     });
 
     console.log(`🚨 ALERTA DISPARADO: ${alert.nome} - ${alert.categoria} ${alert.condicao} R$ ${alert.valor}. Total atual: R$ ${totalGastos}`);
+
+    // Envio de e-mail é best-effort: o alerta já foi gravado em
+    // `notifications` de qualquer forma (linha acima), então uma falha aqui
+    // (SMTP fora do ar, credencial errada etc.) nunca pode derrubar o fluxo
+    // que criou a transação que disparou o alerta.
+    try {
+      const user = await db('users').where({ id: userId }).first('email');
+      if (user?.email) {
+        await new EmailService().enviarAlertaDisparado(user.email, { ...alert, totalGasto: totalGastos });
+      }
+    } catch (error) {
+      console.error('Erro ao enviar e-mail de alerta (não bloqueia o fluxo):', error.message);
+    }
   }
 }
 

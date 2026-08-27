@@ -24,19 +24,13 @@ class TransactionSubject {
     }
 }
 
-class EmailNotifier {
-    update(transaction) {
-        console.log(`Email: Nova transação de ${transaction.type}: R$ ${transaction.amount}`);
-    }
-}
-
-class AlertNotifier {
-    update(transaction) {
-        if (transaction.type === 'expense' && Math.abs(transaction.amount) > 1000) {
-            console.log(`Alerta: Gasto alto detectado: R$ ${Math.abs(transaction.amount)}`);
-        }
-    }
-}
+// EmailNotifier e AlertNotifier existiam aqui como stubs nunca conectados
+// em setupDefaultObservers() (só faziam console.log, e usando nomes de
+// campo que nem existem no objeto real de transação -- type/amount em vez
+// de tipo/valor). O envio de e-mail de verdade quando um alerta dispara
+// agora mora em AlertObserver.triggerAlert(), que já tem os dados corretos
+// do alerta (categoria/condicao/limite) -- não dava pra fazer isso aqui,
+// que só recebe a transação crua.
 
 class LogNotifier {
     update(transaction) {
@@ -44,4 +38,4 @@ class LogNotifier {
     }
 }
 
-module.exports = { TransactionSubject, EmailNotifier, AlertNotifier, LogNotifier };
+module.exports = { TransactionSubject, LogNotifier };
