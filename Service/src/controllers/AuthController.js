@@ -12,10 +12,13 @@ class AuthController {
         });
       }
 
-      if (senha.length < 6) {
+      // 8, não 6 -- alinhado com a validação que o frontend já faz
+      // (ValidationStrategy.js). Antes o backend aceitava uma senha mais
+      // fraca do que a própria UI permitia digitar.
+      if (senha.length < 8) {
         return res.status(400).json({
           success: false,
-          message: 'A senha deve ter pelo menos 6 caracteres.'
+          message: 'A senha deve ter pelo menos 8 caracteres.'
         });
       }
 
@@ -172,8 +175,8 @@ class AuthController {
       if (!token || !novaSenha) {
         return res.status(400).json({ success: false, message: 'Token e nova senha são obrigatórios.' });
       }
-      if (novaSenha.length < 6) {
-        return res.status(400).json({ success: false, message: 'A senha deve ter pelo menos 6 caracteres.' });
+      if (novaSenha.length < 8) {
+        return res.status(400).json({ success: false, message: 'A senha deve ter pelo menos 8 caracteres.' });
       }
 
       await AuthService.resetPassword(token, novaSenha);
