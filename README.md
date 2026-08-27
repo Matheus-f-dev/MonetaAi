@@ -424,6 +424,40 @@ Client/Front/src/
 
 ---
 
+## 🆕 Terceira Entrega — Backend (27/08/2026)
+
+Auditoria de segurança completa + roteiro de novas funcionalidades, todo em `Service/`. Nenhuma tela nova ainda — o handoff para quem for construir a UI está em [`FRONTEND_TODO.md`](FRONTEND_TODO.md).
+
+### 📖 Documentação da API
+Com o servidor rodando (`npm start`), a documentação interativa de **todas** as rotas fica em:
+```
+http://localhost:3000/api-docs
+```
+Gerada a partir de `Service/openapi.json` (OpenAPI 3.0) — dá pra testar cada rota direto pelo navegador, inclusive com token JWT (botão "Authorize").
+
+### 🔒 Auditoria de segurança
+- [x] IDOR corrigido em todos os endpoints de escrita (userId sempre do token, nunca do corpo)
+- [x] CORS, headers de segurança (helmet) e rate limiting em rotas sensíveis
+- [x] Autenticação de dois fatores (2FA/TOTP) opcional por usuário
+- [x] TLS do banco validado por padrão; segredo de sessão obrigatório via variável de ambiente
+- [x] Log de auditoria (`audit_logs`) em `transactions` e `accounts`
+- [x] Dependências vulneráveis atualizadas (0 vulnerabilidades no `npm audit`)
+
+### ✨ Novas funcionalidades (backend)
+- [x] Categorização automática também no cadastro manual de transação (não só no chat)
+- [x] Receita recorrente (`fixed_incomes`) — equivalente ao gasto fixo, para salário/renda mensal
+- [x] E-mail automático quando um alerta de gasto dispara
+- [x] Exportação de relatórios em CSV/PDF
+- [x] Importação de extrato bancário (OFX e CSV do Nubank), com prévia e categoria sugerida antes de gravar
+- [x] Orçamento por categoria, com % consumido no mês
+- [x] Metas financeiras vinculadas a uma conta
+- [x] Reconciliação de saldo (saldo informado pelo usuário vs. calculado pelo sistema)
+- [ ] Open Finance — avaliado, não implementado (exige credenciamento como instituição participante; ver roteiro)
+
+Detalhes técnicos de cada item (tabelas, decisões de design) estão nos commits das branches `security/audit-2026-08-27`, `feature/fase1-baixo-esforco`, `feature/fase2-medio-esforco` e `feature/fase3-mais-ambicioso`.
+
+---
+
 ## 📌 Objetivo
 
 Oferecer uma alternativa gratuita e inteligente para controle financeiro pessoal, com foco em jovens e integração com assistente virtual.

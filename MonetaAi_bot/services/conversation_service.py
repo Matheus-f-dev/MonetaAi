@@ -6,6 +6,7 @@ from services.openai_client import OpenAIClient
 from services.whatsapp_service import WhatsAppService
 from tools_manager import tools_manager
 from session_context import session_context
+from debug_utils import debug_print
 
 class ConversationService:
     def __init__(self, dynamo: DynamoDBManager, openai_client: OpenAIClient):
@@ -50,7 +51,7 @@ class ConversationService:
         Transcreve áudio usando Whisper API e retorna texto
         """
         try:
-            print(f"DEBUG: Transcrevendo áudio usando Whisper API")
+            debug_print(f"DEBUG: Transcrevendo áudio usando Whisper API")
             
             # Transcrever o áudio usando Whisper
             transcription = self.openai_client.transcribe_audio(audio_base64, mime_type)
@@ -78,7 +79,7 @@ class ConversationService:
             
             # Handle image messages
             if image_data and image_data.get("id"):
-                print(f"DEBUG: Processando mensagem com imagem - ID: {image_data['id']}")
+                debug_print(f"DEBUG: Processando mensagem com imagem - ID: {image_data['id']}")
                 
                 # Download the image
                 image_base64 = self.whatsapp_service.download_media(image_data["id"])
@@ -89,14 +90,14 @@ class ConversationService:
                         image_base64, 
                         image_data.get("mime_type", "image/jpeg")
                     )
-                    print(f"DEBUG: Imagem processada e adicionada ao conteúdo da mensagem")
+                    debug_print(f"DEBUG: Imagem processada e adicionada ao conteúdo da mensagem")
                 else:
                     print("ERROR: Falha ao baixar imagem, enviando apenas texto")
                     message_content = f"{input_text}\n\n[Nota: Houve um erro ao processar a imagem enviada]"
             
             # Handle audio messages
             elif audio_data and audio_data.get("id"):
-                print(f"DEBUG: Processando mensagem com áudio - ID: {audio_data['id']}")
+                debug_print(f"DEBUG: Processando mensagem com áudio - ID: {audio_data['id']}")
                 
                 # Download the audio
                 audio_base64 = self.whatsapp_service.download_media(audio_data["id"])
@@ -107,14 +108,14 @@ class ConversationService:
                         audio_base64,
                         audio_data.get("mime_type", "audio/ogg")
                     )
-                    print(f"DEBUG: Áudio transcrito e processado")
+                    debug_print(f"DEBUG: Áudio transcrito e processado")
                 else:
                     print("ERROR: Falha ao baixar áudio, enviando apenas texto")
                     message_content = f"{input_text}\n\n[Nota: Houve um erro ao processar o áudio enviado]"
             
             # Handle file messages
             elif file_data and file_data.get("id"):
-                print(f"DEBUG: Processando mensagem com arquivo - ID: {file_data['id']}, Nome: {file_data.get('filename', 'arquivo')}")
+                debug_print(f"DEBUG: Processando mensagem com arquivo - ID: {file_data['id']}, Nome: {file_data.get('filename', 'arquivo')}")
                 
                 # Download the file
                 file_base64 = self.whatsapp_service.download_media(file_data["id"])
@@ -126,7 +127,7 @@ class ConversationService:
                         file_data.get("filename", "arquivo"),
                         file_data.get("mime_type", "application/octet-stream")
                     )
-                    print(f"DEBUG: Arquivo processado e adicionado ao conteúdo da mensagem")
+                    debug_print(f"DEBUG: Arquivo processado e adicionado ao conteúdo da mensagem")
                 else:
                     print("ERROR: Falha ao baixar arquivo, enviando apenas texto")
                     message_content = f"{input_text}\n\n[Nota: Houve um erro ao processar o arquivo enviado: {file_data.get('filename', 'arquivo')}]"
@@ -286,7 +287,7 @@ class ConversationService:
             window = new_window
 
             truncated = window
-            print(f"DEBUG: Histórico truncado de {len(chat_history)} para {len(truncated)} mensagens (limite base {max_messages})")
+            debug_print(f"DEBUG: Histórico truncado de {len(chat_history)} para {len(truncated)} mensagens (limite base {max_messages})")
             return truncated
         except Exception as e:
             print(f"ERROR: _truncate_chat_history: {e}")
@@ -319,6 +320,9 @@ class ConversationService:
                 final_response = self._extract_assistant_content(message)
                 return {"response": final_response, "chat_history": chat_history}
         except Exception as e:
+            # Traceback completo só vai para o log do servidor (CloudWatch),
+            # nunca na resposta ao chamador -- evita vazar caminho/estrutura
+            # interna do código para quem estiver do outro lado da API.
             print(f"ERROR: process_conversation: {e}")
             print(traceback.format_exc())
-            return {"error": str(e), "traceback": traceback.format_exc()}
+            return {"error": "Erro interno ao processar a conversa."}

@@ -1,6 +1,7 @@
 import json
 from typing import Dict, List, Callable, Any, Iterable
 import traceback
+from debug_utils import debug_print
 
 
 class ToolsManager:
@@ -22,11 +23,11 @@ class ToolsManager:
     def process_tool_call(self, tool_call: Dict, account_id: str) -> str:
         """Processa uma chamada de tool e retorna a resposta."""
         try:
-            print(f"DEBUG: Processando tool call: {tool_call}")
-            print(f"DEBUG: Account ID: {account_id}")
+            debug_print(f"DEBUG: Processando tool call: {tool_call}")
+            debug_print(f"DEBUG: Account ID: {account_id}")
             
             tool_name = tool_call["function"]["name"]
-            print(f"DEBUG: Tool name: {tool_name}")
+            debug_print(f"DEBUG: Tool name: {tool_name}")
             
             if tool_name not in self.handlers:
                 error_response = {
@@ -39,11 +40,11 @@ class ToolsManager:
             try:
                 # Parse dos argumentos
                 args = json.loads(tool_call["function"]["arguments"])
-                print(f"DEBUG: Args parseados: {args}")
+                debug_print(f"DEBUG: Args parseados: {args}")
                 
                 # Chama o handler específico da tool
                 result = self.handlers[tool_name](args, account_id)
-                print(f"DEBUG: Resultado da tool: {result}")
+                debug_print(f"DEBUG: Resultado da tool: {result}")
                 
                 return json.dumps(result, ensure_ascii=False)
                 
@@ -51,12 +52,11 @@ class ToolsManager:
                 error_msg = f"Erro ao processar tool '{tool_name}': {str(e)}"
                 print(error_msg)
                 print(f"Traceback completo:\n{traceback.format_exc()}")
-                print(f"DEBUG: Args que causaram erro: {tool_call.get('function', {}).get('arguments', 'N/A')}")
+                debug_print(f"DEBUG: Args que causaram erro: {tool_call.get('function', {}).get('arguments', 'N/A')}")
                 
                 error_response = {
                     "status": "erro",
                     "mensagem": error_msg,
-                    "traceback": traceback.format_exc()
                 }
                 return json.dumps(error_response, ensure_ascii=False)
                 
@@ -68,7 +68,6 @@ class ToolsManager:
             error_response = {
                 "status": "erro",
                 "mensagem": error_msg,
-                "traceback": traceback.format_exc()
             }
             return json.dumps(error_response, ensure_ascii=False)
 
@@ -82,7 +81,7 @@ tools_manager = ToolsManager()
 def handle_registrar_transacoes(args: Dict, account_id: str) -> Dict:
     """Handler para a tool de registrar transações."""
     try:
-        print(f"DEBUG: handle_registrar_transacoes chamado com args: {args}, account_id: {account_id}")
+        debug_print(f"DEBUG: handle_registrar_transacoes chamado com args: {args}, account_id: {account_id}")
         
         from firebase_manager import FireBaseManager
         firebase_manager = FireBaseManager()
@@ -90,46 +89,46 @@ def handle_registrar_transacoes(args: Dict, account_id: str) -> Dict:
         transaction_type = args.get("tipo", "")
         array_transactions = args.get("transacoes", [])
         
-        print(f"DEBUG: transaction_type: {transaction_type}")
-        print(f"DEBUG: array_transactions: {array_transactions}")
+        debug_print(f"DEBUG: transaction_type: {transaction_type}")
+        debug_print(f"DEBUG: array_transactions: {array_transactions}")
 
         transaction = firebase_manager.add_transaction(account_id, transaction_type, array_transactions)
         
         # Se for uma saída (gasto), verificar alertas
         alertas_atingidos = []
         if transaction_type == "saida":
-            print(f"DEBUG: Transação é do tipo 'saida', verificando alertas para account_id: {account_id}")
+            debug_print(f"DEBUG: Transação é do tipo 'saida', verificando alertas para account_id: {account_id}")
             try:
                 from datetime import datetime
                 
                 # Buscar alertas
                 alertas = firebase_manager.get_alerts(account_id)
-                print(f"DEBUG: Alertas encontrados: {len(alertas)} alertas")
-                print(f"DEBUG: Detalhes dos alertas: {alertas}")
+                debug_print(f"DEBUG: Alertas encontrados: {len(alertas)} alertas")
+                debug_print(f"DEBUG: Detalhes dos alertas: {alertas}")
                 
                 # Filtrar alertas ativos
                 alertas_ativos = [a for a in alertas if a.get('ativo', False)]
-                print(f"DEBUG: Alertas ativos: {len(alertas_ativos)} de {len(alertas)}")
+                debug_print(f"DEBUG: Alertas ativos: {len(alertas_ativos)} de {len(alertas)}")
                 
                 if alertas_ativos:
                     # Buscar histórico de transações
                     transactions_history = firebase_manager.get_transactions_history(account_id)
-                    print(f"DEBUG: Histórico de transações: {len(transactions_history)} transações")
+                    debug_print(f"DEBUG: Histórico de transações: {len(transactions_history)} transações")
                     
                     # Obter mês/ano atual
                     mes_atual = datetime.now().month
                     ano_atual = datetime.now().year
-                    print(f"DEBUG: Verificando alertas para mês {mes_atual}/{ano_atual}")
+                    debug_print(f"DEBUG: Verificando alertas para mês {mes_atual}/{ano_atual}")
                     
                     # Para cada categoria das transações registradas
                     for transacao in array_transactions:
                         categoria_transacao = transacao.get('categoria', '').lower()
-                        print(f"DEBUG: Verificando categoria '{categoria_transacao}'")
+                        debug_print(f"DEBUG: Verificando categoria '{categoria_transacao}'")
                         
                         # Filtrar alertas para esta categoria
                         alertas_categoria = [a for a in alertas_ativos 
                                            if a.get('categoria', '').lower() == categoria_transacao]
-                        print(f"DEBUG: Alertas para categoria '{categoria_transacao}': {len(alertas_categoria)}")
+                        debug_print(f"DEBUG: Alertas para categoria '{categoria_transacao}': {len(alertas_categoria)}")
                         
                         if alertas_categoria:
                             # Somar gastos do mês atual para esta categoria
@@ -145,11 +144,11 @@ def handle_registrar_transacoes(args: Dict, account_id: str) -> Dict:
                                         if dt.month == mes_atual and dt.year == ano_atual:
                                             valor = float(tx.get('valor', 0))
                                             total_mes_categoria += valor
-                                            print(f"DEBUG: Somando R$ {valor} da transação {data_hora}")
+                                            debug_print(f"DEBUG: Somando R$ {valor} da transação {data_hora}")
                                     except Exception as e:
-                                        print(f"DEBUG: Erro ao parsear data '{data_hora}': {e}")
+                                        debug_print(f"DEBUG: Erro ao parsear data '{data_hora}': {e}")
                             
-                            print(f"DEBUG: Total do mês para '{categoria_transacao}': R$ {total_mes_categoria}")
+                            debug_print(f"DEBUG: Total do mês para '{categoria_transacao}': R$ {total_mes_categoria}")
                             
                             # Verificar cada alerta da categoria
                             for alerta in alertas_categoria:
@@ -157,7 +156,7 @@ def handle_registrar_transacoes(args: Dict, account_id: str) -> Dict:
                                 condicao = alerta.get('condicao', '')
                                 nome_alerta = alerta.get('nome', 'Alerta sem nome')
                                 
-                                print(f"DEBUG: Verificando alerta '{nome_alerta}': {condicao} R$ {valor_limite}")
+                                debug_print(f"DEBUG: Verificando alerta '{nome_alerta}': {condicao} R$ {valor_limite}")
                                 
                                 # Verificar condição do alerta
                                 alerta_atingido = False
@@ -176,15 +175,15 @@ def handle_registrar_transacoes(args: Dict, account_id: str) -> Dict:
                                         'condicao': condicao
                                     }
                                     alertas_atingidos.append(alerta_info)
-                                    print(f"DEBUG: ALERTA ATINGIDO! {nome_alerta} - Limite: R$ {valor_limite}, Atual: R$ {total_mes_categoria}")
+                                    debug_print(f"DEBUG: ALERTA ATINGIDO! {nome_alerta} - Limite: R$ {valor_limite}, Atual: R$ {total_mes_categoria}")
                                 else:
-                                    print(f"DEBUG: Alerta não atingido - Limite: R$ {valor_limite}, Atual: R$ {total_mes_categoria}")
+                                    debug_print(f"DEBUG: Alerta não atingido - Limite: R$ {valor_limite}, Atual: R$ {total_mes_categoria}")
                 
             except Exception as e:
-                print(f"DEBUG: Erro ao verificar alertas: {e}")
-                print(f"DEBUG: Traceback alertas: {traceback.format_exc()}")
+                debug_print(f"DEBUG: Erro ao verificar alertas: {e}")
+                debug_print(f"DEBUG: Traceback alertas: {traceback.format_exc()}")
         else:
-            print(f"DEBUG: Transação é do tipo '{transaction_type}', não verificando alertas")
+            debug_print(f"DEBUG: Transação é do tipo '{transaction_type}', não verificando alertas")
         
         # Estrutura correta de resposta
         response = {
@@ -193,7 +192,7 @@ def handle_registrar_transacoes(args: Dict, account_id: str) -> Dict:
             "alertas_atingidos": alertas_atingidos
         }
         
-        print(f"DEBUG: Response final com {len(alertas_atingidos)} alertas atingidos: {response}")
+        debug_print(f"DEBUG: Response final com {len(alertas_atingidos)} alertas atingidos: {response}")
         return response
         
     except Exception as e:
@@ -204,7 +203,6 @@ def handle_registrar_transacoes(args: Dict, account_id: str) -> Dict:
         return {
             "status": "erro",
             "mensagem": error_msg,
-            "traceback": traceback.format_exc()
         }
 
 
@@ -257,7 +255,7 @@ TOOL_REGISTRAR_TRANSACOES = {
 def handle_criar_alerta(args: Dict, account_id: str) -> Dict:
     """Handler para a tool de criar alerta."""
     try:
-        print(f"DEBUG: handle_criar_alerta chamado com args: {args}, account_id: {account_id}")
+        debug_print(f"DEBUG: handle_criar_alerta chamado com args: {args}, account_id: {account_id}")
         
         from firebase_manager import FireBaseManager
         firebase_manager = FireBaseManager()
@@ -266,24 +264,24 @@ def handle_criar_alerta(args: Dict, account_id: str) -> Dict:
         categoria = args.get("categoria", "")
         nome = args.get("nome", f"Alerta {categoria}")
         
-        print(f"DEBUG: valor: {valor}, categoria: {categoria}, nome: {nome}")
+        debug_print(f"DEBUG: valor: {valor}, categoria: {categoria}, nome: {nome}")
 
         # Verificar se já existe alerta para esta categoria
         alertas_existentes = firebase_manager.get_alerts(account_id)
-        print(f"DEBUG: Alertas existentes: {len(alertas_existentes)} alertas")
+        debug_print(f"DEBUG: Alertas existentes: {len(alertas_existentes)} alertas")
         
         alertas_desativados = []
         for alerta in alertas_existentes:
             if (alerta.get('categoria', '').lower() == categoria.lower() and 
                 alerta.get('ativo', False)):
-                print(f"DEBUG: Desativando alerta existente: {alerta.get('nome')} (ID: {alerta.get('id')})")
+                debug_print(f"DEBUG: Desativando alerta existente: {alerta.get('nome')} (ID: {alerta.get('id')})")
                 # Desativar alerta existente
                 resultado = firebase_manager.update_alert(account_id, alerta.get('id'), {'ativo': False})
                 if resultado:
                     alertas_desativados.append(alerta.get('nome', 'Alerta sem nome'))
-                    print(f"DEBUG: Alerta desativado com sucesso")
+                    debug_print(f"DEBUG: Alerta desativado com sucesso")
                 else:
-                    print(f"DEBUG: Erro ao desativar alerta")
+                    debug_print(f"DEBUG: Erro ao desativar alerta")
 
         # Dados do novo alerta
         alert_data = {
@@ -309,7 +307,7 @@ def handle_criar_alerta(args: Dict, account_id: str) -> Dict:
                 "alertas_desativados": alertas_desativados
             }
         
-        print(f"DEBUG: Response final: {response}")
+        debug_print(f"DEBUG: Response final: {response}")
         return response
         
     except Exception as e:
@@ -320,14 +318,13 @@ def handle_criar_alerta(args: Dict, account_id: str) -> Dict:
         return {
             "status": "erro",
             "mensagem": error_msg,
-            "traceback": traceback.format_exc()
         }
 
 
 def handle_modificar_alerta(args: Dict, account_id: str) -> Dict:
     """Handler para a tool de modificar alerta."""
     try:
-        print(f"DEBUG: handle_modificar_alerta chamado com args: {args}, account_id: {account_id}")
+        debug_print(f"DEBUG: handle_modificar_alerta chamado com args: {args}, account_id: {account_id}")
         
         from firebase_manager import FireBaseManager
         firebase_manager = FireBaseManager()
@@ -336,11 +333,11 @@ def handle_modificar_alerta(args: Dict, account_id: str) -> Dict:
         novo_valor = args.get("novo_valor")
         desativar = args.get("desativar", False)
         
-        print(f"DEBUG: categoria: {categoria}, novo_valor: {novo_valor}, desativar: {desativar}")
+        debug_print(f"DEBUG: categoria: {categoria}, novo_valor: {novo_valor}, desativar: {desativar}")
 
         # Buscar alerta ativo da categoria
         alertas_existentes = firebase_manager.get_alerts(account_id)
-        print(f"DEBUG: Alertas existentes: {len(alertas_existentes)} alertas")
+        debug_print(f"DEBUG: Alertas existentes: {len(alertas_existentes)} alertas")
         
         alerta_encontrado = None
         for alerta in alertas_existentes:
@@ -354,10 +351,10 @@ def handle_modificar_alerta(args: Dict, account_id: str) -> Dict:
                 "status": "erro",
                 "mensagem": f"Nenhum alerta ativo encontrado para a categoria '{categoria}'"
             }
-            print(f"DEBUG: Response final: {response}")
+            debug_print(f"DEBUG: Response final: {response}")
             return response
         
-        print(f"DEBUG: Alerta encontrado: {alerta_encontrado.get('nome')} (ID: {alerta_encontrado.get('id')})")
+        debug_print(f"DEBUG: Alerta encontrado: {alerta_encontrado.get('nome')} (ID: {alerta_encontrado.get('id')})")
         
         # Preparar dados para atualização
         update_data = {}
@@ -366,7 +363,7 @@ def handle_modificar_alerta(args: Dict, account_id: str) -> Dict:
         if novo_valor is not None and novo_valor != "" and novo_valor != 0:
             update_data['valor'] = novo_valor
         
-        print(f"DEBUG: Dados para atualização: {update_data}")
+        debug_print(f"DEBUG: Dados para atualização: {update_data}")
         
         # Atualizar alerta
         alerta_atualizado = firebase_manager.update_alert(account_id, alerta_encontrado.get('id'), update_data)
@@ -383,7 +380,7 @@ def handle_modificar_alerta(args: Dict, account_id: str) -> Dict:
                 "mensagem": "Falha ao modificar alerta"
             }
         
-        print(f"DEBUG: Response final: {response}")
+        debug_print(f"DEBUG: Response final: {response}")
         return response
         
     except Exception as e:
@@ -394,28 +391,27 @@ def handle_modificar_alerta(args: Dict, account_id: str) -> Dict:
         return {
             "status": "erro",
             "mensagem": error_msg,
-            "traceback": traceback.format_exc()
         }
 
 
 def handle_consultar_historico(args: Dict, account_id: str) -> Dict:
     """Handler para a tool de consultar histórico."""
     try:
-        print(f"DEBUG: handle_consultar_historico chamado com args: {args}, account_id: {account_id}")
+        debug_print(f"DEBUG: handle_consultar_historico chamado com args: {args}, account_id: {account_id}")
         
         from firebase_manager import FireBaseManager
         firebase_manager = FireBaseManager()
         
-        print(f"DEBUG: Chamando get_transactions_history com account_id: {account_id}")
+        debug_print(f"DEBUG: Chamando get_transactions_history com account_id: {account_id}")
         transactions = firebase_manager.get_transactions_history(account_id)
-        print(f"DEBUG: Transactions retornadas: {transactions}")
+        debug_print(f"DEBUG: Transactions retornadas: {transactions}")
 
         response = {
             "transactions": transactions,
             "status": "sucesso"
         }
         
-        print(f"DEBUG: Response final: {response}")
+        debug_print(f"DEBUG: Response final: {response}")
         return response
         
     except Exception as e:
@@ -426,7 +422,6 @@ def handle_consultar_historico(args: Dict, account_id: str) -> Dict:
         return {
             "status": "erro",
             "mensagem": error_msg,
-            "traceback": traceback.format_exc()
         }
 
 
@@ -517,7 +512,7 @@ def handle_gerar_relatorio(args: Dict, account_id: str) -> Dict:
       - Caso contrário -> aplicar filtro somente às categorias informadas (case-insensitive)
     """
     try:
-        print(f"DEBUG: handle_gerar_relatorio chamado com args: {args}, account_id: {account_id}")
+        debug_print(f"DEBUG: handle_gerar_relatorio chamado com args: {args}, account_id: {account_id}")
         
         from firebase_manager import FireBaseManager
         firebase_manager = FireBaseManager()
@@ -528,9 +523,9 @@ def handle_gerar_relatorio(args: Dict, account_id: str) -> Dict:
         matplotlib.use("Agg")
         import matplotlib.pyplot as plt
 
-        print(f"DEBUG: Chamando get_transactions_history com account_id: {account_id}")
+        debug_print(f"DEBUG: Chamando get_transactions_history com account_id: {account_id}")
         transactions = firebase_manager.get_transactions_history(account_id)
-        print(f"DEBUG: Transactions retornadas (qtd={0 if transactions is None else len(transactions)}): {transactions}")
+        debug_print(f"DEBUG: Transactions retornadas (qtd={0 if transactions is None else len(transactions)}): {transactions}")
 
         # ---------- Helpers ----------
         def parse_date_br(d: str) -> date:
@@ -546,7 +541,7 @@ def handle_gerar_relatorio(args: Dict, account_id: str) -> Dict:
                 return None
 
         def validar_params(p: Dict[str, Any]) -> None:
-            print(f"DEBUG: Validando params: {p}")
+            debug_print(f"DEBUG: Validando params: {p}")
             required = ["data_inicio", "data_fim", "categorias"]
             faltando = [k for k in required if k not in p]
             if faltando:
@@ -555,7 +550,7 @@ def handle_gerar_relatorio(args: Dict, account_id: str) -> Dict:
                 raise TypeError("data_inicio e data_fim devem ser strings em DD/MM/YYYY")
             if not isinstance(p["categorias"], list):
                 raise TypeError("categorias deve ser uma lista (array) de strings")
-            print("DEBUG: Params válidos")
+            debug_print("DEBUG: Params válidos")
 
         def normalizar_categorias(lista: List[Any]) -> List[str]:
             # Mantém apenas strings, strip e remove vazios
@@ -566,7 +561,7 @@ def handle_gerar_relatorio(args: Dict, account_id: str) -> Dict:
                 s = str(c).strip()
                 if s:
                     norm.append(s)
-            print(f"DEBUG: Categorias normalizadas (origem={lista}) -> {norm}")
+            debug_print(f"DEBUG: Categorias normalizadas (origem={lista}) -> {norm}")
             return norm
 
         def deve_aplicar_filtro(categorias_norm: List[str]) -> bool:
@@ -578,7 +573,7 @@ def handle_gerar_relatorio(args: Dict, account_id: str) -> Dict:
             return True
 
         def filtrar_transacoes(transacoes: Iterable[Dict[str, Any]], dt_ini: date, dt_fim: date, aplicar_filtro_cat: bool, categorias_norm: List[str]) -> List[Dict[str, Any]]:
-            print(f"DEBUG: Iniciando filtro | dt_ini={dt_ini}, dt_fim={dt_fim}, aplicar_filtro_cat={aplicar_filtro_cat}, categorias={categorias_norm}")
+            debug_print(f"DEBUG: Iniciando filtro | dt_ini={dt_ini}, dt_fim={dt_fim}, aplicar_filtro_cat={aplicar_filtro_cat}, categorias={categorias_norm}")
             set_categorias = {c.lower() for c in categorias_norm} if aplicar_filtro_cat else set()
             out = []
             # contadores de diagnóstico
@@ -611,7 +606,7 @@ def handle_gerar_relatorio(args: Dict, account_id: str) -> Dict:
             return out
 
         def agregar_por_categoria(transacoes: Iterable[Dict[str, Any]]) -> Dict[str, float]:
-            print(f"DEBUG: Agregando por categoria (qtd={len(transacoes)})")
+            debug_print(f"DEBUG: Agregando por categoria (qtd={len(transacoes)})")
             soma = {}
             for t in transacoes:
                 cat = t.get("categoria", "Sem categoria")
@@ -619,10 +614,10 @@ def handle_gerar_relatorio(args: Dict, account_id: str) -> Dict:
                 try:
                     v = float(valor)
                 except Exception:
-                    print(f"DEBUG: Valor não numérico ignorado: {valor} em t={t}")
+                    debug_print(f"DEBUG: Valor não numérico ignorado: {valor} em t={t}")
                     continue
                 soma[cat] = soma.get(cat, 0.0) + v
-            print(f"DEBUG: Agregação concluída | categorias={len(soma)} | detalhes={soma}")
+            debug_print(f"DEBUG: Agregação concluída | categorias={len(soma)} | detalhes={soma}")
             return soma
 
         def fmt_brl(v: float) -> str:
@@ -632,7 +627,7 @@ def handle_gerar_relatorio(args: Dict, account_id: str) -> Dict:
             itens = sorted(soma_por_cat.items(), key=lambda kv: kv[1], reverse=True)
             cats = [k for k, _ in itens]
             vals = [v for _, v in itens]
-            print(f"DEBUG: Gerando gráfico | categorias={cats} | valores={vals}")
+            debug_print(f"DEBUG: Gerando gráfico | categorias={cats} | valores={vals}")
 
             fig, ax = plt.subplots(figsize=(8, 5), dpi=160)
             if vals:
@@ -656,28 +651,28 @@ def handle_gerar_relatorio(args: Dict, account_id: str) -> Dict:
             fig.savefig(buf, format="png", bbox_inches="tight")
             plt.close(fig)
             b64 = base64.b64encode(buf.getvalue()).decode("ascii")
-            print(f"DEBUG: Gráfico gerado | base64_len={len(b64)} bytes (caracteres)")
+            debug_print(f"DEBUG: Gráfico gerado | base64_len={len(b64)} bytes (caracteres)")
             return b64
         # ---------- Fim helpers ----------
 
         validar_params(args)
         dt_ini = parse_date_br(args["data_inicio"])
         dt_fim = parse_date_br(args["data_fim"])
-        print(f"DEBUG: Datas parseadas | dt_ini={dt_ini} | dt_fim={dt_fim}")
+        debug_print(f"DEBUG: Datas parseadas | dt_ini={dt_ini} | dt_fim={dt_fim}")
         if dt_ini > dt_fim:
             raise ValueError("data_inicio não pode ser maior que data_fim")
         
         categorias_input = args.get("categorias", [])
         categorias_norm = normalizar_categorias(categorias_input)
         aplicar_filtro_cat = deve_aplicar_filtro(categorias_norm)
-        print(f"DEBUG: Resolução do filtro de categorias | aplicar_filtro_cat={aplicar_filtro_cat}")
+        debug_print(f"DEBUG: Resolução do filtro de categorias | aplicar_filtro_cat={aplicar_filtro_cat}")
 
         # Filtra e agrega
         tx_filtradas = filtrar_transacoes(transactions, dt_ini, dt_fim, aplicar_filtro_cat, categorias_norm)
-        print(f"DEBUG: Transações filtradas (qtd={len(tx_filtradas)}): {tx_filtradas}")
+        debug_print(f"DEBUG: Transações filtradas (qtd={len(tx_filtradas)}): {tx_filtradas}")
         soma_por_cat = agregar_por_categoria(tx_filtradas)
         valor_total = sum(soma_por_cat.values())
-        print(f"DEBUG: Valor total agregado={valor_total}")
+        debug_print(f"DEBUG: Valor total agregado={valor_total}")
 
         # Gera imagem base64
         image_base64 = gerar_grafico_barras_base64(soma_por_cat)
@@ -694,7 +689,7 @@ def handle_gerar_relatorio(args: Dict, account_id: str) -> Dict:
             f"Relatório {args['data_inicio']}–{args['data_fim']} | "
             f"{legenda_categorias} | Total: {fmt_brl(valor_total)}"
         )
-        print(f"DEBUG: Caption gerado: {caption}")
+        debug_print(f"DEBUG: Caption gerado: {caption}")
 
         # Envio WhatsApp
         from services.whatsapp_service import WhatsAppService
@@ -702,7 +697,7 @@ def handle_gerar_relatorio(args: Dict, account_id: str) -> Dict:
 
         ctx = session_context.get_account_context(account_id)
 
-        print(f"DEBUG: ctx: {ctx}")
+        debug_print(f"DEBUG: ctx: {ctx}")
         wa_id = ctx.get('wa_id')
         phone_number_id = ctx.get('phone_number_id')
 
@@ -711,9 +706,9 @@ def handle_gerar_relatorio(args: Dict, account_id: str) -> Dict:
                 return str(s)
             return f"{s[:4]}***{s[-3:]}" if len(s) > 7 else "***"
 
-        print(f"DEBUG: Contexto WhatsApp | wa_id={_mask(wa_id)} | phone_number_id={_mask(phone_number_id)} | mime_type={mime_type}")
+        debug_print(f"DEBUG: Contexto WhatsApp | wa_id={_mask(wa_id)} | phone_number_id={_mask(phone_number_id)} | mime_type={mime_type}")
         ws = WhatsAppService()
-        print("DEBUG: Enviando imagem via WhatsApp...")
+        debug_print("DEBUG: Enviando imagem via WhatsApp...")
         result = ws.send_image(
             phone_number_id,
             wa_id,
@@ -722,7 +717,7 @@ def handle_gerar_relatorio(args: Dict, account_id: str) -> Dict:
             caption=caption,
             mime_type=mime_type
         )
-        print(f"DEBUG: Resultado do envio WhatsApp: {result}")
+        debug_print(f"DEBUG: Resultado do envio WhatsApp: {result}")
 
         response = {
             "status": "sucesso",
@@ -734,7 +729,7 @@ def handle_gerar_relatorio(args: Dict, account_id: str) -> Dict:
             "whatsapp_result": result
         }
         
-        print(f"DEBUG: Response final: {response}")
+        debug_print(f"DEBUG: Response final: {response}")
         return response
         
     except Exception as e:
@@ -746,7 +741,6 @@ def handle_gerar_relatorio(args: Dict, account_id: str) -> Dict:
         return {
             "status": "erro",
             "mensagem": error_msg,
-            "traceback": traceback.format_exc()
         }
 
 

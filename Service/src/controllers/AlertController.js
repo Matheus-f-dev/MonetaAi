@@ -19,7 +19,10 @@ function parseValorReais(valor) {
 class AlertController {
   static async create(req, res) {
     try {
-      const { userId, nome, condicao, valor, categoria } = req.body;
+      // userId sempre vem do token — nunca do body (senão dava pra criar
+      // alerta em nome de outro usuário).
+      const userId = req.user.uid;
+      const { nome, condicao, valor, categoria } = req.body;
 
       if (!userId || !nome || !condicao || !valor || !categoria) {
         return res.status(400).json({
@@ -80,7 +83,9 @@ class AlertController {
   static async update(req, res) {
     try {
       const { alertId } = req.params;
-      const { userId, nome, condicao, valor, categoria } = req.body;
+      // userId vem do token — mesma razão do create() acima.
+      const userId = req.user.uid;
+      const { nome, condicao, valor, categoria } = req.body;
 
       if (!userId || !nome || !condicao || !valor || !categoria) {
         return res.status(400).json({
@@ -113,12 +118,13 @@ class AlertController {
   static async delete(req, res) {
     try {
       const { alertId } = req.params;
-      const { userId } = req.body;
+      // userId vem do token — mesma razão do create() acima.
+      const userId = req.user.uid;
 
-      if (!alertId || !userId) {
+      if (!alertId) {
         return res.status(400).json({
           success: false,
-          message: 'AlertId e userId são obrigatórios'
+          message: 'AlertId é obrigatório'
         });
       }
 

@@ -1,5 +1,6 @@
 import json
 from typing import Any, Dict, List
+from debug_utils import debug_print
 
 def parse_sns_event(event: Dict[str, Any]) -> List[dict]:
     payloads = []
@@ -14,5 +15,5 @@ def parse_sns_event(event: Dict[str, Any]) -> List[dict]:
             payloads.append(payload)
         except json.JSONDecodeError:
             print(f"WARN: Falha ao decodificar SNS Message como JSON: {message_str[:200]}")
-    print(f"DEBUG: parse_sns_event encontrou {len(payloads)} payload(s)")
+    debug_print(f"DEBUG: parse_sns_event encontrou {len(payloads)} payload(s)")
     return payloads

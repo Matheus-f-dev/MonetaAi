@@ -11,23 +11,39 @@ const TendenciasController = require('../controllers/TendenciasController');
 const AgentController = require('../agent/AgentController');
 const CardController = require('../controllers/CardController');
 const FixedExpenseController = require('../controllers/FixedExpenseController');
+const FixedIncomeController = require('../controllers/FixedIncomeController');
+const ReportExportController = require('../controllers/ReportExportController');
+const TransactionImportController = require('../controllers/TransactionImportController');
+const BudgetController = require('../controllers/BudgetController');
+const GoalController = require('../controllers/GoalController');
+const ReconciliationController = require('../controllers/ReconciliationController');
 const SplitController = require('../controllers/SplitController');
 const AccountController = require('../controllers/AccountController');
+const TwoFactorController = require('../controllers/TwoFactorController');
 const { authenticateToken, ensureOwnUser } = require('../middleware/auth');
+const { authLimiter, apiLimiter } = require('../middleware/rateLimit');
 
 const router = express.Router();
 
-// ── Rotas públicas (sem token — é aqui que ele é obtido) ──
-router.post('/cadastro', AuthController.register);
-router.post('/login', AuthController.login);
-router.post('/verificar-email', EmailController.verificarEmail);
-router.post('/esqueci-senha', AuthController.esqueciSenha);
-router.post('/redefinir-senha', AuthController.redefinirSenha);
+// ── Rotas públicas (sem token — é aqui que ele é obtido). authLimiter é
+// bem mais apertado que o resto da API: são as rotas naturais de
+// brute-force/enumeração de e-mail (login, cadastro, reset de senha). ──
+router.post('/cadastro', authLimiter, AuthController.register);
+router.post('/login', authLimiter, AuthController.login);
+router.post('/verificar-email', authLimiter, EmailController.verificarEmail);
+router.post('/esqueci-senha', authLimiter, AuthController.esqueciSenha);
+router.post('/redefinir-senha', authLimiter, AuthController.redefinirSenha);
+// Segunda etapa do login com 2FA -- ainda pública porque nesse ponto o
+// usuário só tem o tempToken de 5min (issueTotpPendingToken), não um JWT
+// de sessão de verdade; authenticateToken rejeitaria esse token de qualquer
+// jeito (é o próprio propósito do claim pendingTotp).
+router.post('/login/totp', authLimiter, AuthController.loginTotp);
 router.get('/test', (req, res) => res.json({ message: 'API funcionando' }));
 
 // ── A partir daqui, toda rota exige um token válido. Antes nenhuma rota
 // exigia nada — qualquer request que soubesse um userId lia/escrevia os
 // dados dele. Isso fecha esse buraco. ──
+router.use(apiLimiter);
 router.use(authenticateToken);
 
 router.get('/user/:userId', ensureOwnUser(), AuthController.getUserById);
@@ -40,6 +56,8 @@ router.get('/chart-data/:userId', ensureOwnUser(), TransactionController.getChar
 router.get('/percentage-change/:userId', ensureOwnUser(), TransactionController.getPercentageChange);
 router.put('/transactions/:id', TransactionController.update);
 router.delete('/transactions/:id', TransactionController.delete);
+router.post('/transactions/import/preview', TransactionImportController.preview);
+router.post('/transactions/import/confirm', TransactionImportController.confirm);
 
 // Rotas de alertas
 router.post('/alerts', AlertController.create);
@@ -80,6 +98,13 @@ router.put('/fixed-expenses/:fixedExpenseId', FixedExpenseController.update);
 router.delete('/fixed-expenses/:fixedExpenseId', FixedExpenseController.delete);
 router.post('/fixed-expenses/:fixedExpenseId/lancar', FixedExpenseController.lancar);
 
+// Rotas de receitas fixas (mesmo padrão de gastos fixos)
+router.post('/fixed-incomes', FixedIncomeController.create);
+router.get('/fixed-incomes/:userId', ensureOwnUser(), FixedIncomeController.getUserFixedIncomes);
+router.put('/fixed-incomes/:fixedIncomeId', FixedIncomeController.update);
+router.delete('/fixed-incomes/:fixedIncomeId', FixedIncomeController.delete);
+router.post('/fixed-incomes/:fixedIncomeId/lancar', FixedIncomeController.lancar);
+
 // Rotas de divisão de despesas (split entre pessoas)
 router.get('/split/:userId/people', ensureOwnUser(), SplitController.getPeople);
 router.put('/split/transactions/:transactionId/participants/:participantIndex', SplitController.setParticipantPaid);
@@ -91,6 +116,31 @@ router.get('/accounts/:userId/resumo', ensureOwnUser(), AccountController.getRes
 router.post('/accounts/:userId/transfer', ensureOwnUser(), AccountController.transfer);
 router.put('/accounts/:accountId', AccountController.update);
 router.delete('/accounts/:accountId', AccountController.delete);
+router.post('/accounts/:userId/:accountId/reconciliar', ensureOwnUser(), ReconciliationController.reconciliar);
+router.get('/accounts/:userId/:accountId/reconciliations', ensureOwnUser(), ReconciliationController.getHistorico);
+
+// Rotas de orçamento por categoria
+router.post('/budgets', BudgetController.create);
+router.get('/budgets/:userId', ensureOwnUser(), BudgetController.getUserBudgets);
+router.get('/budgets/:userId/status', ensureOwnUser(), BudgetController.getStatus);
+router.put('/budgets/:budgetId', BudgetController.update);
+router.delete('/budgets/:budgetId', BudgetController.delete);
+
+// Rotas de metas financeiras
+router.post('/goals', GoalController.create);
+router.get('/goals/:userId', ensureOwnUser(), GoalController.getUserGoals);
+router.get('/goals/:userId/progress', ensureOwnUser(), GoalController.getProgress);
+router.put('/goals/:goalId', GoalController.update);
+router.delete('/goals/:goalId', GoalController.delete);
+
+// Rota de exportação de relatórios (CSV/PDF)
+router.get('/relatorios/:userId/export', ensureOwnUser(), ReportExportController.export);
+
+// Rotas de 2FA (TOTP) -- setup/confirm/disable exigem estar logado
+// (JWT normal, não o tempToken do meio do login com 2FA).
+router.post('/2fa/setup', TwoFactorController.setup);
+router.post('/2fa/confirm', TwoFactorController.confirm);
+router.post('/2fa/disable', TwoFactorController.disable);
 
 // Rota do agente Moneta AI
 router.post('/agent/chat', AgentController.chat);

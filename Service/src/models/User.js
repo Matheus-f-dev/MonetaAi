@@ -7,17 +7,21 @@ class User {
     this.email = data.email;
     this.salario = data.salario;
     this.perfilCompleto = Boolean(data.perfil_completo);
+    this.totpAtivo = Boolean(data.totp_ativo);
     this.criadoEm = data.criado_em;
   }
 
-  // Nunca expõe senha_hash/google_id pra fora do model
+  // Nunca expõe senha_hash/google_id/totp_secret pra fora do model --
+  // totpAtivo (só o booleano) é seguro de expor, o frontend precisa saber
+  // se 2FA está ligado pra mostrar a UI certa.
   toJSON() {
     return {
       uid: String(this.id),
       nome: this.nome,
       email: this.email,
       salario: this.salario,
-      perfilCompleto: this.perfilCompleto
+      perfilCompleto: this.perfilCompleto,
+      totpAtivo: this.totpAtivo
     };
   }
 
@@ -52,6 +56,12 @@ class User {
   static async getSenhaHash(id) {
     const row = await db('users').where({ id }).first('senha_hash');
     return row?.senha_hash || null;
+  }
+
+  // Só uso interno (verificação de código TOTP) — nunca sai como toJSON()
+  static async getTotpSecret(id) {
+    const row = await db('users').where({ id }).first('totp_secret');
+    return row?.totp_secret || null;
   }
 
   static async updateSenha(id, senhaHash) {

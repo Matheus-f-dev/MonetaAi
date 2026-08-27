@@ -2,13 +2,27 @@ const crypto = require('crypto');
 const TransactionService = require('../services/TransactionService');
 const TransactionFactory = require('../services/TransactionFactory');
 const { TransactionSubject } = require('../services/TransactionObserver');
+const { inferirCategoria } = require('../services/CategoryInference');
+const AuditLogService = require('../services/AuditLogService');
 
 const transactionSubject = new TransactionSubject();
 
 class TransactionController {
   static async create(req, res) {
     try {
-      const transactionData = req.body;
+      // userId sempre vem da identidade do token, nunca do corpo da
+      // requisição — senão qualquer usuário autenticado poderia gravar
+      // transações em nome de outro (bastava mandar o userId de outra
+      // pessoa no body).
+      const transactionData = { ...req.body, userId: req.user.uid };
+
+      // Preenchimento automático, nunca sobrescrita: só roda quando o
+      // cliente não mandou categoria nenhuma ou mandou o genérico padrão.
+      // Uma categoria explícita do usuário sempre vence.
+      if (!transactionData.categoria || transactionData.categoria === 'Outros') {
+        const inferida = inferirCategoria(transactionData.descricao);
+        if (inferida) transactionData.categoria = inferida;
+      }
 
       // Factory Method Pattern - Criar transação baseada no tipo
       const transactionType = transactionData.tipo?.toLowerCase() === 'receita' ? 'income' : 'expense';
@@ -44,6 +58,13 @@ class TransactionController {
             parcelaTotal: parcelas
           });
           created.push(transaction);
+          await AuditLogService.registrar(null, {
+            userId: transactionData.userId,
+            tabela: 'transactions',
+            registroId: transaction.id,
+            acao: 'insert',
+            dadosNovos: transaction.toJSON ? transaction.toJSON() : transaction
+          });
         }
 
         transactionSubject.notify(transactionData);
@@ -57,6 +78,14 @@ class TransactionController {
       }
 
       const transaction = await transactionService.createTransaction(transactionData);
+
+      await AuditLogService.registrar(null, {
+        userId: transactionData.userId,
+        tabela: 'transactions',
+        registroId: transaction.id,
+        acao: 'insert',
+        dadosNovos: transaction.toJSON ? transaction.toJSON() : transaction
+      });
 
       // Notificar observers sobre a nova transação
       transactionSubject.notify(transactionData);
@@ -176,13 +205,23 @@ class TransactionController {
     try {
       const transactionService = new TransactionService();
       const { id } = req.params;
-      const { userId, ...updateData } = req.body;
+      // userId vem do token (req.user.uid), não do body — senão qualquer
+      // usuário autenticado poderia editar transação de outra pessoa
+      // (bastava mandar o userId da vítima no corpo da requisição).
+      const { userId: _ignored, ...updateData } = req.body;
+      const userId = req.user.uid;
 
-      if (!userId) {
-        return res.status(400).json({ success: false, message: 'userId é obrigatório' });
-      }
-
+      const antes = await transactionService.getTransactionById(userId, id);
       const transaction = await transactionService.updateTransaction(userId, id, updateData);
+
+      await AuditLogService.registrar(null, {
+        userId,
+        tabela: 'transactions',
+        registroId: id,
+        acao: 'update',
+        dadosAntigos: antes?.toJSON ? antes.toJSON() : antes,
+        dadosNovos: transaction?.toJSON ? transaction.toJSON() : transaction
+      });
 
       res.json({
         success: true,
@@ -202,13 +241,19 @@ class TransactionController {
     try {
       const transactionService = new TransactionService();
       const { id } = req.params;
-      const { userId } = req.body;
+      // userId vem do token, não do body — mesma razão do update() acima.
+      const userId = req.user.uid;
 
-      if (!userId) {
-        return res.status(400).json({ success: false, message: 'userId é obrigatório' });
-      }
-
+      const antes = await transactionService.getTransactionById(userId, id);
       await transactionService.deleteTransaction(userId, id);
+
+      await AuditLogService.registrar(null, {
+        userId,
+        tabela: 'transactions',
+        registroId: id,
+        acao: 'delete',
+        dadosAntigos: antes?.toJSON ? antes.toJSON() : antes
+      });
 
       res.json({
         success: true,

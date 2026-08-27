@@ -4,6 +4,7 @@ import traceback
 import base64
 from typing import Any, Dict, List, Optional, Tuple
 from utils.models import IncomingWhatsAppMessage
+from debug_utils import debug_print
 
 META_WHATSAPP_TOKEN = os.environ.get("META_WHATSAPP_TOKEN")
 META_WA_API_VERSION = os.environ.get("META_WA_API_VERSION", "v22.0")
@@ -26,7 +27,7 @@ class WhatsAppService:
             url = f"https://graph.facebook.com/{META_WA_API_VERSION}/{media_id}"
             headers = {"Authorization": f"Bearer {META_WHATSAPP_TOKEN}"}
             
-            print(f"DEBUG: Obtendo URL da mídia para ID: {media_id}")
+            debug_print(f"DEBUG: Obtendo URL da mídia para ID: {media_id}")
             response = requests.get(url, headers=headers, timeout=30)
             response.raise_for_status()
             
@@ -38,13 +39,13 @@ class WhatsAppService:
                 return None
             
             # Now download the actual media
-            print(f"DEBUG: Baixando mídia de: {media_url}")
+            debug_print(f"DEBUG: Baixando mídia de: {media_url}")
             media_response = requests.get(media_url, headers=headers, timeout=60)
             media_response.raise_for_status()
             
             # Convert to base64
             base64_content = base64.b64encode(media_response.content).decode('utf-8')
-            print(f"DEBUG: Mídia baixada com sucesso. Tamanho: {len(media_response.content)} bytes")
+            debug_print(f"DEBUG: Mídia baixada com sucesso. Tamanho: {len(media_response.content)} bytes")
             
             return base64_content
             
@@ -64,7 +65,7 @@ class WhatsAppService:
             resp = requests.post(url, headers=headers, json=json_payload, files=files, timeout=60)
             status = resp.status_code
             text = resp.text
-            print(f"DEBUG: POST {url} status={status} body={text[:400]}")
+            debug_print(f"DEBUG: POST {url} status={status} body={text[:400]}")
             resp.raise_for_status()
             return {"status": "sucesso", "raw": resp.json(), "http_status": status}
         except Exception as e:
@@ -89,7 +90,7 @@ class WhatsAppService:
 
         try:
             resp = requests.post(url, headers=headers, data=data, files=files, timeout=60)
-            print(f"DEBUG: Upload mídia status={resp.status_code} resp={resp.text[:400]}")
+            debug_print(f"DEBUG: Upload mídia status={resp.status_code} resp={resp.text[:400]}")
             resp.raise_for_status()
             data = resp.json()
             return {"status": "sucesso", "media_id": data.get('id'), "raw": data}
@@ -156,10 +157,10 @@ class WhatsAppService:
         }
         headers = {"Authorization": f"Bearer {META_WHATSAPP_TOKEN}", "Content-Type": "application/json"}
         try:
-            print(f"DEBUG: Enviando mensagem WhatsApp para {to}")
-            print(f"DEBUG: WhatsApp request body: {payload}")
+            debug_print(f"DEBUG: Enviando mensagem WhatsApp para {to}")
+            debug_print(f"DEBUG: WhatsApp request body: {payload}")
             r = requests.post(url, headers=headers, json=payload, timeout=30)
-            print(f"DEBUG: Status envio WhatsApp: {r.status_code} - {r.text}")
+            debug_print(f"DEBUG: Status envio WhatsApp: {r.status_code} - {r.text}")
             r.raise_for_status()
             return r.json()
         except Exception as e:
@@ -183,9 +184,9 @@ class WhatsAppService:
         headers = {"Authorization": f"Bearer {META_WHATSAPP_TOKEN}", "Content-Type": "application/json"}
         
         try:
-            print(f"DEBUG: Marcando mensagem como lida - ID: {message_id}")
+            debug_print(f"DEBUG: Marcando mensagem como lida - ID: {message_id}")
             r = requests.post(url, headers=headers, json=payload, timeout=30)
-            print(f"DEBUG: Status confirmação de leitura: {r.status_code} - {r.text}")
+            debug_print(f"DEBUG: Status confirmação de leitura: {r.status_code} - {r.text}")
             r.raise_for_status()
             return r.json()
         except Exception as e:
@@ -212,9 +213,9 @@ class WhatsAppService:
         headers = {"Authorization": f"Bearer {META_WHATSAPP_TOKEN}", "Content-Type": "application/json"}
         
         try:
-            print(f"DEBUG: Marcando como lida e enviando indicador de digitação para {to}")
+            debug_print(f"DEBUG: Marcando como lida e enviando indicador de digitação para {to}")
             r = requests.post(url, headers=headers, json=payload, timeout=30)
-            print(f"DEBUG: Status read + typing: {r.status_code} - {r.text}")
+            debug_print(f"DEBUG: Status read + typing: {r.status_code} - {r.text}")
             r.raise_for_status()
             return r.json()
         except Exception as e:
@@ -267,7 +268,7 @@ class WhatsAppService:
                             }
                             # Set a default text for image messages
                             text_body = "[Imagem enviada]"
-                            print(f"DEBUG: Imagem recebida - ID: {image_data['id']}, MIME: {image_data['mime_type']}")
+                            debug_print(f"DEBUG: Imagem recebida - ID: {image_data['id']}, MIME: {image_data['mime_type']}")
                         elif msg_type == "audio":
                             # Extract audio information
                             audio_info = msg.get("audio", {})
@@ -278,7 +279,7 @@ class WhatsAppService:
                             }
                             # Set a default text for audio messages
                             text_body = "[Áudio enviado]"
-                            print(f"DEBUG: Áudio recebido - ID: {audio_data['id']}, MIME: {audio_data['mime_type']}")
+                            debug_print(f"DEBUG: Áudio recebido - ID: {audio_data['id']}, MIME: {audio_data['mime_type']}")
                         elif msg_type == "voice":
                             # Voice messages are similar to audio but different type
                             voice_info = msg.get("voice", {})
@@ -288,7 +289,7 @@ class WhatsAppService:
                                 "sha256": voice_info.get("sha256")
                             }
                             text_body = "[Mensagem de voz enviada]"
-                            print(f"DEBUG: Mensagem de voz recebida - ID: {audio_data['id']}, MIME: {audio_data['mime_type']}")
+                            debug_print(f"DEBUG: Mensagem de voz recebida - ID: {audio_data['id']}, MIME: {audio_data['mime_type']}")
                         elif msg_type == "document":
                             # Extract document/file information
                             doc_info = msg.get("document", {})
@@ -300,36 +301,36 @@ class WhatsAppService:
                             }
                             # Set a default text for document messages
                             text_body = f"[Arquivo enviado: {file_data['filename']}]"
-                            print(f"DEBUG: Documento recebido - ID: {file_data['id']}, Nome: {file_data['filename']}, MIME: {file_data['mime_type']}")
+                            debug_print(f"DEBUG: Documento recebido - ID: {file_data['id']}, Nome: {file_data['filename']}, MIME: {file_data['mime_type']}")
                         elif msg_type == "video":
                             # Vídeos não são suportados pelo OpenAI
                             text_body = "[Vídeo não suportado]"
                             is_unsupported_type = True
-                            print(f"DEBUG: Tipo de mensagem não suportado: vídeo")
+                            debug_print(f"DEBUG: Tipo de mensagem não suportado: vídeo")
                         elif msg_type == "sticker":
                             # Stickers não são suportados
                             text_body = "[Sticker não suportado]"
                             is_unsupported_type = True
-                            print(f"DEBUG: Tipo de mensagem não suportado: sticker")
+                            debug_print(f"DEBUG: Tipo de mensagem não suportado: sticker")
                         elif msg_type == "location":
                             # Localização não é suportada
                             text_body = "[Localização não suportada]"
                             is_unsupported_type = True
-                            print(f"DEBUG: Tipo de mensagem não suportado: localização")
+                            debug_print(f"DEBUG: Tipo de mensagem não suportado: localização")
                         elif msg_type == "contacts":
                             # Contatos não são suportados
                             text_body = "[Contato não suportado]"
                             is_unsupported_type = True
-                            print(f"DEBUG: Tipo de mensagem não suportado: contatos")
+                            debug_print(f"DEBUG: Tipo de mensagem não suportado: contatos")
                         elif msg_type not in supported_types:
                             # Qualquer outro tipo não suportado
                             text_body = f"[Tipo de mensagem não suportado: {msg_type}]"
                             is_unsupported_type = True
-                            print(f"DEBUG: Tipo de mensagem não suportado: {msg_type}")
+                            debug_print(f"DEBUG: Tipo de mensagem não suportado: {msg_type}")
                         
                         # Skip messages we can't handle (mas agora temos fallback para tipos não suportados)
                         if not text_body and not image_data and not audio_data and not file_data and not is_unsupported_type:
-                            print(f"DEBUG: Mensagem vazia ou inválida, tipo: {msg_type}")
+                            debug_print(f"DEBUG: Mensagem vazia ou inválida, tipo: {msg_type}")
                             continue
                             
                         # Create message object
@@ -357,5 +358,5 @@ class WhatsAppService:
         except Exception as e:
             print(f"ERROR: extract_messages_from_webhook: {e}")
             print(traceback.format_exc())
-        print(f"DEBUG: Mensagens extraídas do webhook: {len(results)}")
+        debug_print(f"DEBUG: Mensagens extraídas do webhook: {len(results)}")
         return results

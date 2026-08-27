@@ -17,7 +17,7 @@ const corsOptions = {
       callback(null, true);
     } else {
       console.log('CORS blocked origin:', origin);
-      callback(null, true); // Temporariamente permitir todos
+      callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
