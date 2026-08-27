@@ -30,14 +30,14 @@ class FixedExpenseController {
         });
       }
 
-      const [id] = await db('fixed_expenses').insert({
+      const [{ id }] = await db('fixed_expenses').insert({
         user_id: userId,
         nome,
         valor: parseFloat(valor) || 0,
         categoria: categoria || 'Outros',
         dia_vencimento: Math.min(28, Math.max(1, parseInt(diaVencimento, 10) || 1)),
         icone: icone || '📌'
-      });
+      }).returning('id');
 
       const row = await db('fixed_expenses').where({ id }).first();
 
@@ -167,7 +167,7 @@ class FixedExpenseController {
       const now = new Date();
       const dataHora = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}, ${now.toLocaleTimeString('pt-BR')}`;
 
-      const [transactionId] = await db('transactions').insert({
+      const [{ id: transactionId }] = await db('transactions').insert({
         user_id: userId,
         tipo: 'despesa',
         valor: fixedExpense.valor,
@@ -176,7 +176,7 @@ class FixedExpenseController {
         data_hora: dataHora,
         recurrence_id: fixedExpenseId,
         competencia
-      });
+      }).returning('id');
 
       res.status(201).json({
         success: true,

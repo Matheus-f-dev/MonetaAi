@@ -22,14 +22,14 @@ class User {
   }
 
   static async create({ nome, email, senhaHash = null, googleId = null, salario = 0 }) {
-    const [id] = await db('users').insert({
+    const [{ id }] = await db('users').insert({
       nome,
       email,
       senha_hash: senhaHash,
       google_id: googleId,
       salario,
       perfil_completo: salario > 0
-    });
+    }).returning('id');
     return User.findById(id);
   }
 

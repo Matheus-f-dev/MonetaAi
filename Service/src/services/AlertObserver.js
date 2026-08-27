@@ -24,7 +24,7 @@ class AlertObserver {
       const transacoesDoMes = await db('transactions')
         .where({ user_id: userId, categoria, tipo: 'despesa' })
         .whereRaw(
-          "MONTH(STR_TO_DATE(SUBSTRING_INDEX(data_hora, ',', 1), '%d/%m/%Y')) = ? AND YEAR(STR_TO_DATE(SUBSTRING_INDEX(data_hora, ',', 1), '%d/%m/%Y')) = ?",
+          "EXTRACT(MONTH FROM TO_DATE(SPLIT_PART(data_hora, ',', 1), 'DD/MM/YYYY')) = ? AND EXTRACT(YEAR FROM TO_DATE(SPLIT_PART(data_hora, ',', 1), 'DD/MM/YYYY')) = ?",
           [currentMonth, currentYear]
         );
 

@@ -28,13 +28,13 @@ class AlertController {
         });
       }
 
-      const [id] = await db('alerts').insert({
+      const [{ id }] = await db('alerts').insert({
         user_id: userId,
         nome,
         condicao,
         valor: parseValorReais(valor),
         categoria
-      });
+      }).returning('id');
 
       res.status(201).json({
         success: true,

@@ -16,16 +16,14 @@ exports.up = function (knex) {
 
     table.index(['user_id', 'ativo']);
   }).then(() => knex.raw(`
-    ALTER TABLE accounts
-    ADD COLUMN principal_marker INT GENERATED ALWAYS AS (IF(principal, user_id, NULL)) VIRTUAL,
-    ADD UNIQUE KEY uniq_principal_por_usuario (principal_marker)
+    CREATE UNIQUE INDEX uniq_principal_por_usuario ON accounts (user_id) WHERE principal = true
   `));
   // Segunda camada de proteção contra duas "Conta Principal" pro mesmo
-  // usuário (além do lock de aplicação em AccountController): coluna
-  // gerada que só existe quando principal=true, com índice único — MySQL
-  // ignora NULLs num índice único, então só reclama se alguém tentar
-  // inserir um SEGUNDO principal=true pro mesmo usuário, não importa a
-  // corrida entre requisições.
+  // usuário (além do lock de aplicação em AccountController): índice único
+  // parcial que só enxerga linhas com principal=true — Postgres permite
+  // índice único condicionado a um WHERE, então só reclama se alguém
+  // tentar inserir um SEGUNDO principal=true pro mesmo usuário, não importa
+  // a corrida entre requisições.
 };
 
 exports.down = function (knex) {

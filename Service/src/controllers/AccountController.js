@@ -38,7 +38,7 @@ class AccountController {
         if (recheck.length > 0) return recheck;
 
         const principal = new Account({ userId, nome: 'Conta Principal', tipo: 'corrente', saldoInicial: 0, principal: true });
-        const [id] = await trx('accounts').insert({ user_id: userId, ...principal.toPersistence() });
+        const [{ id }] = await trx('accounts').insert({ user_id: userId, ...principal.toPersistence() }).returning('id');
         return trx('accounts').where({ id });
       });
     }
@@ -80,7 +80,7 @@ class AccountController {
       const existing = await db('accounts').where({ user_id: userId, ativo: true }).first();
       const account = new Account({ userId, nome, tipo, saldoInicial, instituicao, cor, principal: !existing });
 
-      const [id] = await db('accounts').insert({ user_id: userId, ...account.toPersistence() });
+      const [{ id }] = await db('accounts').insert({ user_id: userId, ...account.toPersistence() }).returning('id');
       const row = await db('accounts').where({ id }).first();
 
       res.status(201).json({
@@ -213,7 +213,7 @@ class AccountController {
 
         const dataHora = nowDataHora();
 
-        const [fromTransactionId] = await trx('transactions').insert({
+        const [{ id: fromTransactionId }] = await trx('transactions').insert({
           user_id: userId,
           tipo: 'despesa',
           valor: valorNum,
@@ -223,9 +223,9 @@ class AccountController {
           account_id: fromAccountId,
           is_transferencia: true,
           transfer_id: key
-        });
+        }).returning('id');
 
-        const [toTransactionId] = await trx('transactions').insert({
+        const [{ id: toTransactionId }] = await trx('transactions').insert({
           user_id: userId,
           tipo: 'receita',
           valor: valorNum,
@@ -235,7 +235,7 @@ class AccountController {
           account_id: toAccountId,
           is_transferencia: true,
           transfer_id: key
-        });
+        }).returning('id');
 
         await trx('transfers').insert({
           user_id: userId,
