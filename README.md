@@ -61,9 +61,9 @@ MonetaAi/
 ## 🚀 Como Executar o Projeto
 
 ### Pré-requisitos
-- Node.js (versão 16 ou superior)
-- npm ou yarn
-- Conta Firebase configurada
+- Node.js 18+
+- npm
+- PostgreSQL 14+ rodando localmente (ou acessível via rede)
 
 ### 1. Backend (Service)
 ```bash
@@ -73,17 +73,32 @@ cd MonetaAi/Service
 # Instalar dependências
 npm install
 
-# Configurar variáveis de ambiente
-# Criar arquivo .env com as configurações do Firebase
+# Criar o arquivo .env (não versionado) com pelo menos:
+#   DB_HOST=127.0.0.1
+#   DB_PORT=5432
+#   DB_USER=moneta_app
+#   DB_PASSWORD=<sua senha>
+#   DB_NAME=Moneta
+#   JWT_SECRET=<qualquer string longa e aleatória>
+#   FRONTEND_URL=http://localhost:5173
 
+# Criar o banco e o role de aplicação (uma vez só, como um usuário com
+# privilégio de criar role/database no Postgres):
+#   CREATE DATABASE "Moneta";
+#   CREATE ROLE moneta_app LOGIN PASSWORD '<mesma senha do .env>';
+#   GRANT CONNECT ON DATABASE "Moneta" TO moneta_app;
 
-# Criar arquivo ServiceAccountKey.json com as configurações do Firebase
-
+# Criar todas as tabelas — schema versionado via Knex, não SQL manual.
+# Reproduz o banco inteiro do zero em qualquer ambiente novo.
+npm run migrate
 
 # Executar o servidor
 npm start
 # Servidor rodará em http://localhost:3000
 ```
+
+Schema novo? `npm run migrate:make -- nome_da_mudanca` cria o arquivo de
+migration; `npm run migrate:rollback` desfaz o último batch aplicado.
 
 ### 2. Frontend (Client)
 ```bash
@@ -221,7 +236,7 @@ EXTRAS FUNCIONALIDADES
 ## 🎨 Padrões GoF Implementados
 
 ### 1. **Singleton Pattern** ✅ FUNCIONANDO
-- **Backend:** `Service/src/config/DatabaseConnection.js` - Conexão única Firebase
+- **Backend:** `Service/src/config/database.js` - Conexão única Knex/PostgreSQL
 - **Frontend:** `Client/Front/src/core/services/ApiConnection.js` - Conexão única API
 - **Uso:** TransactionController, useTransactionData
 - **Benefício:** Evita múltiplas conexões desnecessárias
@@ -296,7 +311,7 @@ console.log(api1 === api2); // Deve retornar: true
 Service/
 ├── src/
 │   ├── config/
-│   │   └── DatabaseConnection.js     # Singleton Pattern (Backend)
+│   │   └── database.js               # Singleton Pattern (Backend)
 │   ├── controllers/
 │   │   ├── TransactionController.js  # Usa Singleton + Factory + Observer
 │   │   └── AlertController.js        # Gerencia alertas e notificações
@@ -390,8 +405,9 @@ Client/Front/src/
 - **Node.js** - Runtime JavaScript
 - **Express.js** - Framework web MVC
 - **EJS** - Template engine para Views
-- **Firebase Firestore** - Banco de dados NoSQL
-- **Firebase Auth** - Autenticação
+- **PostgreSQL** - Banco de dados relacional
+- **Knex** - Query builder e migrations versionadas
+- **bcrypt + JWT** - Autenticação própria
 
 ### Chatbot & IA
 - **Python** - Linguagem do bot

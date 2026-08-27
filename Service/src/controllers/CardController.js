@@ -27,7 +27,7 @@ class CardController {
         });
       }
 
-      const [id] = await db('cards').insert({
+      const [{ id }] = await db('cards').insert({
         user_id: userId,
         nome,
         instituicao: instituicao || '',
@@ -36,7 +36,7 @@ class CardController {
         dia_fechamento: parseInt(diaFechamento, 10) || 1,
         dia_vencimento: parseInt(diaVencimento, 10) || 10,
         cor: cor || 'roxo'
-      });
+      }).returning('id');
 
       const row = await db('cards').where({ id }).first();
 

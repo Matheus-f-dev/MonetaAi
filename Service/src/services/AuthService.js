@@ -94,14 +94,18 @@ class AuthService {
     }
 
     const token = crypto.randomBytes(32).toString('hex');
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
     const expiraEm = new Date(Date.now() + 60 * 60 * 1000); // 1h
 
-    await db('password_resets').insert({ user_id: user.id, token, expira_em: expiraEm });
+    // Só o hash vai pro banco — o token cru some depois de enviado no
+    // e-mail (chamador desta função), nunca fica persistido em lugar nenhum.
+    await db('password_resets').insert({ user_id: user.id, token_hash: tokenHash, expira_em: expiraEm });
     return token;
   }
 
   static async resetPassword(token, novaSenha) {
-    const registro = await db('password_resets').where({ token }).first();
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+    const registro = await db('password_resets').where({ token_hash: tokenHash }).first();
     if (!registro || registro.usado_em || new Date(registro.expira_em) < new Date()) {
       const err = new Error('Link de redefinição inválido ou expirado.');
       err.code = 'INVALID_TOKEN';

@@ -4,6 +4,9 @@ node_modules/
 # Ignora arquivos .env (segurança!)
 .env
 
+# Contém a senha do role de app do Postgres em texto puro (bootstrap local)
+sql/schema.sql
+
 # Logs
 *.log
 

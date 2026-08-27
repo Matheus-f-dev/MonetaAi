@@ -6,7 +6,7 @@ const { db } = require('../config/database');
 // o trabalho que ele é bom em fazer.
 class TransactionRepository {
   async create(userId, transactionData, splitParticipantes = null) {
-    const [id] = await db('transactions').insert({ ...transactionData, user_id: userId });
+    const [{ id }] = await db('transactions').insert({ ...transactionData, user_id: userId }).returning('id');
 
     if (splitParticipantes?.length) {
       await db('split_participants').insert(
@@ -30,7 +30,7 @@ class TransactionRepository {
       // data_hora é guardada como string "dd/mm/yyyy, HH:MM:SS" — comparar
       // como texto não ordena certo, então convertemos pra data no SQL.
       query = query.whereRaw(
-        "STR_TO_DATE(SUBSTRING_INDEX(data_hora, ',', 1), '%d/%m/%Y') BETWEEN ? AND ?",
+        "TO_DATE(SPLIT_PART(data_hora, ',', 1), 'DD/MM/YYYY') BETWEEN ? AND ?",
         [filters.startDate, filters.endDate]
       );
     }
