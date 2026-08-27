@@ -16,6 +16,7 @@ const ReportExportController = require('../controllers/ReportExportController');
 const TransactionImportController = require('../controllers/TransactionImportController');
 const BudgetController = require('../controllers/BudgetController');
 const GoalController = require('../controllers/GoalController');
+const ReconciliationController = require('../controllers/ReconciliationController');
 const SplitController = require('../controllers/SplitController');
 const AccountController = require('../controllers/AccountController');
 const { authenticateToken, ensureOwnUser } = require('../middleware/auth');
@@ -109,6 +110,8 @@ router.get('/accounts/:userId/resumo', ensureOwnUser(), AccountController.getRes
 router.post('/accounts/:userId/transfer', ensureOwnUser(), AccountController.transfer);
 router.put('/accounts/:accountId', AccountController.update);
 router.delete('/accounts/:accountId', AccountController.delete);
+router.post('/accounts/:userId/:accountId/reconciliar', ensureOwnUser(), ReconciliationController.reconciliar);
+router.get('/accounts/:userId/:accountId/reconciliations', ensureOwnUser(), ReconciliationController.getHistorico);
 
 // Rotas de orçamento por categoria
 router.post('/budgets', BudgetController.create);
