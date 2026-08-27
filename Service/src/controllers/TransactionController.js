@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const TransactionService = require('../services/TransactionService');
 const TransactionFactory = require('../services/TransactionFactory');
 const { TransactionSubject } = require('../services/TransactionObserver');
+const { inferirCategoria } = require('../services/CategoryInference');
 
 const transactionSubject = new TransactionSubject();
 
@@ -13,6 +14,14 @@ class TransactionController {
       // transações em nome de outro (bastava mandar o userId de outra
       // pessoa no body).
       const transactionData = { ...req.body, userId: req.user.uid };
+
+      // Preenchimento automático, nunca sobrescrita: só roda quando o
+      // cliente não mandou categoria nenhuma ou mandou o genérico padrão.
+      // Uma categoria explícita do usuário sempre vence.
+      if (!transactionData.categoria || transactionData.categoria === 'Outros') {
+        const inferida = inferirCategoria(transactionData.descricao);
+        if (inferida) transactionData.categoria = inferida;
+      }
 
       // Factory Method Pattern - Criar transação baseada no tipo
       const transactionType = transactionData.tipo?.toLowerCase() === 'receita' ? 'income' : 'expense';

@@ -8,6 +8,7 @@
  */
 
 const TransactionService = require('../services/TransactionService');
+const { inferirCategoria } = require('../services/CategoryInference');
 
 class ActionExecutor {
   constructor(userId) {
@@ -44,19 +45,24 @@ class ActionExecutor {
   async registrarGasto({ valor, descricao, categoria, data }) {
     if (!valor || valor <= 0) return { sucesso: false, mensagem: 'Valor inválido para o gasto.' };
 
+    // A IA já manda a categoria na maioria dos casos (segue as regras do
+    // próprio prompt), mas se vier vazia, cai no mesmo inferidor usado no
+    // cadastro manual em vez de ir direto pro genérico "Outros".
+    const categoriaFinal = categoria || inferirCategoria(descricao) || 'Outros';
+
     const transaction = await this.transactionService.createTransaction({
       userId: this.userId,
       tipo: 'despesa',
       valor: parseFloat(valor),
-      descricao: descricao || categoria || 'Gasto',
-      categoria: categoria || 'Outros',
+      descricao: descricao || categoriaFinal || 'Gasto',
+      categoria: categoriaFinal,
       dataHora: data || new Date().toLocaleDateString('pt-BR'),
     });
 
     return {
       sucesso: true,
       resultado: transaction,
-      mensagem: `Gasto de R$ ${parseFloat(valor).toFixed(2).replace('.', ',')} em ${categoria} registrado!`
+      mensagem: `Gasto de R$ ${parseFloat(valor).toFixed(2).replace('.', ',')} em ${categoriaFinal} registrado!`
     };
   }
 
@@ -64,12 +70,16 @@ class ActionExecutor {
   async registrarReceita({ valor, descricao, categoria, data }) {
     if (!valor || valor <= 0) return { sucesso: false, mensagem: 'Valor inválido para a receita.' };
 
+    // Receita usa "Renda" como fallback (não "Outros") -- mas ainda tenta a
+    // inferência primeiro, caso a descrição bata com alguma regra específica.
+    const categoriaFinal = categoria || inferirCategoria(descricao) || 'Renda';
+
     const transaction = await this.transactionService.createTransaction({
       userId: this.userId,
       tipo: 'receita',
       valor: parseFloat(valor),
-      descricao: descricao || categoria || 'Receita',
-      categoria: categoria || 'Renda',
+      descricao: descricao || categoriaFinal || 'Receita',
+      categoria: categoriaFinal,
       dataHora: data || new Date().toLocaleDateString('pt-BR'),
     });
 
