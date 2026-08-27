@@ -81,7 +81,7 @@ class AuthController {
 
       res.status(200).json({
         success: true,
-        message: 'Login realizado com sucesso!',
+        message: result.requiresTotp ? 'Senha correta — informe o código de verificação.' : 'Login realizado com sucesso!',
         ...result
       });
 
@@ -184,6 +184,27 @@ class AuthController {
 
     } catch (err) {
       res.status(400).json({ success: false, message: err.message || 'Não foi possível redefinir a senha.' });
+    }
+  }
+
+  // Segunda etapa do login quando a conta tem 2FA ativo -- recebe o
+  // tempToken devolvido por login() e o código do app autenticador.
+  static async loginTotp(req, res) {
+    try {
+      const { tempToken, code } = req.body;
+      if (!tempToken || !code) {
+        return res.status(400).json({ success: false, message: 'tempToken e code são obrigatórios.' });
+      }
+
+      const result = await AuthService.completeTotpLogin(tempToken, code);
+      res.status(200).json({ success: true, message: 'Login realizado com sucesso!', ...result });
+
+    } catch (err) {
+      const mensagens = {
+        INVALID_TEMP_TOKEN: err.message,
+        INVALID_TOTP_CODE: 'Código de verificação inválido.'
+      };
+      res.status(400).json({ success: false, message: mensagens[err.code] || 'Não foi possível concluir o login.' });
     }
   }
 }

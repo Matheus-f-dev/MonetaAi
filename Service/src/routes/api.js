@@ -19,6 +19,7 @@ const GoalController = require('../controllers/GoalController');
 const ReconciliationController = require('../controllers/ReconciliationController');
 const SplitController = require('../controllers/SplitController');
 const AccountController = require('../controllers/AccountController');
+const TwoFactorController = require('../controllers/TwoFactorController');
 const { authenticateToken, ensureOwnUser } = require('../middleware/auth');
 const { authLimiter, apiLimiter } = require('../middleware/rateLimit');
 
@@ -32,6 +33,11 @@ router.post('/login', authLimiter, AuthController.login);
 router.post('/verificar-email', authLimiter, EmailController.verificarEmail);
 router.post('/esqueci-senha', authLimiter, AuthController.esqueciSenha);
 router.post('/redefinir-senha', authLimiter, AuthController.redefinirSenha);
+// Segunda etapa do login com 2FA -- ainda pública porque nesse ponto o
+// usuário só tem o tempToken de 5min (issueTotpPendingToken), não um JWT
+// de sessão de verdade; authenticateToken rejeitaria esse token de qualquer
+// jeito (é o próprio propósito do claim pendingTotp).
+router.post('/login/totp', authLimiter, AuthController.loginTotp);
 router.get('/test', (req, res) => res.json({ message: 'API funcionando' }));
 
 // ── A partir daqui, toda rota exige um token válido. Antes nenhuma rota
@@ -129,6 +135,12 @@ router.delete('/goals/:goalId', GoalController.delete);
 
 // Rota de exportação de relatórios (CSV/PDF)
 router.get('/relatorios/:userId/export', ensureOwnUser(), ReportExportController.export);
+
+// Rotas de 2FA (TOTP) -- setup/confirm/disable exigem estar logado
+// (JWT normal, não o tempToken do meio do login com 2FA).
+router.post('/2fa/setup', TwoFactorController.setup);
+router.post('/2fa/confirm', TwoFactorController.confirm);
+router.post('/2fa/disable', TwoFactorController.disable);
 
 // Rota do agente Moneta AI
 router.post('/agent/chat', AgentController.chat);
