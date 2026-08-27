@@ -11,6 +11,7 @@ const TendenciasController = require('../controllers/TendenciasController');
 const AgentController = require('../agent/AgentController');
 const CardController = require('../controllers/CardController');
 const FixedExpenseController = require('../controllers/FixedExpenseController');
+const FixedIncomeController = require('../controllers/FixedIncomeController');
 const SplitController = require('../controllers/SplitController');
 const AccountController = require('../controllers/AccountController');
 const { authenticateToken, ensureOwnUser } = require('../middleware/auth');
@@ -83,6 +84,13 @@ router.get('/fixed-expenses/:userId', ensureOwnUser(), FixedExpenseController.ge
 router.put('/fixed-expenses/:fixedExpenseId', FixedExpenseController.update);
 router.delete('/fixed-expenses/:fixedExpenseId', FixedExpenseController.delete);
 router.post('/fixed-expenses/:fixedExpenseId/lancar', FixedExpenseController.lancar);
+
+// Rotas de receitas fixas (mesmo padrão de gastos fixos)
+router.post('/fixed-incomes', FixedIncomeController.create);
+router.get('/fixed-incomes/:userId', ensureOwnUser(), FixedIncomeController.getUserFixedIncomes);
+router.put('/fixed-incomes/:fixedIncomeId', FixedIncomeController.update);
+router.delete('/fixed-incomes/:fixedIncomeId', FixedIncomeController.delete);
+router.post('/fixed-incomes/:fixedIncomeId/lancar', FixedIncomeController.lancar);
 
 // Rotas de divisão de despesas (split entre pessoas)
 router.get('/split/:userId/people', ensureOwnUser(), SplitController.getPeople);
