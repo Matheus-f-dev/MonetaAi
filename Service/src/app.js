@@ -67,6 +67,12 @@ app.use((err, req, res, next) => {
   if (err.message === 'Not allowed by CORS') {
     return res.status(403).json({ success: false, message: 'Origem não permitida.' });
   }
+  // JSON malformado no corpo da requisição é erro de quem chamou (400), não
+  // do servidor (500) -- o body-parser já classifica isso como
+  // 'entity.parse.failed' com o status certo, só não estava sendo respeitado.
+  if (err.type === 'entity.parse.failed') {
+    return res.status(400).json({ success: false, message: 'Corpo da requisição não é um JSON válido.' });
+  }
   console.error('Erro não tratado:', err);
   res.status(500).json({ success: false, message: 'Erro interno do servidor.' });
 });

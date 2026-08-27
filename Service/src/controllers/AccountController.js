@@ -4,6 +4,7 @@ const Account = require('../models/Account');
 const TransactionFactory = require('../services/TransactionFactory');
 const CardController = require('./CardController');
 const FixedExpenseController = require('./FixedExpenseController');
+const AuditLogService = require('../services/AuditLogService');
 
 function nowDataHora() {
   const now = new Date();
@@ -86,6 +87,10 @@ class AccountController {
       const [{ id }] = await db('accounts').insert({ user_id: userId, ...account.toPersistence() }).returning('id');
       const row = await db('accounts').where({ id }).first();
 
+      await AuditLogService.registrar(null, {
+        userId, tabela: 'accounts', registroId: id, acao: 'insert', dadosNovos: toApiShape(row)
+      });
+
       res.status(201).json({
         success: true,
         message: 'Conta cadastrada com sucesso',
@@ -123,10 +128,23 @@ class AccountController {
         return res.status(400).json({ success: false, message: 'userId e nome da conta são obrigatórios' });
       }
 
+      const antes = await db('accounts').where({ id: accountId, user_id: userId }).first();
+
       const account = new Account({ userId, nome, tipo, saldoInicial, instituicao, cor });
       await db('accounts').where({ id: accountId, user_id: userId }).update({
         ...account.toPersistence(),
         atualizado_em: db.fn.now()
+      });
+
+      const depois = await db('accounts').where({ id: accountId, user_id: userId }).first();
+
+      await AuditLogService.registrar(null, {
+        userId,
+        tabela: 'accounts',
+        registroId: accountId,
+        acao: 'update',
+        dadosAntigos: antes ? toApiShape(antes) : null,
+        dadosNovos: depois ? toApiShape(depois) : null
       });
 
       res.json({ success: true, message: 'Conta atualizada com sucesso' });
@@ -171,6 +189,12 @@ class AccountController {
             await trx('accounts').where({ id: promoted.id }).update({ principal: true });
           }
         }
+
+        // Log e mutação na mesma transação -- ou os dois são gravados
+        // juntos, ou nenhum é.
+        await AuditLogService.registrar(trx, {
+          userId, tabela: 'accounts', registroId: accountId, acao: 'delete', dadosAntigos: toApiShape(target)
+        });
       });
 
       res.json({ success: true, message: 'Conta removida com sucesso' });
@@ -259,6 +283,15 @@ class AccountController {
           descricao: descricao || '',
           from_transaction_id: fromTransactionId,
           to_transaction_id: toTransactionId
+        });
+
+        await AuditLogService.registrar(trx, {
+          userId, tabela: 'transactions', registroId: fromTransactionId, acao: 'insert',
+          dadosNovos: { tipo: 'despesa', valor: valorNum, accountId: fromAccountId, isTransferencia: true, transferId: key }
+        });
+        await AuditLogService.registrar(trx, {
+          userId, tabela: 'transactions', registroId: toTransactionId, acao: 'insert',
+          dadosNovos: { tipo: 'receita', valor: valorNum, accountId: toAccountId, isTransferencia: true, transferId: key }
         });
 
         return { alreadyProcessed: false };

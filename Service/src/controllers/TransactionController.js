@@ -3,6 +3,7 @@ const TransactionService = require('../services/TransactionService');
 const TransactionFactory = require('../services/TransactionFactory');
 const { TransactionSubject } = require('../services/TransactionObserver');
 const { inferirCategoria } = require('../services/CategoryInference');
+const AuditLogService = require('../services/AuditLogService');
 
 const transactionSubject = new TransactionSubject();
 
@@ -57,6 +58,13 @@ class TransactionController {
             parcelaTotal: parcelas
           });
           created.push(transaction);
+          await AuditLogService.registrar(null, {
+            userId: transactionData.userId,
+            tabela: 'transactions',
+            registroId: transaction.id,
+            acao: 'insert',
+            dadosNovos: transaction.toJSON ? transaction.toJSON() : transaction
+          });
         }
 
         transactionSubject.notify(transactionData);
@@ -70,6 +78,14 @@ class TransactionController {
       }
 
       const transaction = await transactionService.createTransaction(transactionData);
+
+      await AuditLogService.registrar(null, {
+        userId: transactionData.userId,
+        tabela: 'transactions',
+        registroId: transaction.id,
+        acao: 'insert',
+        dadosNovos: transaction.toJSON ? transaction.toJSON() : transaction
+      });
 
       // Notificar observers sobre a nova transação
       transactionSubject.notify(transactionData);
@@ -195,7 +211,17 @@ class TransactionController {
       const { userId: _ignored, ...updateData } = req.body;
       const userId = req.user.uid;
 
+      const antes = await transactionService.getTransactionById(userId, id);
       const transaction = await transactionService.updateTransaction(userId, id, updateData);
+
+      await AuditLogService.registrar(null, {
+        userId,
+        tabela: 'transactions',
+        registroId: id,
+        acao: 'update',
+        dadosAntigos: antes?.toJSON ? antes.toJSON() : antes,
+        dadosNovos: transaction?.toJSON ? transaction.toJSON() : transaction
+      });
 
       res.json({
         success: true,
@@ -218,7 +244,16 @@ class TransactionController {
       // userId vem do token, não do body — mesma razão do update() acima.
       const userId = req.user.uid;
 
+      const antes = await transactionService.getTransactionById(userId, id);
       await transactionService.deleteTransaction(userId, id);
+
+      await AuditLogService.registrar(null, {
+        userId,
+        tabela: 'transactions',
+        registroId: id,
+        acao: 'delete',
+        dadosAntigos: antes?.toJSON ? antes.toJSON() : antes
+      });
 
       res.json({
         success: true,
