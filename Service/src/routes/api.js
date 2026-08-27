@@ -15,6 +15,7 @@ const FixedIncomeController = require('../controllers/FixedIncomeController');
 const ReportExportController = require('../controllers/ReportExportController');
 const TransactionImportController = require('../controllers/TransactionImportController');
 const BudgetController = require('../controllers/BudgetController');
+const GoalController = require('../controllers/GoalController');
 const SplitController = require('../controllers/SplitController');
 const AccountController = require('../controllers/AccountController');
 const { authenticateToken, ensureOwnUser } = require('../middleware/auth');
@@ -115,6 +116,13 @@ router.get('/budgets/:userId', ensureOwnUser(), BudgetController.getUserBudgets)
 router.get('/budgets/:userId/status', ensureOwnUser(), BudgetController.getStatus);
 router.put('/budgets/:budgetId', BudgetController.update);
 router.delete('/budgets/:budgetId', BudgetController.delete);
+
+// Rotas de metas financeiras
+router.post('/goals', GoalController.create);
+router.get('/goals/:userId', ensureOwnUser(), GoalController.getUserGoals);
+router.get('/goals/:userId/progress', ensureOwnUser(), GoalController.getProgress);
+router.put('/goals/:goalId', GoalController.update);
+router.delete('/goals/:goalId', GoalController.delete);
 
 // Rota de exportação de relatórios (CSV/PDF)
 router.get('/relatorios/:userId/export', ensureOwnUser(), ReportExportController.export);
