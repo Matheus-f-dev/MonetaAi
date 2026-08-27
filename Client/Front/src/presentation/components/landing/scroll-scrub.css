@@ -1,0 +1,258 @@
+/* Palco do scrub. O <video> é irmão do poster e só aparece quando um frame
+   real foi pintado, então nunca há caixa preta nem salto de imagem. */
+
+.scrub {
+  --scrub-progress: 0;
+  position: relative;
+  isolation: isolate;
+  color: var(--bone);
+  background: var(--ink-900);
+}
+
+.scrub__stage {
+  position: sticky;
+  top: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--ink-900);
+}
+
+.scrub__media,
+.scrub__layer,
+.scrub__picture,
+.scrub__poster,
+.scrub__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.scrub__media {
+  z-index: 0;
+}
+
+.scrub__layer {
+  margin: 0;
+  overflow: hidden;
+  opacity: 0;
+  will-change: opacity;
+}
+
+/* Primeiro capítulo visível antes do JS assumir, pra não abrir em preto. */
+.scrub__layer:first-child {
+  opacity: 1;
+}
+
+.scrub__poster,
+.scrub__video {
+  display: block;
+  object-fit: cover;
+  object-position: var(--scrub-object-position);
+}
+
+.scrub__poster {
+  z-index: 0;
+}
+
+.scrub__video {
+  z-index: 1;
+}
+
+.scrub__layer[data-video-painted='true'] .scrub__poster {
+  visibility: hidden;
+}
+
+/* Vinheta: garante contraste da copy sobre qualquer frame do filme. */
+.scrub__stage::after {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  content: '';
+  background:
+    linear-gradient(to right, var(--ink-900) 0%, rgb(14 20 22 / 0.55) 38%, transparent 68%),
+    linear-gradient(to top, rgb(14 20 22 / 0.72) 0%, transparent 45%);
+  pointer-events: none;
+}
+
+.scrub__progress {
+  position: absolute;
+  z-index: 5;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 2px;
+  background: rgb(238 242 241 / 0.12);
+  pointer-events: none;
+}
+
+.scrub__progress span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--jade);
+  transform: scaleX(var(--scrub-progress));
+  transform-origin: left center;
+}
+
+.scrub__route {
+  position: absolute;
+  z-index: 6;
+  right: clamp(1rem, 4vw, 4rem);
+  bottom: clamp(1.5rem, 3vw, 2.5rem);
+  left: clamp(1rem, 4vw, 4rem);
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.15rem;
+}
+
+/* Marcador de capítulo: tipografia mono e um sublinhado que engrossa no ativo.
+   Estado ativo não depende de hover. */
+.scrub__route-button {
+  min-height: 2.75rem;
+  padding: 0.6rem 0.85rem;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  color: var(--steel);
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.25s ease, border-color 0.25s ease;
+}
+
+.scrub__route-button:hover {
+  color: var(--smoke);
+}
+
+.scrub__route-button[aria-current='step'] {
+  border-bottom-color: var(--jade);
+  color: var(--bone);
+}
+
+.scrub__route-button:focus-visible {
+  outline: 2px solid var(--jade);
+  outline-offset: 3px;
+}
+
+/* A história sobe por cima do palco fixo. */
+.scrub__story {
+  position: relative;
+  z-index: 3;
+  margin-top: -100dvh;
+  pointer-events: none;
+}
+
+.scrub__chapter {
+  position: relative;
+}
+
+.scrub__pin {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  min-height: 100dvh;
+  padding: clamp(5rem, 9vw, 8rem) clamp(1.25rem, 6vw, 6rem);
+  pointer-events: none;
+}
+
+.scrub__chapter[data-align='right'] .scrub__pin {
+  justify-content: flex-end;
+}
+
+.scrub__copy {
+  position: relative;
+  width: min(38rem, 47vw);
+  pointer-events: auto;
+}
+
+.scrub__title {
+  max-width: 15ch;
+  margin: 0;
+  color: var(--bone);
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 5.4vw, 5.4rem);
+  font-weight: 700;
+  line-height: 0.96;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+.scrub__body {
+  max-width: 40ch;
+  margin: 1.5rem 0 0;
+  color: var(--smoke);
+  font-size: clamp(1rem, 1.25vw, 1.15rem);
+  line-height: 1.6;
+}
+
+.scrub__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  align-items: center;
+  margin-top: 2.25rem;
+}
+
+@media (max-width: 860px) {
+  .scrub__poster,
+  .scrub__video {
+    object-position: var(--scrub-mobile-position);
+  }
+
+  .scrub__stage::after {
+    background: linear-gradient(to top, var(--ink-900) 2%, rgb(14 20 22 / 0.6) 42%, transparent 78%);
+  }
+
+  .scrub__route {
+    right: max(0.75rem, env(safe-area-inset-right));
+    bottom: max(0.75rem, env(safe-area-inset-bottom));
+    left: max(0.75rem, env(safe-area-inset-left));
+    justify-content: flex-start;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+
+  .scrub__route::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrub__route-button {
+    flex: 0 0 auto;
+  }
+
+  .scrub__pin,
+  .scrub__chapter[data-align='right'] .scrub__pin {
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding: 6rem max(1.25rem, env(safe-area-inset-right)) calc(6rem + env(safe-area-inset-bottom))
+      max(1.25rem, env(safe-area-inset-left));
+  }
+
+  .scrub__copy {
+    width: min(100%, 34rem);
+  }
+
+  .scrub__title {
+    max-width: 16ch;
+    font-size: clamp(2.2rem, 10vw, 3.6rem);
+  }
+}
+
+/* Sem movimento: nenhum byte de vídeo é buscado pelo JS e cada capítulo vira
+   uma tela estática sobre o próprio poster. A história continua inteira. */
+@media (prefers-reduced-motion: reduce) {
+  .scrub__chapter {
+    min-height: 100dvh !important;
+  }
+
+  .scrub__progress span {
+    transition: none;
+  }
+}

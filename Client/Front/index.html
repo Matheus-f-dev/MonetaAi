@@ -2,12 +2,199 @@
 <html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href='/MonetaAi-minas summit.png' />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Moneta AI</title>
+
+    <title>Moneta, gestão financeira que começa numa frase</title>
+    <meta
+      name="description"
+      content="Registre um gasto mandando uma mensagem de texto comum. A Moneta identifica categoria, conta e cartão, e o seu saldo fica certo na hora. Plano grátis, sem cartão."
+    />
+    <link rel="canonical" href="https://monetaai.site/" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="theme-color" content="#0e1416" />
+
+    <link rel="icon" type="image/svg+xml" href="/moneta-mark.svg" />
+    <link rel="apple-touch-icon" href="/MonetaAi-minas summit.png" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Moneta" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:title" content="Moneta, gestão financeira que começa numa frase" />
+    <meta
+      property="og:description"
+      content="Registre um gasto mandando uma mensagem de texto comum. A Moneta identifica categoria, conta e cartão, e o seu saldo fica certo na hora."
+    />
+    <meta property="og:url" content="https://monetaai.site/" />
+    <meta property="og:image" content="https://monetaai.site/assets/moneta/og-cover.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Peça circular de aço usinado sobre fundo escuro, a marca visual da Moneta." />
+
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Moneta, gestão financeira que começa numa frase" />
+    <meta
+      name="twitter:description"
+      content="Registre um gasto mandando uma mensagem de texto comum. A Moneta identifica categoria, conta e cartão, e o seu saldo fica certo na hora."
+    />
+    <meta name="twitter:image" content="https://monetaai.site/assets/moneta/og-cover.jpg" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Hanken+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+    <!-- Painel logado: Hanken Grotesk e Zilla Slab. Landing: Satoshi. Mono compartilhado. -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Zilla+Slab:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Hanken+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://api.fontshare.com/v2/css?f%5B%5D=satoshi@500,700,900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!--
+      Dados estruturados da landing. Mantidos aqui porque o app é uma SPA e o
+      rastreador precisa disso já no HTML servido.
+
+      ATENÇÃO: as perguntas abaixo espelham QUESTIONS em
+      src/presentation/components/landing/content.js. Mudou lá, muda aqui.
+    -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://monetaai.site/#organization",
+            "name": "Moneta",
+            "url": "https://monetaai.site/",
+            "logo": "https://monetaai.site/moneta-mark.svg"
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://monetaai.site/#website",
+            "url": "https://monetaai.site/",
+            "name": "Moneta",
+            "inLanguage": "pt-BR",
+            "publisher": { "@id": "https://monetaai.site/#organization" }
+          },
+          {
+            "@type": "SoftwareApplication",
+            "@id": "https://monetaai.site/#app",
+            "name": "Moneta",
+            "applicationCategory": "FinanceApplication",
+            "operatingSystem": "Web",
+            "url": "https://monetaai.site/",
+            "inLanguage": "pt-BR",
+            "description": "Plataforma de gestão financeira em que o lançamento de despesas é feito por mensagem de texto, com categoria, conta e cartão identificados automaticamente.",
+            "publisher": { "@id": "https://monetaai.site/#organization" },
+            "featureList": [
+              "Registro de despesa por mensagem de texto",
+              "Categorização automática de lançamentos",
+              "Saldo separado por conta e por cartão",
+              "Metas e orçamento por categoria",
+              "Alertas de gasto por categoria",
+              "Relatórios consolidados e tendência de gasto"
+            ],
+            "offers": [
+              {
+                "@type": "Offer",
+                "name": "Starter",
+                "price": "0",
+                "priceCurrency": "BRL",
+                "description": "Uma conta conectada, categorização automática e relatório simples do mês."
+              },
+              {
+                "@type": "Offer",
+                "name": "Pro",
+                "price": "29.90",
+                "priceCurrency": "BRL",
+                "description": "Contas e cartões ilimitados, metas e orçamento por categoria, alertas e relatórios avançados.",
+                "priceSpecification": {
+                  "@type": "UnitPriceSpecification",
+                  "price": "29.90",
+                  "priceCurrency": "BRL",
+                  "billingDuration": 1,
+                  "billingIncrement": 1,
+                  "unitCode": "MON"
+                }
+              },
+              {
+                "@type": "Offer",
+                "name": "Business",
+                "price": "79.90",
+                "priceCurrency": "BRL",
+                "description": "Múltiplos usuários por conta, fluxo de caixa empresarial, exportação contábil e suporte prioritário.",
+                "priceSpecification": {
+                  "@type": "UnitPriceSpecification",
+                  "price": "79.90",
+                  "priceCurrency": "BRL",
+                  "billingDuration": 1,
+                  "billingIncrement": 1,
+                  "unitCode": "MON"
+                }
+              }
+            ]
+          },
+          {
+            "@type": "FAQPage",
+            "@id": "https://monetaai.site/#faq",
+            "inLanguage": "pt-BR",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Meus dados financeiros ficam seguros?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Sim. Seus lançamentos ficam isolados por usuário no banco de dados e sua senha nunca é armazenada, porque a autenticação passa pelo Firebase Auth. O tratamento de dados segue a LGPD: você pode pedir exportação ou exclusão dos seus dados quando quiser."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Como funciona o registro por mensagem?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Você manda uma mensagem de texto descrevendo o gasto. O sistema lê só o que precisa pra registrar o lançamento, ou seja categoria, valor e conta, e não usa suas conversas pra mais nada."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Posso cancelar quando quiser?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Sim, sem multa e sem fidelidade. O cancelamento de planos pagos é feito direto no seu perfil e vale até o fim do período já pago."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Funciona pra conta conjunta ou pra empresa?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Pra uso compartilhado, seja conta conjunta, sócios ou time financeiro, o plano Business permite múltiplos usuários na mesma conta, com fluxo de caixa e exportação contábil."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Preciso pagar pra começar?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Não. O plano Starter é grátis e já registra seus gastos com categorização automática. Você só paga se precisar de contas ilimitadas, metas ou relatórios avançados."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Preciso instalar algum aplicativo?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Não. Pra registrar, basta mandar a mensagem. Pra ver relatórios, metas e configurações, é só acessar pelo navegador, no computador ou no celular."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

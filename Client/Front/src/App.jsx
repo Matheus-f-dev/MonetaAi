@@ -7,8 +7,7 @@ import { useTheme } from './presentation/hooks/useTheme';
 import { ProtectedRoute } from './presentation/components/ProtectedRoute';
 import { decryptRoute } from './shared/urlCrypto';
 import { ToastContainer } from './presentation/components/system/ToastContainer';
-// Lazy: a landing page carrega uma cena 3D (three.js) que não deve pesar
-// no bundle de quem só vai fazer login e usar o painel.
+// Lazy: mantém a landing fora do bundle de quem só vai fazer login e usar o painel.
 const LandingPage = lazy(() => import('./presentation/pages/Home'));
 import LoginCard from './presentation/pages/Login';
 import Cadastro from './presentation/pages/Register';
