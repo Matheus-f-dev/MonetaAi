@@ -1,0 +1,31 @@
+.figure {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.15em;
+  /* !important pelo mesmo motivo documentado em global.css: o
+     `* { font-family: inherit !important }` do App.css legado sobrepõe
+     qualquer família diferente da herdada. Sai na Fase 9. */
+  font-family: var(--font-mono) !important;
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
+}
+
+.currency {
+  color: var(--color-ink-faint);
+  font-weight: var(--weight-medium);
+  font-size: 0.62em;
+}
+
+.sign {
+  font-weight: var(--weight-bold);
+}
+
+.neutral { color: var(--color-ink); }
+.positive { color: var(--color-positive); }
+.negative { color: var(--color-negative); }
+
+.sm { font-size: var(--text-sm); }
+.md { font-size: var(--text-base); }
+.lg { font-size: var(--text-lg); }
+.xl { font-size: var(--text-2xl); }

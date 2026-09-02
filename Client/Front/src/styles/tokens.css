@@ -1,0 +1,180 @@
+/* ============================================================
+   Tokens de design — Moneta, redesign pós-login (Fase 0)
+   ============================================================
+   Direção: "livro-razão" (ledger). O produto inteiro nasce de uma
+   conversa no WhatsApp virando um lançamento contábil -- a identidade
+   visual devia parecer as duas coisas ao mesmo tempo: precisa como um
+   extrato, cálida como uma conversa. Nada de roxo-SaaS-de-IA (a paleta
+   antiga usava #8b5cf6, a cor mais batida de produto de IA hoje) --
+   base em tinta verde-escura (não preto/azul-ardósia frio), destaque
+   em âmbar (carimbo/selo, não decoração), positivo/negativo com
+   personalidade de carimbo de tinta, não semáforo genérico.
+
+   O elemento assinatura do sistema é a figura monetária: todo valor em
+   R$ no produto usa fonte monoespaçada com algarismos tabulares (ver
+   --font-mono e o componente MoneyFigure) -- o app inteiro comunica
+   "sua grana, contada com precisão" através da própria tipografia dos
+   números, não de um ícone ou ilustração solta.
+   ============================================================ */
+
+:root {
+  /* ---------- Cor: modo claro ("papel de recibo") ---------- */
+  --color-bg: #faf8f4;
+  --color-bg-raised: #ffffff;
+  --color-bg-sunken: #f2ede4;
+
+  --color-ink: #16211c;           /* texto principal -- verde-tinta, não preto puro */
+  --color-ink-muted: #6b6459;     /* texto secundário -- cinza quente, não ardósia */
+  --color-ink-faint: #a39d8e;     /* texto terciário/placeholder */
+
+  --color-line: #e7e1d6;          /* linha de régua/borda -- cor de pauta de caderno */
+  --color-line-strong: #d6cfc0;
+
+  --color-brand: #1f4d3a;         /* tinta verde-pinho -- marca, texto de ênfase, botão primário */
+  --color-brand-strong: #163a2b;
+  --color-brand-soft: #e3ece6;
+
+  --color-accent: #b9812c;        /* âmbar/latão -- selo, destaque, estado ativo. Usado com parcimônia. */
+  --color-accent-strong: #96681e;
+  --color-accent-soft: #f6ecd8;
+
+  --color-positive: #2f6f4e;      /* receita/entrada -- verde-carimbo */
+  --color-positive-soft: #e2efe6;
+  --color-negative: #a23b2e;      /* despesa/saída -- vermelho-lacre, não vermelho-erro genérico */
+  --color-negative-soft: #f6e6e2;
+  --color-warning: #a3701f;
+  --color-warning-soft: #f5ecd9;
+
+  --color-focus-ring: #1f4d3a;
+
+  /* ---------- Tipografia ---------- */
+  --font-display: 'Sora', 'Segoe UI', system-ui, sans-serif;
+  --font-body: 'Karla', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  --text-xs: 0.75rem;    /* 12px -- legendas, timestamps */
+  --text-sm: 0.875rem;   /* 14px -- corpo denso, tabela */
+  --text-base: 1rem;     /* 16px -- corpo padrão */
+  --text-md: 1.125rem;   /* 18px -- subtítulo de card */
+  --text-lg: 1.375rem;   /* 22px -- título de seção */
+  --text-xl: 1.75rem;    /* 28px -- título de página */
+  --text-2xl: 2.25rem;   /* 36px -- KPI grande, saldo */
+  --text-3xl: 3rem;      /* 48px -- destaque hero (raro, fora do shell logado) */
+
+  --leading-tight: 1.15;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.7;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* ---------- Espaçamento (escala 4px) ---------- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* ---------- Raio -- estruturado, não bolha ---------- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-full: 999px;
+
+  /* ---------- Elevação ---------- */
+  --shadow-sm: 0 1px 2px rgba(22, 33, 28, 0.06);
+  --shadow-md: 0 4px 16px rgba(22, 33, 28, 0.08);
+  --shadow-lg: 0 12px 32px rgba(22, 33, 28, 0.14);
+
+  /* ---------- Motion ---------- */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 360ms;
+
+  /* ---------- Layout do shell ---------- */
+  --shell-sidebar-w: 248px;
+  --shell-topbar-h: 64px;
+  --shell-content-max-w: 1180px;
+}
+
+/* ---------- Cor: modo escuro ---------- */
+:root[data-theme='dark'] {
+  --color-bg: #14201b;
+  --color-bg-raised: #1b2b23;
+  --color-bg-sunken: #0f1814;
+
+  --color-ink: #eef2ee;
+  --color-ink-muted: #a7b3ac;
+  --color-ink-faint: #6d7972;
+
+  --color-line: #2a3a32;
+  --color-line-strong: #38493f;
+
+  --color-brand: #7fd1a8;
+  --color-brand-strong: #a3e4c1;
+  --color-brand-soft: #1e3a2c;
+
+  --color-accent: #e0b567;
+  --color-accent-strong: #f0cd8c;
+  --color-accent-soft: #35301e;
+
+  --color-positive: #6fc496;
+  --color-positive-soft: #1b3327;
+  --color-negative: #e08774;
+  --color-negative-soft: #3a2420;
+  --color-warning: #e0b567;
+  --color-warning-soft: #35301e;
+
+  --color-focus-ring: #7fd1a8;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* prefers-color-scheme só decide quando não há escolha explícita salva
+   (mesma convenção que useTheme.js já usa hoje via atributo no root). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --color-bg: #14201b;
+    --color-bg-raised: #1b2b23;
+    --color-bg-sunken: #0f1814;
+    --color-ink: #eef2ee;
+    --color-ink-muted: #a7b3ac;
+    --color-ink-faint: #6d7972;
+    --color-line: #2a3a32;
+    --color-line-strong: #38493f;
+    --color-brand: #7fd1a8;
+    --color-brand-strong: #a3e4c1;
+    --color-brand-soft: #1e3a2c;
+    --color-accent: #e0b567;
+    --color-accent-strong: #f0cd8c;
+    --color-accent-soft: #35301e;
+    --color-positive: #6fc496;
+    --color-positive-soft: #1b3327;
+    --color-negative: #e08774;
+    --color-negative-soft: #3a2420;
+    --color-warning: #e0b567;
+    --color-warning-soft: #35301e;
+    --color-focus-ring: #7fd1a8;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-base: 0ms;
+    --duration-slow: 0ms;
+  }
+}

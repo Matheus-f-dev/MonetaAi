@@ -1,0 +1,95 @@
+/* Base do redesign pós-login.
+   ============================================================
+   ATENÇÃO ao escopo: durante as fases 0-8 o app roda meio novo, meio
+   legado (landing e Login/Register seguem com o CSS antigo, que tem seu
+   próprio reset e suas próprias variáveis em system.css/_variables.css).
+   Um reset global aqui vazaria pra landing -- que está explicitamente
+   fora do escopo do redesign -- e quebraria produção no meio do caminho.
+
+   Por isso tudo que aplica ESTILO (não token) vive sob `.ds-scope`, a
+   classe que o shell novo e a página /design-system colocam na própria
+   raiz. Na Fase 9, quando o CSS legado sair, isso vira reset global de
+   verdade e a classe some. Os tokens (tokens.css) já podem ser globais:
+   são só custom properties com nomes novos (--color-*, --font-*, --space-*),
+   não colidem com as antigas (--bg, --card, --primary...).
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Karla:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap');
+
+.ds-scope,
+.ds-scope *,
+.ds-scope *::before,
+.ds-scope *::after {
+  box-sizing: border-box;
+}
+
+/* Os !important de font-family abaixo são necessidade, não preferência:
+   App.css:106 declara `* { font-family: inherit !important }` globalmente.
+   Como o `*` também casa com <html>, que não tem de quem herdar, tudo no
+   app resolve pro serif inicial do browser -- inclusive style inline.
+   Sem empatar com !important aqui, nenhuma fonte do design system aparece.
+   A landing bateu no mesmo muro e resolveu igual (ver home.css:53).
+   Some na Fase 9, junto com o App.css legado. */
+.ds-scope {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-body) !important;
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  min-height: 100%;
+}
+
+.ds-scope h1,
+.ds-scope h2,
+.ds-scope h3,
+.ds-scope h4 {
+  font-family: var(--font-display) !important;
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+  margin: 0;
+  color: var(--color-ink);
+}
+
+.ds-scope p {
+  margin: 0;
+}
+
+.ds-scope button,
+.ds-scope input,
+.ds-scope select,
+.ds-scope textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+.ds-scope button {
+  cursor: pointer;
+}
+
+.ds-scope a {
+  color: var(--color-brand);
+}
+
+/* Foco visível em qualquer elemento interativo -- remover o outline no
+   :focus cru sem repor em :focus-visible é a causa mais comum de
+   navegação por teclado ficar cega num app. */
+.ds-scope :focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.ds-scope img,
+.ds-scope svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* Algarismo tabular pra alinhar números em coluna (tabelas, KPIs) sem
+   precisar do componente MoneyFigure inteiro. */
+.ds-scope .tabular-nums {
+  font-variant-numeric: tabular-nums;
+}

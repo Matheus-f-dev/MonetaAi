@@ -27,15 +27,30 @@ import Agent from './presentation/pages/Agent';
 import AuthCallback from './presentation/pages/AuthCallback';
 import PrivacyPolicy from './presentation/pages/legal/PrivacyPolicy';
 import TermsOfService from './presentation/pages/legal/TermsOfService';
+// Catálogo do design system: a atribuição inteira fica atrás de
+// import.meta.env.DEV, que o Vite substitui por `false` no build --
+// aí o Rollup elimina o ramo morto e o import() dinâmico junto, e a
+// página não vai parar no bundle de produção. Guardar só o ponto de
+// render não bastava: o chunk continuava sendo gerado.
+const DesignSystemPage = import.meta.env.DEV
+  ? lazy(() => import('./design-system/pages/DesignSystemPage'))
+  : null;
 
 function AppRouter() {
   const location = useLocation();
   
   const renderComponent = () => {
     const currentPath = location.pathname;
-    
+
     if (currentPath === '/') return <LandingPage />;
-    
+
+    // Catálogo do design system do redesign (Fase 0) -- só existe em
+    // desenvolvimento; `import.meta.env.DEV` é estático, então o Vite
+    // remove a página inteira do bundle de produção no tree-shaking.
+    if (import.meta.env.DEV && currentPath === '/design-system') {
+      return <DesignSystemPage />;
+    }
+
     // Rotas diretas
     switch (currentPath) {
       case '/login': return <LoginCard />;

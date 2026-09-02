@@ -5,7 +5,11 @@ import { useLocation, useNavigate } from 'react-router-dom';
 // callback do Google (que é justamente quem CRIA a sessão).
 const PUBLIC_ROUTES = [
   '/', '/login', '/cadastro', '/esqueci-senha',
-  '/auth/callback', '/privacy-policy', '/terms-of-service'
+  '/auth/callback', '/privacy-policy', '/terms-of-service',
+  // Catálogo do design system (Fase 0 do redesign) -- só monta em dev
+  // (ver App.jsx). Público de propósito: é material de referência do
+  // time, não faz sentido exigir estar logado pra abrir.
+  ...(import.meta.env.DEV ? ['/design-system'] : [])
 ];
 
 // Existe um token no localStorage e ele ainda não expirou? Decodifica só o
