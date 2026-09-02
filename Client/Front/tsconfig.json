@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode (Vite/esbuild faz a transpilação de verdade — isto é
+       só para checagem de tipos e para o editor). */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* allowJs: o redesign está reconstruindo tela por tela em .tsx à
+       medida que cada fase avança (ver decisão técnica no resumo da
+       Fase 0) -- o .jsx antigo que ainda não foi tocado continua
+       compilando normalmente enquanto convive com o código novo. */
+    "allowJs": true,
+    "checkJs": false,
+
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src"]
+}
