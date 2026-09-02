@@ -1,9 +1,10 @@
 const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
 // Antes verificava um ID token do Firebase e não estava plugado em rota
 // nenhuma — toda a API confiava cegamente no :userId da URL. Agora verifica
 // o JWT próprio (emitido em AuthService) e É aplicado nas rotas protegidas.
-const authenticateToken = (req, res, next) => {
+const authenticateToken = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(' ')[1];
 
@@ -18,7 +19,7 @@ const authenticateToken = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, secret); // { uid, email, iat, exp }
+    const decoded = jwt.verify(token, secret); // { uid, email, tv, iat, exp }
 
     // Token intermediário do fluxo de 2FA (emitido em
     // AuthService.issueTotpPendingToken) -- prova só que a senha foi
@@ -27,6 +28,21 @@ const authenticateToken = (req, res, next) => {
     // válido) passaria batido aqui e o 2FA inteiro seria pulável.
     if (decoded.pendingTotp) {
       return res.status(403).json({ success: false, message: 'Complete a verificação em duas etapas antes de continuar.' });
+    }
+
+    // Achado #11: revogação sem blacklist -- compara a versão embutida no
+    // token (no momento em que ele foi emitido) com a versão atual do
+    // usuário no banco. Troca de senha e exclusão de conta incrementam essa
+    // versão (User.bumpTokenVersion), o que invalida instantaneamente
+    // qualquer token emitido antes disso, mesmo que ainda não tenha
+    // expirado. Token antigo sem o claim `tv` (emitido antes desta
+    // mudança) é tratado como versão 0 -- mesmo valor default da coluna,
+    // então sessões já abertas continuam válidas até o próximo evento que
+    // incrementa a versão.
+    const tokenVersion = decoded.tv ?? 0;
+    const currentVersion = await User.getTokenVersion(decoded.uid);
+    if (currentVersion === null || tokenVersion !== currentVersion) {
+      return res.status(403).json({ success: false, message: 'Sessão inválida. Faça login novamente.' });
     }
 
     req.user = decoded;

@@ -4,6 +4,8 @@ const crypto = require('crypto');
 const speakeasy = require('speakeasy');
 const { db } = require('../config/database');
 const User = require('../models/User');
+const AuditLogService = require('./AuditLogService');
+const CryptoService = require('./CryptoService');
 
 const SALT_ROUNDS = 10;
 const TOKEN_EXPIRY = '24h';
@@ -19,8 +21,10 @@ function requireJwtSecret() {
   return secret;
 }
 
+// `tv` (token_version) embutido aqui é o que permite revogar sessões sem
+// blacklist -- ver User.bumpTokenVersion e a checagem em middleware/auth.js.
 function issueToken(user) {
-  return jwt.sign({ uid: user.id, email: user.email }, requireJwtSecret(), { expiresIn: TOKEN_EXPIRY });
+  return jwt.sign({ uid: user.id, email: user.email, tv: user.tokenVersion }, requireJwtSecret(), { expiresIn: TOKEN_EXPIRY });
 }
 
 // Token de curtíssima duração pra segurar o "meio do login" quando 2FA está
@@ -232,7 +236,80 @@ class AuthService {
 
     const senhaHash = await bcrypt.hash(novaSenha, SALT_ROUNDS);
     await User.updateSenha(registro.user_id, senhaHash);
+    // Achado #11: uma sessão aberta antes da troca de senha não deveria
+    // continuar valendo depois -- essa é justamente a situação que motivou
+    // token_version existir.
+    await User.bumpTokenVersion(registro.user_id);
     await db('password_resets').where({ id: registro.id }).update({ usado_em: db.fn.now() });
+  }
+
+  // ── Exclusão de conta (LGPD, achado #14 da auditoria) ──
+  //
+  // Anonimiza em vez de apagar a linha de verdade: `transactions`,
+  // `accounts`, `cards`, `audit_logs` etc. têm FK pra `users.id` -- um
+  // DELETE de verdade ou quebra (RESTRICT) ou arrasta o histórico
+  // financeiro inteiro junto (CASCADE), incluindo os próprios audit_logs
+  // que existem justamente pra reconstituir o que aconteceu numa conta.
+  // Escrubar os campos de identificação e desativar login mantém a conta
+  // funcionalmente "apagada" (ninguém loga nela de novo, nenhum dado
+  // pessoal identificável sobra) sem quebrar a integridade referencial do
+  // resto do sistema. Consistente com a Cláusula Oitava dos Termos de Uso
+  // ("Exclusão da conta e dos arquivos").
+  static async deleteAccount(userId, senha) {
+    const user = await User.findById(userId);
+    if (!user) {
+      const err = new Error('Usuário não encontrado.');
+      err.code = 'USER_NOT_FOUND';
+      throw err;
+    }
+
+    const senhaHash = await User.getSenhaHash(userId);
+    if (senhaHash) {
+      // Confirmação de posse de verdade -- só ter um JWT válido não deveria
+      // bastar pra uma ação irreversível (mesmo raciocínio do disableTotp).
+      // Contas só-Google (sem senha) pulam essa checagem -- não tem com o
+      // que comparar, e o próprio login OAuth já provou a identidade.
+      if (!senha) {
+        const err = new Error('Confirme sua senha para excluir a conta.');
+        err.code = 'PASSWORD_REQUIRED';
+        throw err;
+      }
+      const senhaCorreta = await bcrypt.compare(senha, senhaHash);
+      if (!senhaCorreta) {
+        const err = new Error('Senha incorreta.');
+        err.code = 'INVALID_PASSWORD';
+        throw err;
+      }
+    }
+
+    const emailAnonimizado = `deleted-${userId}-${Date.now()}@removed.moneta`;
+
+    await db.transaction(async (trx) => {
+      await trx('users').where({ id: userId }).update({
+        nome: 'Usuário removido',
+        email: emailAnonimizado,
+        senha_hash: null,
+        google_id: null,
+        salario: CryptoService.encrypt('0'), // coluna é cifrada -- gravar em texto puro aqui quebraria a leitura depois (CryptoService.decrypt rejeita formato inválido)
+        totp_secret: null,
+        totp_ativo: false,
+        atualizado_em: trx.fn.now()
+      });
+      // Invalida qualquer token emitido antes da exclusão (achado #11) --
+      // sem isso, um JWT já em posse de alguém continuaria "funcionando"
+      // (embora contra uma conta já anonimizada) até expirar sozinho.
+      await User.bumpTokenVersion(userId, trx);
+
+      // Sem dadosAntigos/dadosNovos de propósito -- registrar os dados
+      // pessoais aqui derrotaria o próprio propósito da exclusão. O que
+      // importa pro histórico é O QUE aconteceu e QUANDO, não o conteúdo.
+      await AuditLogService.registrar(trx, {
+        userId,
+        tabela: 'users',
+        registroId: userId,
+        acao: 'exclusao_conta'
+      });
+    });
   }
 }
 

@@ -18,13 +18,51 @@ export const useAuth = () => {
       });
       
       const data = await response.json();
-      
-      if (data.success) {
+
+      // `success:true` também cobre a resposta intermediária do 2FA
+      // (`requiresTotp:true`, sem `token`/`user` -- só um `tempToken` de
+      // troca) -- gravar aqui sem checar isso guardava a string literal
+      // "undefined" no localStorage (achado testando o login de verdade
+      // com um usuário com 2FA ativo) e fazia a navegação pro /system
+      // falhar silenciosamente. Só é login completo de fato quando o
+      // backend manda token + user.
+      if (data.success && data.token && data.user) {
         localStorage.setItem('user', JSON.stringify(data.user));
         localStorage.setItem('token', data.token);
       }
-      
+
       setMessage(data.message || (data.success ? 'Login realizado com sucesso!' : 'Erro no login'));
+      return data;
+    } catch (error) {
+      const errorMsg = 'Erro ao conectar com o servidor.';
+      setMessage(errorMsg);
+      return { success: false, message: errorMsg };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Segunda etapa do login quando a conta tem 2FA ativo -- completa o que
+  // login() deixou pendente (requiresTotp/tempToken).
+  const completeTotpLogin = async (tempToken, code) => {
+    setLoading(true);
+    setMessage('');
+
+    try {
+      const response = await fetch(`${API_URL}/api/login/totp`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tempToken, code })
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.token && data.user) {
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('token', data.token);
+      }
+
+      setMessage(data.message || (data.success ? 'Login realizado com sucesso!' : 'Código inválido'));
       return data;
     } catch (error) {
       const errorMsg = 'Erro ao conectar com o servidor.';
@@ -111,6 +149,7 @@ export const useAuth = () => {
     loading,
     message,
     login,
+    completeTotpLogin,
     register,
     resetPassword,
     verifyEmail,

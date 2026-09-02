@@ -1,13 +1,25 @@
 const { db } = require('../config/database');
+const CryptoService = require('../services/CryptoService');
+
+// Decifra o salário lido do banco -- centralizado aqui pra ser o único
+// lugar do model que sabe que a coluna é cifrada (achado #3: dado pessoal
+// sensível, cifrado em repouso desde a migration encrypt_users_salario).
+// `salario` pode ser null (registro anonimizado por deleteAccount, ou
+// nunca preenchido) -- não tenta decifrar nesse caso.
+function decryptSalario(row) {
+  if (row.salario === null || row.salario === undefined) return 0;
+  return Number(CryptoService.decrypt(row.salario));
+}
 
 class User {
   constructor(data) {
     this.id = data.id;
     this.nome = data.nome;
     this.email = data.email;
-    this.salario = data.salario;
+    this.salario = decryptSalario(data);
     this.perfilCompleto = Boolean(data.perfil_completo);
     this.totpAtivo = Boolean(data.totp_ativo);
+    this.tokenVersion = data.token_version;
     this.criadoEm = data.criado_em;
   }
 
@@ -31,8 +43,8 @@ class User {
       email,
       senha_hash: senhaHash,
       google_id: googleId,
-      salario,
-      perfil_completo: salario > 0
+      salario: CryptoService.encrypt(String(salario)),
+      perfil_completo: salario > 0 // calculado antes de cifrar -- comparação numérica não funciona no texto cifrado
     }).returning('id');
     return User.findById(id);
   }
@@ -69,8 +81,26 @@ class User {
   }
 
   static async update(id, fields) {
-    await db('users').where({ id }).update({ ...fields, atualizado_em: db.fn.now() });
+    // Se algum chamador futuro atualizar salario por aqui, cifra antes de
+    // gravar -- ninguém fora deste model deveria saber que a coluna é cifrada.
+    const dadosParaGravar = { ...fields };
+    if ('salario' in dadosParaGravar) {
+      dadosParaGravar.salario = CryptoService.encrypt(String(dadosParaGravar.salario));
+    }
+    await db('users').where({ id }).update({ ...dadosParaGravar, atualizado_em: db.fn.now() });
     return User.findById(id);
+  }
+
+  // Só uso interno (middleware/auth.js) -- consulta enxuta, sem decifrar
+  // salario à toa em todo request autenticado só pra comparar um inteiro.
+  static async getTokenVersion(id) {
+    const row = await db('users').where({ id }).first('token_version');
+    return row ? row.token_version : null;
+  }
+
+  static async bumpTokenVersion(id, trx = null) {
+    const conexao = trx || db;
+    await conexao('users').where({ id }).increment('token_version', 1);
   }
 }
 

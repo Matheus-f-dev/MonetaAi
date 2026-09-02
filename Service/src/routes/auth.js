@@ -1,6 +1,7 @@
 const express = require('express');
 const passport = require('passport');
 const AuthService = require('../services/AuthService');
+const OAuthExchangeService = require('../services/OAuthExchangeService');
 const router = express.Router();
 
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
@@ -23,7 +24,18 @@ router.get('/google/callback',
         nome: req.user.nome
       };
 
-      res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/system?token=${token}&user=${encodeURIComponent(JSON.stringify(userData))}`);
+      // Achado #12: token de sessão não vai mais na URL (fica em log de
+      // acesso/histórico do navegador) -- em vez disso, um código opaco de
+      // uso único (60s de validade) que o AuthCallback.jsx troca por
+      // token+user via POST em /api/auth/exchange. Ver OAuthExchangeService
+      // pro trade-off assumido (código em memória, não sobrevive a múltiplas
+      // instâncias do Node).
+      //
+      // Continua indo pro /auth/callback (rota pública, não exige sessão
+      // ainda), não direto pro /system -- é o AuthCallback.jsx que sabe
+      // completar a troca antes de navegar pro dashboard.
+      const exchangeCode = OAuthExchangeService.issueCode({ token, user: userData });
+      res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth/callback?code=${exchangeCode}`);
     } catch (error) {
       console.error('Erro no callback do Google:', error);
       res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/login?error=auth_failed`);

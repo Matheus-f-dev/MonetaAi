@@ -5,7 +5,6 @@ import './presentation/styles/pages/profile.css';
 import './presentation/styles/pages/system-hovers.css';
 import { useTheme } from './presentation/hooks/useTheme';
 import { ProtectedRoute } from './presentation/components/ProtectedRoute';
-import { decryptRoute } from './shared/urlCrypto';
 import { ToastContainer } from './presentation/components/system/ToastContainer';
 // Lazy: mantém a landing fora do bundle de quem só vai fazer login e usar o painel.
 const LandingPage = lazy(() => import('./presentation/pages/Home'));
@@ -60,33 +59,6 @@ function AppRouter() {
       case '/terms-of-service': return <TermsOfService />;
     }
 
-    if (currentPath.startsWith('/app/')) {
-      const decryptedRoute = decryptRoute(currentPath);
-      
-      switch (decryptedRoute) {
-        case '/login': return <LoginCard />;
-        case '/cadastro': return <Cadastro />;
-        case '/esqueci-senha': return <RedefinirSenha />;
-        case '/system': return <System />;
-        case '/expenses': return <Expenses />;
-        case '/incomes': return <Incomes />;
-        case '/cartoes': return <Cards />;
-        case '/gastos-fixos': return <FixedExpenses />;
-        case '/pessoas': return <People />;
-        case '/contas': return <Contas />;
-        case '/profile': return <Profile />;
-        case '/alerts': return <Alerts />;
-        case '/reports': return <Reports />;
-        case '/analytics': return <Analytics />;
-        case '/impacto-financeiro': return <ImpactoFinanceiro />;
-        case '/agent': return <Agent />;
-        case '/auth/callback': return <AuthCallback />;
-        case '/privacy-policy': return <PrivacyPolicy />;
-        case '/terms-of-service': return <TermsOfService />;
-        default: return <LandingPage />;
-      }
-    }
-    
     return <LandingPage />;
   };
   

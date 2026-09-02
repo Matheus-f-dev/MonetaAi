@@ -1,4 +1,5 @@
 const AuthService = require('../services/AuthService');
+const OAuthExchangeService = require('../services/OAuthExchangeService');
 
 class AuthController {
   static async register(req, res) {
@@ -185,6 +186,49 @@ class AuthController {
     } catch (err) {
       res.status(400).json({ success: false, message: err.message || 'Não foi possível redefinir a senha.' });
     }
+  }
+
+  // Exclusão de conta (LGPD/direito ao esquecimento) -- ver AuthService
+  // .deleteAccount para a justificativa de anonimizar em vez de apagar a
+  // linha. `req.params.userId` já foi conferido contra `req.user.uid` pelo
+  // middleware ensureOwnUser antes de chegar aqui.
+  static async deleteAccount(req, res) {
+    try {
+      const { userId } = req.params;
+      const { senha } = req.body;
+
+      await AuthService.deleteAccount(userId, senha);
+
+      res.json({ success: true, message: 'Conta excluída com sucesso.' });
+
+    } catch (err) {
+      const mensagens = {
+        USER_NOT_FOUND: 'Usuário não encontrado.',
+        PASSWORD_REQUIRED: err.message,
+        INVALID_PASSWORD: 'Senha incorreta.'
+      };
+      const status = err.code === 'USER_NOT_FOUND' ? 404 : 400;
+      if (!mensagens[err.code]) {
+        console.error('[AuthController.deleteAccount]', err.message);
+      }
+      res.status(status).json({ success: false, message: mensagens[err.code] || 'Erro ao excluir conta.' });
+    }
+  }
+
+  // Troca o código de uso único do callback do Google (ver
+  // OAuthExchangeService) por token+user de verdade -- fora da URL/logs.
+  static async exchangeOAuthCode(req, res) {
+    const { code } = req.body;
+    if (!code) {
+      return res.status(400).json({ success: false, message: 'code é obrigatório.' });
+    }
+
+    const payload = OAuthExchangeService.consumeCode(code);
+    if (!payload) {
+      return res.status(400).json({ success: false, message: 'Código de login inválido ou expirado.' });
+    }
+
+    res.json({ success: true, token: payload.token, user: payload.user });
   }
 
   // Segunda etapa do login quando a conta tem 2FA ativo -- recebe o
