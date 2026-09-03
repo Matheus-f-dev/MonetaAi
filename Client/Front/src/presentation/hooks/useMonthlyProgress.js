@@ -10,7 +10,12 @@ export function useMonthlyProgress(transactions, salary) {
     const monthlyExpenses = transactions
       .filter(transaction => {
         if (transaction.tipo?.toLowerCase() !== 'despesa') return false;
-        
+        // Perna de saída de uma transferência entre contas próprias não é
+        // gasto de verdade -- sem isso, transferir pra poupança inflava o
+        // "quanto do salário já foi gasto" (achado testando a Fase 4, ao
+        // usar a transferência entre contas de Contas).
+        if (transaction.isTransferencia) return false;
+
         const dateField = transaction.dataHora || transaction.data || transaction.criadoEm;
         if (!dateField) return false;
         
