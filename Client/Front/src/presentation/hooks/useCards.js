@@ -3,6 +3,7 @@ import { getAuthHeaders } from '../../shared/authHeaders';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
+/** @param {string | null} [userId] */
 export const useCards = (userId = null) => {
   const [loading, setLoading] = useState(false);
   const [cards, setCards] = useState([]);

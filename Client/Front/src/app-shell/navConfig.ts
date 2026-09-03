@@ -24,7 +24,9 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { label: 'Gastos', path: '/expenses' },
       { label: 'Receitas', path: '/incomes' },
-      { label: 'Gastos fixos', path: '/gastos-fixos' }
+      { label: 'Gastos fixos', path: '/gastos-fixos' },
+      { label: 'Receita recorrente', path: '/receita-recorrente' },
+      { label: 'Importar extrato', path: '/importar-extrato' }
     ]
   },
   {

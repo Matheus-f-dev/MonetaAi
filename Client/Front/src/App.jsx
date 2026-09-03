@@ -11,10 +11,7 @@ const LandingPage = lazy(() => import('./presentation/pages/Home'));
 import LoginCard from './presentation/pages/Login';
 import Cadastro from './presentation/pages/Register';
 import RedefinirSenha from './presentation/pages/ChangePassword';
-import Expenses from './presentation/pages/Expenses';
-import Incomes from './presentation/pages/Incomes';
 import Cards from './presentation/pages/Cards';
-import FixedExpenses from './presentation/pages/FixedExpenses';
 import People from './presentation/pages/People';
 import Contas from './presentation/pages/Contas';
 import Profile from './presentation/pages/Profile';
@@ -28,6 +25,11 @@ import PrivacyPolicy from './presentation/pages/legal/PrivacyPolicy';
 import TermsOfService from './presentation/pages/legal/TermsOfService';
 import { AppShell } from './app-shell/AppShell';
 const DashboardPage = lazy(() => import('./features/dashboard/DashboardPage'));
+const ExpensesPage = lazy(() => import('./features/movements/ExpensesPage'));
+const IncomesPage = lazy(() => import('./features/movements/IncomesPage'));
+const FixedExpensesPage = lazy(() => import('./features/movements/FixedExpensesPage'));
+const FixedIncomesPage = lazy(() => import('./features/movements/FixedIncomesPage'));
+const ImportStatementPage = lazy(() => import('./features/movements/ImportStatementPage'));
 
 // Catálogo do design system: a atribuição inteira fica atrás de
 // import.meta.env.DEV, que o Vite substitui por `false` no build --
@@ -73,13 +75,11 @@ function App() {
 
               2) Páginas já na identidade nova -- filhas do <AppShell/>
                  (sidebar/topbar novos, tema, os 7 grupos de navegação
-                 da Fase 0). Fase 2 traz o dashboard (/system) como
-                 primeira página de produto de verdade. */}
+                 da Fase 0). Fase 2 trouxe o dashboard; Fase 3 traz
+                 Movimentações inteira (Gastos, Receitas, Gastos Fixos,
+                 Receita Recorrente, Importar Extrato). */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/expenses" element={<Expenses />} />
-            <Route path="/incomes" element={<Incomes />} />
             <Route path="/cartoes" element={<Cards />} />
-            <Route path="/gastos-fixos" element={<FixedExpenses />} />
             <Route path="/pessoas" element={<People />} />
             <Route path="/contas" element={<Contas />} />
             <Route path="/profile" element={<Profile />} />
@@ -91,6 +91,11 @@ function App() {
 
             <Route element={<AppShell />}>
               <Route path="/system" element={<DashboardPage />} />
+              <Route path="/expenses" element={<ExpensesPage />} />
+              <Route path="/incomes" element={<IncomesPage />} />
+              <Route path="/gastos-fixos" element={<FixedExpensesPage />} />
+              <Route path="/receita-recorrente" element={<FixedIncomesPage />} />
+              <Route path="/importar-extrato" element={<ImportStatementPage />} />
               {import.meta.env.DEV && <Route path="/design-system" element={<DesignSystemPage />} />}
             </Route>
           </Route>

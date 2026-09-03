@@ -1,0 +1,113 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.typeToggle {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.typeButton {
+  flex: 1;
+  padding: 0.625rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-line-strong);
+  background: var(--color-bg-raised);
+  color: var(--color-ink-muted);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+}
+
+.typeButtonActiveIncome {
+  background: var(--color-positive-soft);
+  border-color: var(--color-positive);
+  color: var(--color-positive);
+}
+
+.typeButtonActiveExpense {
+  background: var(--color-negative-soft);
+  border-color: var(--color-negative);
+  color: var(--color-negative);
+}
+
+.splitToggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+}
+
+.splitBox {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--color-bg-sunken);
+  border-radius: var(--radius-md);
+}
+
+.splitRow {
+  display: grid;
+  grid-template-columns: 1fr 100px auto;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.splitInput {
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-raised);
+  font-size: var(--text-sm);
+}
+
+.splitRemove {
+  background: none;
+  border: none;
+  color: var(--color-ink-faint);
+  font-size: 1.1rem;
+  padding: var(--space-1);
+}
+
+.splitRemove:hover {
+  color: var(--color-negative);
+}
+
+.splitActions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.linkButton {
+  background: none;
+  border: none;
+  color: var(--color-brand);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  padding: 0;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+/* Mesmo breakpoint usado em RecurringItemsPage -- achado testando a Fase 3
+   em viewport mobile: Valor e Data lado a lado (1fr 1fr) espremiam o
+   <input type="date"> nativo, cortando o texto do valor selecionado. */
+@media (max-width: 700px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+}
