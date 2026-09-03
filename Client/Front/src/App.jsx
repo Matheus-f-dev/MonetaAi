@@ -11,9 +11,7 @@ const LandingPage = lazy(() => import('./presentation/pages/Home'));
 import LoginCard from './presentation/pages/Login';
 import Cadastro from './presentation/pages/Register';
 import RedefinirSenha from './presentation/pages/ChangePassword';
-import Cards from './presentation/pages/Cards';
 import People from './presentation/pages/People';
-import Contas from './presentation/pages/Contas';
 import Profile from './presentation/pages/Profile';
 import Alerts from './presentation/pages/Alerts';
 import Reports from './presentation/pages/Reports';
@@ -30,6 +28,10 @@ const IncomesPage = lazy(() => import('./features/movements/IncomesPage'));
 const FixedExpensesPage = lazy(() => import('./features/movements/FixedExpensesPage'));
 const FixedIncomesPage = lazy(() => import('./features/movements/FixedIncomesPage'));
 const ImportStatementPage = lazy(() => import('./features/movements/ImportStatementPage'));
+const ContasPage = lazy(() => import('./features/wealth/ContasPage'));
+const CartoesPage = lazy(() => import('./features/wealth/CartoesPage'));
+const OrcamentoPage = lazy(() => import('./features/wealth/OrcamentoPage'));
+const MetasPage = lazy(() => import('./features/wealth/MetasPage'));
 
 // Catálogo do design system: a atribuição inteira fica atrás de
 // import.meta.env.DEV, que o Vite substitui por `false` no build --
@@ -75,13 +77,14 @@ function App() {
 
               2) Páginas já na identidade nova -- filhas do <AppShell/>
                  (sidebar/topbar novos, tema, os 7 grupos de navegação
-                 da Fase 0). Fase 2 trouxe o dashboard; Fase 3 traz
+                 da Fase 0). Fase 2 trouxe o dashboard; Fase 3 trouxe
                  Movimentações inteira (Gastos, Receitas, Gastos Fixos,
-                 Receita Recorrente, Importar Extrato). */}
+                 Receita Recorrente, Importar Extrato); Fase 4 traz
+                 Patrimônio (Contas, Cartões, Orçamento, Metas) --
+                 Contas e Cartões migram da camada 1 pra esta, Orçamento
+                 e Metas são telas novas (backend já existia, sem UI). */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/cartoes" element={<Cards />} />
             <Route path="/pessoas" element={<People />} />
-            <Route path="/contas" element={<Contas />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/alerts" element={<Alerts />} />
             <Route path="/reports" element={<Reports />} />
@@ -96,6 +99,10 @@ function App() {
               <Route path="/gastos-fixos" element={<FixedExpensesPage />} />
               <Route path="/receita-recorrente" element={<FixedIncomesPage />} />
               <Route path="/importar-extrato" element={<ImportStatementPage />} />
+              <Route path="/contas" element={<ContasPage />} />
+              <Route path="/cartoes" element={<CartoesPage />} />
+              <Route path="/orcamento" element={<OrcamentoPage />} />
+              <Route path="/metas" element={<MetasPage />} />
               {import.meta.env.DEV && <Route path="/design-system" element={<DesignSystemPage />} />}
             </Route>
           </Route>

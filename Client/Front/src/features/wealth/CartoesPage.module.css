@@ -1,0 +1,184 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: var(--shell-content-max-w);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: var(--text-xl);
+}
+
+.subtitle {
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+  margin-top: var(--space-1);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--space-4);
+}
+
+/* Cor de fundo do próprio cartão, não do resto da tela -- mesma paleta que
+   a tela antiga usava, texto sempre branco por cima (contraste garantido
+   nos dois temas, já que o fundo aqui não segue os tokens do tema). */
+.tile {
+  color: #fff;
+}
+
+.tile-roxo {
+  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+}
+
+.tile-azul {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+
+.tile-verde {
+  background: linear-gradient(135deg, #10b981, #047857);
+}
+
+.tile-grafite {
+  background: linear-gradient(135deg, #475569, #1e293b);
+}
+
+.tileTop {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-xs);
+  opacity: 0.85;
+}
+
+.tileInst {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tileFinal {
+  font-family: var(--font-mono);
+}
+
+.tileName {
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-md);
+  margin: var(--space-2) 0 var(--space-3);
+}
+
+.tileInvoice {
+  font-size: var(--text-sm);
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
+}
+
+.tileBottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--text-xs);
+  opacity: 0.85;
+  margin-top: var(--space-3);
+  gap: var(--space-2);
+}
+
+.tileBar {
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.25);
+  overflow: hidden;
+  margin-top: var(--space-2);
+}
+
+.tileBarFill {
+  height: 100%;
+  background: #fff;
+}
+
+.tileBarFillOver {
+  background: var(--color-negative);
+}
+
+.tileActions {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.tileActions :global(button) {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.colorLabel {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  display: block;
+  margin-bottom: var(--space-2);
+}
+
+.colorPicker {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  border: 2px solid transparent;
+}
+
+.swatch-roxo {
+  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+}
+
+.swatch-azul {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+
+.swatch-verde {
+  background: linear-gradient(135deg, #10b981, #047857);
+}
+
+.swatch-grafite {
+  background: linear-gradient(135deg, #475569, #1e293b);
+}
+
+.swatchActive {
+  border-color: var(--color-ink);
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+@media (max-width: 700px) {
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+}
