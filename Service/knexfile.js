@@ -14,7 +14,13 @@ const base = {
     // Postgres já fala UTF-8 nativamente na conexão (client_encoding padrão
     // é UTF8) — nenhum charset extra precisa ser forçado como precisava no
     // mysql2.
-    ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false
+    // rejectUnauthorized:false aceitaria qualquer certificado (inclusive um
+    // forjado por um MITM) — só desliga a validação se DB_SSL_INSECURE=true
+    // for setado explicitamente (ex.: certificado autoassinado sem CA
+    // conhecida), nunca por padrão.
+    ssl: process.env.DB_SSL === 'true'
+      ? { rejectUnauthorized: process.env.DB_SSL_INSECURE !== 'true' }
+      : false
   },
   migrations: {
     directory: './src/db/migrations',

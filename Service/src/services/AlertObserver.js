@@ -1,4 +1,6 @@
 const { db } = require('../config/database');
+const EmailService = require('./EmailService');
+const { totalGastoNoMes } = require('./CategorySpendingService');
 
 class AlertObserver {
   async update(transaction) {
@@ -12,23 +14,10 @@ class AlertObserver {
       const alerts = await db('alerts').where({ user_id: userId, categoria, ativo: true });
       if (alerts.length === 0) return;
 
-      // Calcular total de gastos da categoria no mês atual. Antes isso
-      // consultava uma coleção `transacoes` que nunca era escrita em lugar
-      // nenhum (todo o resto do app usa `historico`/`transactions`) — esse
-      // cálculo estava silenciosamente sempre zerado. Corrigido pra
-      // consultar a tabela certa.
-      const now = new Date();
-      const currentMonth = now.getMonth() + 1;
-      const currentYear = now.getFullYear();
-
-      const transacoesDoMes = await db('transactions')
-        .where({ user_id: userId, categoria, tipo: 'despesa' })
-        .whereRaw(
-          "EXTRACT(MONTH FROM TO_DATE(SPLIT_PART(data_hora, ',', 1), 'DD/MM/YYYY')) = ? AND EXTRACT(YEAR FROM TO_DATE(SPLIT_PART(data_hora, ',', 1), 'DD/MM/YYYY')) = ?",
-          [currentMonth, currentYear]
-        );
-
-      const totalGastos = transacoesDoMes.reduce((sum, t) => sum + Math.abs(parseFloat(t.valor) || 0), 0);
+      // Total de gastos da categoria no mês atual -- extraído pra
+      // CategorySpendingService (era duplicado aqui e ia ser duplicado de
+      // novo em BudgetController; agora as duas pontas usam a mesma query).
+      const totalGastos = await totalGastoNoMes(userId, categoria);
 
       alerts.forEach((alert) => {
         const limite = parseFloat(alert.valor);
@@ -69,6 +58,19 @@ class AlertObserver {
     });
 
     console.log(`🚨 ALERTA DISPARADO: ${alert.nome} - ${alert.categoria} ${alert.condicao} R$ ${alert.valor}. Total atual: R$ ${totalGastos}`);
+
+    // Envio de e-mail é best-effort: o alerta já foi gravado em
+    // `notifications` de qualquer forma (linha acima), então uma falha aqui
+    // (SMTP fora do ar, credencial errada etc.) nunca pode derrubar o fluxo
+    // que criou a transação que disparou o alerta.
+    try {
+      const user = await db('users').where({ id: userId }).first('email');
+      if (user?.email) {
+        await new EmailService().enviarAlertaDisparado(user.email, { ...alert, totalGasto: totalGastos });
+      }
+    } catch (error) {
+      console.error('Erro ao enviar e-mail de alerta (não bloqueia o fluxo):', error.message);
+    }
   }
 }
 

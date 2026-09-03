@@ -8,16 +8,15 @@ const corsOptions = {
     const allowedOrigins = [
       'http://localhost:3000',
       'http://localhost:5173',
-      'https://www.monetaai.site',
-      'https://monetaai.site',
-      'https://monetaai-frontend-2pemd90yq-matheus-projects-9993ec57.vercel.app'
+      'https://monetaai.joaopaseixas.com.br',
+      'https://www.monetaai.joaopaseixas.com.br'
     ];
     
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       console.log('CORS blocked origin:', origin);
-      callback(null, true); // Temporariamente permitir todos
+      callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,

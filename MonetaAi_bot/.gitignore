@@ -52,5 +52,11 @@ serviceAccountKey.json
 *.pem
 *.key
 
+# Build artifacts de deploy (Lambda) — um serviceAccountKey.json local pode
+# acabar dentro de um zip de build; bloquear o zip solto não protege
+# arquivos já embutidos DENTRO dele, então nunca gere/comite um zip a
+# partir de uma pasta que tenha o serviceAccountKey.json real presente.
+*.zip
+
 # AWS
 .aws/

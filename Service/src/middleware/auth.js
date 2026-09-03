@@ -18,7 +18,18 @@ const authenticateToken = (req, res, next) => {
   }
 
   try {
-    req.user = jwt.verify(token, secret); // { uid, email, iat, exp }
+    const decoded = jwt.verify(token, secret); // { uid, email, iat, exp }
+
+    // Token intermediário do fluxo de 2FA (emitido em
+    // AuthService.issueTotpPendingToken) -- prova só que a senha foi
+    // conferida, nunca deve valer como sessão de verdade em nenhuma rota
+    // normal da API. Sem essa checagem, esse token (mesmo segredo, uid
+    // válido) passaria batido aqui e o 2FA inteiro seria pulável.
+    if (decoded.pendingTotp) {
+      return res.status(403).json({ success: false, message: 'Complete a verificação em duas etapas antes de continuar.' });
+    }
+
+    req.user = decoded;
     next();
   } catch (error) {
     return res.status(403).json({ success: false, message: 'Token inválido ou expirado' });

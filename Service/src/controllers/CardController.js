@@ -18,7 +18,10 @@ function toApiShape(row) {
 class CardController {
   static async create(req, res) {
     try {
-      const { userId, nome, instituicao, final, limite, diaFechamento, diaVencimento, cor } = req.body;
+      // userId sempre vem do token — nunca do body (senão dava pra criar
+      // cartão em nome de outro usuário).
+      const userId = req.user.uid;
+      const { nome, instituicao, final, limite, diaFechamento, diaVencimento, cor } = req.body;
 
       if (!userId || !nome) {
         return res.status(400).json({
@@ -70,7 +73,9 @@ class CardController {
   static async update(req, res) {
     try {
       const { cardId } = req.params;
-      const { userId, nome, instituicao, final, limite, diaFechamento, diaVencimento, cor } = req.body;
+      // userId vem do token — mesma razão do create() acima.
+      const userId = req.user.uid;
+      const { nome, instituicao, final, limite, diaFechamento, diaVencimento, cor } = req.body;
 
       if (!userId || !nome) {
         return res.status(400).json({ success: false, message: 'userId e nome do cartão são obrigatórios' });
@@ -97,10 +102,11 @@ class CardController {
   static async delete(req, res) {
     try {
       const { cardId } = req.params;
-      const { userId } = req.body;
+      // userId vem do token — mesma razão do create() acima.
+      const userId = req.user.uid;
 
-      if (!cardId || !userId) {
-        return res.status(400).json({ success: false, message: 'cardId e userId são obrigatórios' });
+      if (!cardId) {
+        return res.status(400).json({ success: false, message: 'cardId é obrigatório' });
       }
 
       // Soft delete: mantém o histórico de transações já vinculadas ao cartão íntegro

@@ -6,6 +6,7 @@ import io
 import time
 from typing import List, Dict, Any
 from tools_manager import tools_manager
+from debug_utils import debug_print
 
 class OpenAIClient:
     def __init__(self):
@@ -29,10 +30,10 @@ class OpenAIClient:
             # Volta um nível (services -> root)
             root_dir = os.path.dirname(script_dir)
             system_file_path = os.path.join(root_dir, file_name)
-            print(f"DEBUG: Carregando system prompt de: {system_file_path}")
+            debug_print(f"DEBUG: Carregando system prompt de: {system_file_path}")
             with open(system_file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
-                print(f"DEBUG: System prompt carregado. Tamanho: {len(content)}")
+                debug_print(f"DEBUG: System prompt carregado. Tamanho: {len(content)}")
                 return content
         except Exception as e:
             print(f"ERROR: Falha ao carregar system prompt: {e}")
@@ -41,7 +42,7 @@ class OpenAIClient:
 
     def make_request(self, messages: List[Dict[str, Any]]):
         try:
-            print(f"DEBUG: OpenAI request com {len(messages)} mensagens")
+            debug_print(f"DEBUG: OpenAI request com {len(messages)} mensagens")
             headers = {"Content-Type": "application/json", "Authorization": f"Bearer {self.api_key}"}
             payload = {
                 "model": self.model,
@@ -54,11 +55,11 @@ class OpenAIClient:
                 "frequency_penalty": 0,
                 "presence_penalty": 0
             }
-            print(f"DEBUG: OpenAI request body: {payload}")
+            debug_print(f"DEBUG: OpenAI request body: {payload}")
             resp = requests.post(self.api_url, headers=headers, json=payload)
-            print(f"DEBUG: OpenAI status {resp.status_code}")
+            debug_print(f"DEBUG: OpenAI status {resp.status_code}")
             data = resp.json()
-            print(f"DEBUG: OpenAI JSON: {data}")
+            debug_print(f"DEBUG: OpenAI JSON: {data}")
             resp.raise_for_status()
             return data
         except Exception as e:
@@ -77,7 +78,7 @@ class OpenAIClient:
           - TRANSCRIBE_POSTPROCESS (default 1 = ativa normalização leve)
         """
         try:
-            print(f"DEBUG: Iniciando transcrição de áudio. Modelo primário={self.transcribe_model}")
+            debug_print(f"DEBUG: Iniciando transcrição de áudio. Modelo primário={self.transcribe_model}")
             started = time.time()
             # Decode base64 audio
             audio_data = base64.b64decode(audio_base64)
@@ -105,9 +106,9 @@ class OpenAIClient:
                 }
                 if self.transcribe_prompt:
                     files['prompt'] = (None, self.transcribe_prompt)
-                print(f"DEBUG: Enviando {len(audio_data)} bytes para transcrição com modelo={model}")
+                debug_print(f"DEBUG: Enviando {len(audio_data)} bytes para transcrição com modelo={model}")
                 resp = requests.post(self.whisper_url, headers=headers, files=files, timeout=self.transcribe_timeout)
-                print(f"DEBUG: API STT status {resp.status_code} (model={model})")
+                debug_print(f"DEBUG: API STT status {resp.status_code} (model={model})")
                 data = {}
                 try:
                     data = resp.json()
@@ -131,10 +132,10 @@ class OpenAIClient:
 
             if (not transcription) and fallback_model:
                 try:
-                    print(f"DEBUG: Tentando fallback para {fallback_model}")
+                    debug_print(f"DEBUG: Tentando fallback para {fallback_model}")
                     transcription = _attempt(fallback_model)
                     if transcription:
-                        print(f"DEBUG: Fallback bem sucedido ({fallback_model})")
+                        debug_print(f"DEBUG: Fallback bem sucedido ({fallback_model})")
                 except Exception as e2:
                     print(f"ERROR: Falha também no fallback {fallback_model}: {e2}")
                     if error_primary:
@@ -155,7 +156,7 @@ class OpenAIClient:
                 transcription = t
 
             elapsed = time.time() - started
-            print(f"DEBUG: Transcrição concluída em {elapsed:.2f}s (modelo_final={'fallback:'+fallback_model if (fallback_model and error_primary) else primary_model}) -> '{transcription[:100]}{'...' if len(transcription) > 100 else ''}'")
+            debug_print(f"DEBUG: Transcrição concluída em {elapsed:.2f}s (modelo_final={'fallback:'+fallback_model if (fallback_model and error_primary) else primary_model}) -> '{transcription[:100]}{'...' if len(transcription) > 100 else ''}'")
             return transcription
 
         except Exception as e:

@@ -21,7 +21,10 @@ function toApiShape(row) {
 class FixedExpenseController {
   static async create(req, res) {
     try {
-      const { userId, nome, valor, categoria, diaVencimento, icone } = req.body;
+      // userId sempre vem do token — nunca do body (senão dava pra criar
+      // gasto fixo em nome de outro usuário).
+      const userId = req.user.uid;
+      const { nome, valor, categoria, diaVencimento, icone } = req.body;
 
       if (!userId || !nome || !valor || !diaVencimento) {
         return res.status(400).json({
@@ -97,7 +100,9 @@ class FixedExpenseController {
   static async update(req, res) {
     try {
       const { fixedExpenseId } = req.params;
-      const { userId, nome, valor, categoria, diaVencimento, icone } = req.body;
+      // userId vem do token — mesma razão do create() acima.
+      const userId = req.user.uid;
+      const { nome, valor, categoria, diaVencimento, icone } = req.body;
 
       if (!userId || !nome || !valor || !diaVencimento) {
         return res.status(400).json({ success: false, message: 'Campos obrigatórios ausentes' });
@@ -122,10 +127,11 @@ class FixedExpenseController {
   static async delete(req, res) {
     try {
       const { fixedExpenseId } = req.params;
-      const { userId } = req.body;
+      // userId vem do token — mesma razão do create() acima.
+      const userId = req.user.uid;
 
-      if (!fixedExpenseId || !userId) {
-        return res.status(400).json({ success: false, message: 'fixedExpenseId e userId são obrigatórios' });
+      if (!fixedExpenseId) {
+        return res.status(400).json({ success: false, message: 'fixedExpenseId é obrigatório' });
       }
 
       await db('fixed_expenses').where({ id: fixedExpenseId, user_id: userId }).update({
@@ -144,10 +150,11 @@ class FixedExpenseController {
   static async lancar(req, res) {
     try {
       const { fixedExpenseId } = req.params;
-      const { userId } = req.body;
+      // userId vem do token — mesma razão do create() acima.
+      const userId = req.user.uid;
 
-      if (!fixedExpenseId || !userId) {
-        return res.status(400).json({ success: false, message: 'fixedExpenseId e userId são obrigatórios' });
+      if (!fixedExpenseId) {
+        return res.status(400).json({ success: false, message: 'fixedExpenseId é obrigatório' });
       }
 
       const fixedExpense = await db('fixed_expenses').where({ id: fixedExpenseId, user_id: userId }).first();

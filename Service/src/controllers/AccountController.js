@@ -4,6 +4,7 @@ const Account = require('../models/Account');
 const TransactionFactory = require('../services/TransactionFactory');
 const CardController = require('./CardController');
 const FixedExpenseController = require('./FixedExpenseController');
+const AuditLogService = require('../services/AuditLogService');
 
 function nowDataHora() {
   const now = new Date();
@@ -71,7 +72,10 @@ class AccountController {
 
   static async create(req, res) {
     try {
-      const { userId, nome, tipo, saldoInicial, instituicao, cor } = req.body;
+      // userId sempre vem do token — nunca do body (senão dava pra criar
+      // conta em nome de outro usuário).
+      const userId = req.user.uid;
+      const { nome, tipo, saldoInicial, instituicao, cor } = req.body;
 
       if (!userId || !nome) {
         return res.status(400).json({ success: false, message: 'userId e nome da conta são obrigatórios' });
@@ -82,6 +86,10 @@ class AccountController {
 
       const [{ id }] = await db('accounts').insert({ user_id: userId, ...account.toPersistence() }).returning('id');
       const row = await db('accounts').where({ id }).first();
+
+      await AuditLogService.registrar(null, {
+        userId, tabela: 'accounts', registroId: id, acao: 'insert', dadosNovos: toApiShape(row)
+      });
 
       res.status(201).json({
         success: true,
@@ -112,16 +120,31 @@ class AccountController {
   static async update(req, res) {
     try {
       const { accountId } = req.params;
-      const { userId, nome, tipo, saldoInicial, instituicao, cor } = req.body;
+      // userId vem do token — mesma razão do create() acima.
+      const userId = req.user.uid;
+      const { nome, tipo, saldoInicial, instituicao, cor } = req.body;
 
       if (!userId || !nome) {
         return res.status(400).json({ success: false, message: 'userId e nome da conta são obrigatórios' });
       }
 
+      const antes = await db('accounts').where({ id: accountId, user_id: userId }).first();
+
       const account = new Account({ userId, nome, tipo, saldoInicial, instituicao, cor });
       await db('accounts').where({ id: accountId, user_id: userId }).update({
         ...account.toPersistence(),
         atualizado_em: db.fn.now()
+      });
+
+      const depois = await db('accounts').where({ id: accountId, user_id: userId }).first();
+
+      await AuditLogService.registrar(null, {
+        userId,
+        tabela: 'accounts',
+        registroId: accountId,
+        acao: 'update',
+        dadosAntigos: antes ? toApiShape(antes) : null,
+        dadosNovos: depois ? toApiShape(depois) : null
       });
 
       res.json({ success: true, message: 'Conta atualizada com sucesso' });
@@ -134,10 +157,14 @@ class AccountController {
   static async delete(req, res) {
     try {
       const { accountId } = req.params;
-      const { userId } = req.body;
+      // userId vem do token, não do body — e o próprio UPDATE abaixo agora
+      // exige user_id = userId, não só id = accountId (antes o WHERE real
+      // nem verificava dono nenhum: dava pra desativar a conta de qualquer
+      // pessoa só sabendo o id, sem nem precisar acertar o userId no body).
+      const userId = req.user.uid;
 
-      if (!accountId || !userId) {
-        return res.status(400).json({ success: false, message: 'accountId e userId são obrigatórios' });
+      if (!accountId) {
+        return res.status(400).json({ success: false, message: 'accountId é obrigatório' });
       }
 
       const accounts = await db('accounts').where({ user_id: userId, ativo: true });
@@ -148,8 +175,12 @@ class AccountController {
 
       const target = accounts.find((a) => a.id === Number(accountId));
 
+      if (!target) {
+        return res.status(404).json({ success: false, message: 'Conta não encontrada' });
+      }
+
       await db.transaction(async (trx) => {
-        await trx('accounts').where({ id: accountId }).update({ ativo: false, removido_em: trx.fn.now() });
+        await trx('accounts').where({ id: accountId, user_id: userId }).update({ ativo: false, removido_em: trx.fn.now() });
 
         // Se a conta removida era a principal, promove outra pra assumir o papel
         if (target?.principal) {
@@ -158,6 +189,12 @@ class AccountController {
             await trx('accounts').where({ id: promoted.id }).update({ principal: true });
           }
         }
+
+        // Log e mutação na mesma transação -- ou os dois são gravados
+        // juntos, ou nenhum é.
+        await AuditLogService.registrar(trx, {
+          userId, tabela: 'accounts', registroId: accountId, acao: 'delete', dadosAntigos: toApiShape(target)
+        });
       });
 
       res.json({ success: true, message: 'Conta removida com sucesso' });
@@ -246,6 +283,15 @@ class AccountController {
           descricao: descricao || '',
           from_transaction_id: fromTransactionId,
           to_transaction_id: toTransactionId
+        });
+
+        await AuditLogService.registrar(trx, {
+          userId, tabela: 'transactions', registroId: fromTransactionId, acao: 'insert',
+          dadosNovos: { tipo: 'despesa', valor: valorNum, accountId: fromAccountId, isTransferencia: true, transferId: key }
+        });
+        await AuditLogService.registrar(trx, {
+          userId, tabela: 'transactions', registroId: toTransactionId, acao: 'insert',
+          dadosNovos: { tipo: 'receita', valor: valorNum, accountId: toAccountId, isTransferencia: true, transferId: key }
         });
 
         return { alreadyProcessed: false };

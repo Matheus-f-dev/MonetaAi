@@ -26,14 +26,20 @@
     "dotenv": "^17.2.0",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
+    "express-rate-limit": "^8.6.2",
     "express-session": "^1.18.2",
-    "firebase-admin": "^13.4.0",
+    "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.2",
     "knex": "^3.3.0",
-    "nodemailer": "^7.0.5",
+    "multer": "^2.2.0",
+    "nodemailer": "^9.0.5",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
-    "pg": "^8.23.0"
+    "pdfkit": "^0.20.1",
+    "pg": "^8.23.0",
+    "qrcode": "^1.5.4",
+    "speakeasy": "^2.0.0",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

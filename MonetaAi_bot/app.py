@@ -5,6 +5,7 @@ import traceback
 from typing import Dict, Any
 from tools_manager import tools_manager
 from dynamodb_manager import DynamoDBManager
+from debug_utils import debug_print
 # Refatorado: utilizar serviços dedicados
 from services.openai_client import OpenAIClient
 from services.conversation_service import ConversationService
@@ -37,11 +38,11 @@ def load_system_prompt():
         script_dir = os.path.dirname(os.path.abspath(__file__))
         system_file_path = os.path.join(script_dir, 'system_prompt.txt')
         
-        print(f"DEBUG: Tentando carregar system prompt de: {system_file_path}")
+        debug_print(f"DEBUG: Tentando carregar system prompt de: {system_file_path}")
         
         with open(system_file_path, 'r', encoding='utf-8') as file:
             content = file.read()
-            print(f"DEBUG: System prompt carregado com sucesso. Tamanho: {len(content)} caracteres")
+            debug_print(f"DEBUG: System prompt carregado com sucesso. Tamanho: {len(content)} caracteres")
             return content
             
     except FileNotFoundError as e:
@@ -76,7 +77,7 @@ def lambda_handler(event, context):
       - Chamada direta (API Gateway) -> retorna JSON
     """
     try:
-        print(f"DEBUG: lambda_handler event keys: {list(event.keys())}")
+        debug_print(f"DEBUG: lambda_handler event keys: {list(event.keys())}")
 
         # Fluxo SNS
         if "Records" in event and isinstance(event["Records"], list) and event["Records"] and "Sns" in event["Records"][0]:
@@ -109,17 +110,19 @@ def lambda_handler(event, context):
 
         result = process_conversation(user_input, whatsapp_id)
         if 'error' in result:
-            return _response(500, {'error': result['error'], 'traceback': result.get('traceback', '')})
+            return _response(500, {'error': result['error']})
         return _response(200, {'response': result['response'], 'chat_history': result['chat_history']})
 
     except Exception as e:
+        # Traceback só no log do servidor (CloudWatch) -- nunca na resposta
+        # ao chamador, mesma razão do fix em conversation_service.py.
         print(f"ERROR: lambda_handler exception: {e}")
         print(traceback.format_exc())
-        return _response(500, {'error': str(e), 'traceback': traceback.format_exc()})
+        return _response(500, {'error': 'Erro interno ao processar a requisição.'})
 
 
 def _process_incoming_whatsapp_message(msg: IncomingWhatsAppMessage):
-    print(f"DEBUG: _process_incoming_whatsapp_message wa_id={msg.wa_id} text={msg.text} type={msg.message_type}")
+    debug_print(f"DEBUG: _process_incoming_whatsapp_message wa_id={msg.wa_id} text={msg.text} type={msg.message_type}")
     # Atualiza contexto de sessão com dados do WhatsApp (inclui phone_number_id)
     try:
         session_context.update_from_incoming(msg)
@@ -128,7 +131,7 @@ def _process_incoming_whatsapp_message(msg: IncomingWhatsAppMessage):
 
     # Check if it's an unsupported message type
     if msg.is_unsupported_type:
-        print(f"DEBUG: Tipo de mensagem não suportado detectado: {msg.message_type}")
+        debug_print(f"DEBUG: Tipo de mensagem não suportado detectado: {msg.message_type}")
         
         # Create fallback messages based on message type
         fallback_messages = {
