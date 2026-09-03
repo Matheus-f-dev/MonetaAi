@@ -19,6 +19,9 @@ export type { TableProps } from './components/Table';
 export { EmptyState } from './components/EmptyState';
 export type { EmptyStateProps } from './components/EmptyState';
 
+export { QueryState } from './components/QueryState';
+export type { QueryStateProps } from './components/QueryState';
+
 export { Skeleton } from './components/Skeleton';
 export type { SkeletonProps } from './components/Skeleton';
 
