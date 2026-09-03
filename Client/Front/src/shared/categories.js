@@ -5,5 +5,5 @@ export const CATEGORIES = [
   'Vestuário', 'Tecnologia', 'Assinaturas e serviços', 'Impostos e taxas',
   'Doações e caridade', 'Pets', 'Investimentos', 'Dívidas e financiamentos',
   'Presentes e comemorações', 'Casa e decoração', 'Serviços domésticos',
-  'Trabalho / Renda extra', 'Salário / Provento fixo', 'Outros'
+  'Trabalho / Renda extra', 'Salário / Provento fixo', 'Renda', 'Outros'
 ];
