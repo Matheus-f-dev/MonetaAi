@@ -10,6 +10,9 @@ export type { BadgeProps, BadgeTone } from './components/Badge';
 export { Input } from './components/Input';
 export type { InputProps } from './components/Input';
 
+export { Select } from './components/Select';
+export type { SelectProps, SelectOption } from './components/Select';
+
 export { Modal } from './components/Modal';
 export type { ModalProps } from './components/Modal';
 
