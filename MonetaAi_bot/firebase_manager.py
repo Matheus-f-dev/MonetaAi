@@ -2,6 +2,7 @@ from datetime import datetime
 from firebase_admin import credentials, firestore
 import firebase_admin
 import traceback
+from debug_utils import debug_print
 
 class FireBaseManager:
     def __init__(self):
@@ -40,8 +41,8 @@ class FireBaseManager:
     def add_transaction(self, account_id, transaction_type, array_transactions):
         """Adiciona nova transacao."""
         try:
-            print(f"DEBUG Firebase: account_id={account_id}, tipo={transaction_type}")
-            print(f"DEBUG Firebase: array_transactions={array_transactions}")
+            debug_print(f"DEBUG Firebase: account_id={account_id}, tipo={transaction_type}")
+            debug_print(f"DEBUG Firebase: array_transactions={array_transactions}")
             
             # Gera timestamp
             data_hora = datetime.now().strftime("%d/%m/%Y, %H:%M:%S")
@@ -50,14 +51,14 @@ class FireBaseManager:
             # Corrigindo a iteração - array_transactions deve ser uma lista
             if isinstance(array_transactions, list):
                 for t in array_transactions:
-                    print(f"DEBUG Firebase: Processando transação: {t}")
+                    debug_print(f"DEBUG Firebase: Processando transação: {t}")
                     
                     value = t.get("valor")
                     category = t.get("categoria") 
                     description = t.get("descricao")
                     name = t.get("nome")
                     
-                    print(f"DEBUG Firebase: valor={value}, categoria={category}, descricao={description}, nome={name}")
+                    debug_print(f"DEBUG Firebase: valor={value}, categoria={category}, descricao={description}, nome={name}")
 
                     historico_ref = (
                         self.firestore
@@ -80,14 +81,14 @@ class FireBaseManager:
 
                     retorno_registro.append(registro)
                     
-                    print(f"DEBUG Firebase: Salvando registro: {registro}")
+                    debug_print(f"DEBUG Firebase: Salvando registro: {registro}")
                     # Grava no Firestore
                     doc_ref.set(registro)
             else:
                 # Se for um dict (formato antigo), converte
-                print("DEBUG Firebase: Convertendo formato antigo de dict para lista")
+                debug_print("DEBUG Firebase: Convertendo formato antigo de dict para lista")
                 for key, t in array_transactions.items():
-                    print(f"DEBUG Firebase: Processando transação key={key}: {t}")
+                    debug_print(f"DEBUG Firebase: Processando transação key={key}: {t}")
                     
                     value = t.get("valor")
                     category = t.get("categoria")
@@ -113,11 +114,11 @@ class FireBaseManager:
 
                     retorno_registro.append(registro)
                     
-                    print(f"DEBUG Firebase: Salvando registro: {registro}")
+                    debug_print(f"DEBUG Firebase: Salvando registro: {registro}")
                     # Grava no Firestore
                     doc_ref.set(registro)
                 
-            print(f"DEBUG Firebase: Retornando {len(retorno_registro)} registros")
+            debug_print(f"DEBUG Firebase: Retornando {len(retorno_registro)} registros")
             return retorno_registro
             
         except Exception as e:
@@ -153,8 +154,8 @@ class FireBaseManager:
     def create_alert(self, account_id, alert_data):
         """Cria um novo alerta."""
         try:
-            print(f"DEBUG Firebase: Criando alerta para account_id={account_id}")
-            print(f"DEBUG Firebase: alert_data={alert_data}")
+            debug_print(f"DEBUG Firebase: Criando alerta para account_id={account_id}")
+            debug_print(f"DEBUG Firebase: alert_data={alert_data}")
             
             data_hora = datetime.now().strftime("%d/%m/%Y, %H:%M:%S")
             
@@ -172,7 +173,7 @@ class FireBaseManager:
                 **alert_data
             }
 
-            print(f"DEBUG Firebase: Salvando alerta: {alerta}")
+            debug_print(f"DEBUG Firebase: Salvando alerta: {alerta}")
             doc_ref.set(alerta)
             return alerta
             
@@ -185,8 +186,8 @@ class FireBaseManager:
     def update_alert(self, account_id, alert_id, alert_data):
         """Modifica um alerta existente."""
         try:
-            print(f"DEBUG Firebase: Modificando alerta {alert_id} para account_id={account_id}")
-            print(f"DEBUG Firebase: alert_data={alert_data}")
+            debug_print(f"DEBUG Firebase: Modificando alerta {alert_id} para account_id={account_id}")
+            debug_print(f"DEBUG Firebase: alert_data={alert_data}")
             
             data_hora = datetime.now().strftime("%d/%m/%Y, %H:%M:%S")
             
@@ -201,7 +202,7 @@ class FireBaseManager:
             # Adiciona timestamp de modificação
             alert_data["dataModificacao"] = data_hora
             
-            print(f"DEBUG Firebase: Atualizando alerta: {alert_data}")
+            debug_print(f"DEBUG Firebase: Atualizando alerta: {alert_data}")
             doc_ref.update(alert_data)
             
             # Retorna o alerta atualizado

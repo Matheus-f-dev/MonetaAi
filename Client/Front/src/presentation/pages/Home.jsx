@@ -1,5 +1,5 @@
 import '../styles/pages/home.css';
-import { useSecureNavigation } from '../hooks/useSecureNavigation';
+import { useNavigate } from 'react-router-dom';
 import { CHAPTERS } from '../components/landing/content';
 import SiteHeader from '../components/landing/SiteHeader';
 import ScrollScrub from '../components/landing/ScrollScrub';
@@ -13,33 +13,33 @@ import Closing from '../components/landing/Closing';
 import SiteFooter from '../components/landing/SiteFooter';
 
 export default function LandingPage() {
-  const { secureNavigate } = useSecureNavigation();
+  const navigate = useNavigate();
 
   // Só o primeiro capítulo carrega CTA: os outros três são narrativa, e um
   // botão em cada um transformaria a jornada numa fileira de botões.
   const chapterActions = (index) =>
     index === 0 ? (
       <>
-        <CtaHero onNavigate={secureNavigate} />
+        <CtaHero onNavigate={navigate} />
         <CtaJourney />
       </>
     ) : null;
 
   return (
     <div className="landing">
-      <SiteHeader onNavigate={secureNavigate} />
+      <SiteHeader onNavigate={navigate} />
 
       <main>
         <ScrollScrub scenes={CHAPTERS} renderActions={chapterActions} />
         <Mechanics />
         <Capabilities />
         <Assurances />
-        <Plans onNavigate={secureNavigate} />
+        <Plans onNavigate={navigate} />
         <Questions />
-        <Closing onNavigate={secureNavigate} />
+        <Closing onNavigate={navigate} />
       </main>
 
-      <SiteFooter onNavigate={secureNavigate} />
+      <SiteFooter onNavigate={navigate} />
     </div>
   );
 }

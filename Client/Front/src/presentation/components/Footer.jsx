@@ -1,11 +1,9 @@
 import React from 'react';
-import { encryptRoute } from '../../shared/urlCrypto';
 import './Footer.css';
 
 const Footer = () => {
   const handleLegalLink = (route) => {
-    const encryptedRoute = encryptRoute(route);
-    window.open(`/app${encryptedRoute}`, '_blank');
+    window.open(route, '_blank');
   };
 
   return (

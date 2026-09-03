@@ -38,6 +38,10 @@ router.post('/redefinir-senha', authLimiter, AuthController.redefinirSenha);
 // de sessão de verdade; authenticateToken rejeitaria esse token de qualquer
 // jeito (é o próprio propósito do claim pendingTotp).
 router.post('/login/totp', authLimiter, AuthController.loginTotp);
+// Troca o código de uso único do callback OAuth (ver OAuthExchangeService)
+// pelo token+user de verdade -- pública pelo mesmo motivo do /login/totp:
+// quem chama ainda não tem um JWT de sessão nesse ponto.
+router.post('/auth/exchange', authLimiter, AuthController.exchangeOAuthCode);
 router.get('/test', (req, res) => res.json({ message: 'API funcionando' }));
 
 // ── A partir daqui, toda rota exige um token válido. Antes nenhuma rota
@@ -47,6 +51,7 @@ router.use(apiLimiter);
 router.use(authenticateToken);
 
 router.get('/user/:userId', ensureOwnUser(), AuthController.getUserById);
+router.delete('/user/:userId', ensureOwnUser(), AuthController.deleteAccount);
 
 // Rotas de transações
 router.post('/transactions', TransactionController.create);

@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import "../styles/pages/system.css";
 import "../styles/components/TransactionModal.css";
 import "../styles/components/ActivityHistory.css";
@@ -56,34 +55,16 @@ ChartJS.register(
 export default function System() {
   useTheme();
   const { addToast } = useToast();
-  const [searchParams] = useSearchParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
-  
-  // Capturar token e dados do usuário da URL se existirem
-  useEffect(() => {
-    const token = searchParams.get('token');
-    const userParam = searchParams.get('user');
-    
-    if (token) {
-      localStorage.setItem('token', token);
-    }
-    
-    if (userParam) {
-      try {
-        const userData = JSON.parse(decodeURIComponent(userParam));
-        localStorage.setItem('user', JSON.stringify(userData));
-      } catch (error) {
-        console.error('Erro ao processar dados do usuário:', error);
-      }
-    }
-    
-    if (token || userParam) {
-      // Remover parâmetros da URL
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-  }, [searchParams]);
-  
+
+  // Captura de token/user via query string saiu daqui -- era uma cópia
+  // duplicada do que o AuthCallback.jsx (rota /auth/callback) já faz, e
+  // só era alcançada porque o backend redirecionava o OAuth do Google
+  // direto pro /system em vez de pro /auth/callback. Corrigido na origem
+  // (Service/src/routes/auth.js) -- token e user agora sempre passam pelo
+  // AuthCallback antes de chegar aqui.
+
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const userName = user.nome || user.displayName || "Usuário";
   const userId = user.uid || 'default-user';

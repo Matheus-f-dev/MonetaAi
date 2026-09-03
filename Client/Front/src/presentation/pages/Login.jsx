@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import '../styles/pages/Login.css';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { useSecureNavigation } from '../hooks/useSecureNavigation';
 import { ValidationContext, EmailValidation, PasswordValidation } from '../../core/services/ValidationStrategy';
 import { useToast } from '../hooks/useToast';
 import { useTerms } from '../hooks/useTerms';
@@ -12,11 +11,17 @@ export default function LoginCard() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const { secureNavigate } = useSecureNavigation();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { loading, message, login, googleLogin } = useAuth();
+  const { loading, message, login, completeTotpLogin, googleLogin } = useAuth();
   const { addToast } = useToast();
   const { termsAccepted, showTermsModal, acceptTerms, declineTerms, showTerms } = useTerms();
+
+  // Segunda etapa do login (2FA) -- só existe depois que login() devolve
+  // requiresTotp. tempToken vem do backend (5min de validade), nunca é
+  // exibido, só guardado pra completar o POST /login/totp.
+  const [tempToken, setTempToken] = useState(null);
+  const [totpCode, setTotpCode] = useState('');
 
   useEffect(() => {
     const error = searchParams.get('error');
@@ -27,33 +32,47 @@ export default function LoginCard() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    
+
     if (!termsAccepted) {
       showTerms();
       return;
     }
-    
+
     // Strategy - validar email e senha
     const emailValidator = new ValidationContext(new EmailValidation());
     const passwordValidator = new ValidationContext(new PasswordValidation());
-    
+
     const emailValidation = emailValidator.validate(email);
     const passwordValidation = passwordValidator.validate(senha);
-    
+
     if (!emailValidation.isValid) {
       addToast(emailValidation.message, 'error');
       return;
     }
-    
+
     if (!passwordValidation.isValid) {
       addToast(passwordValidation.message, 'error');
       return;
     }
-    
+
     const result = await login(email, senha);
 
-    if (result.success) {
-      secureNavigate('/system');
+    if (result.success && result.token) {
+      navigate('/system');
+    } else if (result.requiresTotp) {
+      setTempToken(result.tempToken);
+    }
+  }
+
+  async function handleTotpSubmit(e) {
+    e.preventDefault();
+    const result = await completeTotpLogin(tempToken, totpCode);
+
+    if (result.success && result.token) {
+      navigate('/system');
+    } else {
+      addToast(result.message || 'Código inválido.', 'error');
+      setTotpCode('');
     }
   }
 
@@ -86,6 +105,9 @@ export default function LoginCard() {
       <div className="auth-form-side">
       <div className="login-card">
         <Link to="/" className="back-link">← Voltar ao início</Link>
+
+        {!tempToken ? (
+        <>
         <h2>
           Bem-vindo à <span className="brand-name">Moneta</span>
         </h2>
@@ -130,34 +152,69 @@ export default function LoginCard() {
           <button type="submit" className="login-btn" disabled={loading}>
             {loading ? 'Entrando...' : 'Entrar'}
           </button>
-          
+
           <div className="divider">
             <span>ou</span>
           </div>
-          
-          <button 
-            type="button" 
+
+          <button
+            type="button"
             className="google-login-btn"
             onClick={googleLogin}
             disabled={loading}
           >
-            <img 
-              src="https://developers.google.com/identity/images/g-logo.png" 
-              alt="Google" 
+            <img
+              src="https://developers.google.com/identity/images/g-logo.png"
+              alt="Google"
               className="google-icon"
             />
             Entrar com Google
           </button>
-          
+
           <p id="mensagem" style={{
             color: message.includes('sucesso') ? '#1f6e46' : '#d2401f'
           }}>{message}</p>
         </form>
 
         <div className="footer-links">
-          <button onClick={() => secureNavigate('/esqueci-senha')} className="link-btn">Esqueci minha senha</button>
-          <button onClick={() => secureNavigate('/cadastro')} className="link-btn">Criar conta</button>
+          <button onClick={() => navigate('/esqueci-senha')} className="link-btn">Esqueci minha senha</button>
+          <button onClick={() => navigate('/cadastro')} className="link-btn">Criar conta</button>
         </div>
+        </>
+        ) : (
+        <>
+        <h2>Verificação em duas etapas</h2>
+        <p>Abra seu app autenticador e digite o código de 6 dígitos.</p>
+
+        <form className="login-form" onSubmit={handleTotpSubmit}>
+          <label>Código de verificação</label>
+          <input
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={6}
+            placeholder="000000"
+            autoFocus
+            required
+            value={totpCode}
+            onChange={e => setTotpCode(e.target.value.replace(/\D/g, ''))}
+            className="email-input"
+          />
+
+          <button type="submit" className="login-btn" disabled={loading || totpCode.length !== 6}>
+            {loading ? 'Verificando...' : 'Confirmar'}
+          </button>
+
+          <p id="mensagem" style={{
+            color: message.includes('sucesso') ? '#1f6e46' : '#d2401f'
+          }}>{message}</p>
+        </form>
+
+        <div className="footer-links">
+          <button onClick={() => { setTempToken(null); setTotpCode(''); }} className="link-btn">← Voltar pro login</button>
+        </div>
+        </>
+        )}
       </div>
       </div>
     </div>
