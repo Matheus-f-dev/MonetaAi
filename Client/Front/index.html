@@ -4,52 +4,66 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Moneta, gestão financeira que começa numa frase</title>
+    <title>MonetaAI: gestão financeira inteligente para entender seu dinheiro</title>
     <meta
       name="description"
-      content="Registre um gasto mandando uma mensagem de texto comum. A Moneta identifica categoria, conta e cartão, e o seu saldo fica certo na hora. Plano grátis, sem cartão."
+      content="Gestão financeira com inteligência artificial: registre gastos por texto, foto ou voz, acompanhe saldo por conta e cartão e receba insights sobre os seus números. Plano Starter grátis."
     />
     <link rel="canonical" href="https://monetaai.site/" />
     <meta name="robots" content="index, follow, max-image-preview:large" />
-    <meta name="theme-color" content="#0e1416" />
+
+    <!-- A landing segue a preferência do sistema, então a cor da barra do
+         navegador acompanha: papel quente no claro, tinta no escuro. -->
+    <meta name="theme-color" content="#FBFAF7" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0A0E0D" media="(prefers-color-scheme: dark)" />
 
     <link rel="icon" type="image/svg+xml" href="/moneta-mark.svg" />
     <link rel="apple-touch-icon" href="/MonetaAi-minas summit.png" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Moneta" />
+    <meta property="og:site_name" content="MonetaAI" />
     <meta property="og:locale" content="pt_BR" />
-    <meta property="og:title" content="Moneta, gestão financeira que começa numa frase" />
+    <meta property="og:title" content="MonetaAI: entenda seu dinheiro e decida melhor" />
     <meta
       property="og:description"
-      content="Registre um gasto mandando uma mensagem de texto comum. A Moneta identifica categoria, conta e cartão, e o seu saldo fica certo na hora."
+      content="Registre gastos por texto, foto ou voz. A MonetaAI organiza o mês, encontra os padrões do seu histórico e explica o que eles significam."
     />
     <meta property="og:url" content="https://monetaai.site/" />
+    <!--
+      CONFIRMAR / SUBSTITUIR: og-cover.jpg foi produzido para a direção visual
+      anterior (peça de aço sobre fundo escuro). O motivo do anel continua
+      sendo a marca, então ele não está errado, mas a arte de compartilhamento
+      deve ser refeita na nova direção (papel quente, verde profundo, painel do
+      produto). Arquivo esperado: public/assets/moneta/og-cover.jpg, 1200x630.
+    -->
     <meta property="og:image" content="https://monetaai.site/assets/moneta/og-cover.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Peça circular de aço usinado sobre fundo escuro, a marca visual da Moneta." />
+    <meta property="og:image:alt" content="Marca da MonetaAI: dois anéis concêntricos com a letra M ao centro." />
 
     <!-- Twitter / X -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Moneta, gestão financeira que começa numa frase" />
+    <meta name="twitter:title" content="MonetaAI: entenda seu dinheiro e decida melhor" />
     <meta
       name="twitter:description"
-      content="Registre um gasto mandando uma mensagem de texto comum. A Moneta identifica categoria, conta e cartão, e o seu saldo fica certo na hora."
+      content="Registre gastos por texto, foto ou voz. A MonetaAI organiza o mês, encontra os padrões do seu histórico e explica o que eles significam."
     />
     <meta name="twitter:image" content="https://monetaai.site/assets/moneta/og-cover.jpg" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
-    <!-- Painel logado: Hanken Grotesk e Zilla Slab. Landing: Satoshi. Mono compartilhado. -->
+    <!--
+      Um pedido só para as cinco famílias, em vez de dois pedidos para dois
+      provedores.
+        landing ....... Instrument Sans (interface), Instrument Serif (uma
+                        metade de manchete, em itálico), JetBrains Mono (todo
+                        número em coluna e todo rótulo)
+        painel logado . Hanken Grotesk, Zilla Slab, JetBrains Mono
+      A Satoshi saiu junto com a landing antiga, que era a única a usá-la.
+    -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Zilla+Slab:ital,wght@0,400;0,500;0,600;0,700;1,500&family=Hanken+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://api.fontshare.com/v2/css?f%5B%5D=satoshi@500,700,900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600;700&family=Zilla+Slab:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap"
       rel="stylesheet"
     />
 
@@ -57,8 +71,8 @@
       Dados estruturados da landing. Mantidos aqui porque o app é uma SPA e o
       rastreador precisa disso já no HTML servido.
 
-      ATENÇÃO: as perguntas abaixo espelham QUESTIONS em
-      src/presentation/components/landing/content.js. Mudou lá, muda aqui.
+      ATENÇÃO: o bloco FAQPage abaixo espelha QUESTIONS em
+      src/presentation/landing/data/copy.js. Mudou lá, muda aqui.
     -->
     <script type="application/ld+json">
       {
@@ -67,7 +81,7 @@
           {
             "@type": "Organization",
             "@id": "https://monetaai.site/#organization",
-            "name": "Moneta",
+            "name": "MonetaAI",
             "url": "https://monetaai.site/",
             "logo": "https://monetaai.site/moneta-mark.svg"
           },
@@ -75,27 +89,30 @@
             "@type": "WebSite",
             "@id": "https://monetaai.site/#website",
             "url": "https://monetaai.site/",
-            "name": "Moneta",
+            "name": "MonetaAI",
             "inLanguage": "pt-BR",
             "publisher": { "@id": "https://monetaai.site/#organization" }
           },
           {
             "@type": "SoftwareApplication",
             "@id": "https://monetaai.site/#app",
-            "name": "Moneta",
+            "name": "MonetaAI",
             "applicationCategory": "FinanceApplication",
             "operatingSystem": "Web",
             "url": "https://monetaai.site/",
             "inLanguage": "pt-BR",
-            "description": "Plataforma de gestão financeira em que o lançamento de despesas é feito por mensagem de texto, com categoria, conta e cartão identificados automaticamente.",
+            "description": "Plataforma de gestão financeira pessoal com inteligência artificial. O lançamento de despesas é feito por mensagem de texto, foto da nota fiscal ou áudio, com categoria, conta e cartão identificados automaticamente, e o histórico vira análises, alertas e projeção de saldo.",
             "publisher": { "@id": "https://monetaai.site/#organization" },
             "featureList": [
-              "Registro de despesa por mensagem de texto",
+              "Registro de despesa por mensagem de texto, foto ou voz",
               "Categorização automática de lançamentos",
               "Saldo separado por conta e por cartão",
               "Metas e orçamento por categoria",
               "Alertas de gasto por categoria",
-              "Relatórios consolidados e tendência de gasto"
+              "Análises de despesas por categoria e evolução mensal",
+              "Projeção de saldo futuro em três cenários",
+              "Análise de impacto financeiro de uma compra",
+              "Relatórios consolidados e exportação em planilha"
             ],
             "offers": [
               {
@@ -103,14 +120,14 @@
                 "name": "Starter",
                 "price": "0",
                 "priceCurrency": "BRL",
-                "description": "Uma conta conectada, categorização automática e relatório simples do mês."
+                "description": "Uma conta conectada, registro por texto, foto ou voz, categorização automática e relatório simples do mês."
               },
               {
                 "@type": "Offer",
                 "name": "Pro",
                 "price": "29.90",
                 "priceCurrency": "BRL",
-                "description": "Contas e cartões ilimitados, metas e orçamento por categoria, alertas e relatórios avançados.",
+                "description": "Contas e cartões ilimitados, metas e orçamento por categoria, alertas, análises, tendência e projeção de saldo.",
                 "priceSpecification": {
                   "@type": "UnitPriceSpecification",
                   "price": "29.90",

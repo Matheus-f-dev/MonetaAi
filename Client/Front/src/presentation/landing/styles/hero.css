@@ -1,0 +1,173 @@
+/* ============================================================================
+   Hero
+   Duas colunas assimétricas: a copy tem largura de leitura, o produto tem o
+   resto. A grade de razão e o anel da marca ficam gravados no papel, sem
+   flutuar e sem brilho.
+   ==========================================================================*/
+.mn-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  padding-block: clamp(48px, 7vw, 96px) clamp(64px, 8vw, 116px);
+  border-bottom: 1px solid var(--rule);
+}
+
+/* grade de razão: o "papel de contabilidade" da direção visual */
+.mn-hero__ledger {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-image:
+    linear-gradient(to right, var(--rule-2) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--rule-2) 1px, transparent 1px);
+  background-size: 96px 96px;
+  mask-image: radial-gradient(115% 85% at 72% 8%, #000 12%, transparent 76%);
+  opacity: 0.85;
+}
+
+/* o anel da marca, gravado, atrás de tudo */
+.mn-hero__ring {
+  position: absolute;
+  top: -20%;
+  right: -14%;
+  z-index: -1;
+  color: var(--brand);
+  opacity: 0.05;
+  pointer-events: none;
+}
+.mn-hero__ring svg { width: min(880px, 74vw); height: auto; }
+
+.mn-hero__in {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
+  align-items: center;
+  gap: clamp(40px, 5vw, 76px);
+}
+
+/* ---- coluna de texto ---------------------------------------------------- */
+.mn-hero__copy { max-width: 34rem; }
+
+.mn-hero__title {
+  margin-top: var(--s6);
+  max-width: 17ch;
+}
+.mn-hero__title-b {
+  display: block;
+  color: var(--brand);
+  /* a serifa tem altura-x menor, então ela precisa de um empurrão pra sentar
+     na mesma linha de base ótica da grotesca acima */
+  font-size: 1.06em;
+  line-height: 0.94;
+  margin-top: 0.08em;
+}
+
+.mn-hero__lead { margin-top: var(--s8); max-width: 33rem; }
+
+.mn-hero__ctas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s4) var(--s6);
+  margin-top: var(--s10);
+}
+
+.mn-hero__note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: var(--s5);
+  font-size: var(--t-xs);
+  color: var(--ink-3);
+}
+.mn-hero__note svg { color: var(--brand); flex: none; }
+
+/* ---- palco do produto --------------------------------------------------- */
+.mn-hero__stage {
+  position: relative;
+  min-width: 0;
+  /* entrada própria: o painel sobe um pouco mais que o resto, então o olho vai
+     pra ele primeiro */
+  opacity: 0;
+  transform: translateY(26px) scale(0.99);
+  transform-origin: 60% 100%;
+  transition:
+    opacity 760ms var(--ease-out),
+    transform 760ms var(--ease-out);
+}
+.mn-hero__stage.is-in { opacity: 1; transform: none; }
+
+.mn-hero__panel { position: relative; z-index: 1; }
+
+/* ---- notificação: o único elemento fora da superfície ------------------- */
+.mn-toast {
+  position: relative;
+  z-index: 2;
+  margin: -18px 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  max-width: 290px;
+  padding: 12px 15px;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: var(--r3);
+  box-shadow: var(--sh3);
+}
+.mn-toast__icon {
+  display: grid;
+  place-items: center;
+  width: 30px; height: 30px;
+  flex: none;
+  border-radius: var(--r2);
+  background: rgba(255, 255, 255, .1);
+  color: var(--warn);
+}
+.mn[data-appearance='dark'] .mn-toast {
+  background: var(--surface-2);
+  border: 1px solid var(--rule);
+  color: var(--ink);
+}
+.mn-toast__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: var(--t-xs);
+  line-height: 1.35;
+}
+.mn-toast__body b { font-weight: 600; }
+.mn-toast__body em {
+  font-style: normal;
+  font-family: var(--font-mono) !important;
+  font-size: var(--t-label);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.56;
+}
+
+/* ---- adaptação ---------------------------------------------------------- */
+@media (max-width: 1080px) {
+  .mn-hero__in {
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(44px, 7vw, 68px);
+  }
+  .mn-hero__copy { max-width: 40rem; }
+  .mn-hero__title { max-width: 20ch; }
+  .mn-hero__ring { top: auto; bottom: -8%; right: -30%; }
+  .mn-hero__ledger { mask-image: radial-gradient(130% 70% at 50% 0%, #000 10%, transparent 78%); }
+}
+
+@media (max-width: 720px) {
+  .mn-hero { padding-block: var(--s8) var(--s16); }
+  .mn-hero__title { max-width: none; }
+  .mn-hero__title-b { display: inline; font-size: 1.04em; }
+  .mn-hero__ctas { gap: var(--s3); margin-top: var(--s8); }
+  .mn-hero__ctas .mn-btn--solid { width: 100%; }
+  .mn-hero__ledger { background-size: 64px 64px; }
+
+  /* no telefone ela ocupa a largura inteira, em vez de um bloco estreito
+     encostado na direita */
+  .mn-toast {
+    max-width: none;
+    margin: var(--s4) 0 0;
+  }
+}

@@ -1,0 +1,194 @@
+/* ============================================================================
+   Primitivas: botão, cabeçalho de seção, selo, delta.
+   Tudo que aparece em mais de uma seção mora aqui.
+   ==========================================================================*/
+
+/* ---------------------------------------------------------------------------
+   Botão
+   Três variantes, ponto. Altura mínima de 44px em todas, para o alvo de toque
+   no celular nunca depender do zoom do visitante.
+   ------------------------------------------------------------------------- */
+.mn-btn {
+  --btn-h: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--btn-h);
+  padding-inline: 20px;
+  border-radius: var(--r2);
+  font-size: var(--t-sm);
+  font-weight: 600;
+  letter-spacing: -0.008em;
+  line-height: 1;
+  white-space: nowrap;
+  text-align: center;
+  transition:
+    background-color var(--dur-1) var(--ease),
+    border-color var(--dur-1) var(--ease),
+    color var(--dur-1) var(--ease),
+    box-shadow var(--dur-2) var(--ease),
+    transform var(--dur-1) var(--ease);
+}
+
+.mn-btn--lg { --btn-h: 54px; padding-inline: 26px; font-size: var(--t-body); }
+.mn-btn--sm { --btn-h: 44px; padding-inline: 16px; font-size: var(--t-xs); }
+
+.mn-btn__i {
+  flex: none;
+  transition: transform var(--dur-2) var(--ease-out);
+}
+.mn-btn:hover .mn-btn__i { transform: translateX(3px); }
+
+/* sólido: a ação principal. Uma por tela. */
+.mn-btn--solid {
+  background: var(--brand);
+  color: var(--paper);
+  box-shadow: var(--sh1);
+}
+.mn-btn--solid:hover {
+  background: var(--brand-hover);
+  box-shadow: var(--sh2);
+  transform: translateY(-1px);
+}
+.mn-btn--solid:active { transform: translateY(0); box-shadow: var(--sh1); }
+
+.mn[data-appearance='dark'] .mn-btn--solid {
+  background: var(--brand-mark);
+  color: #06120E;
+}
+.mn[data-appearance='dark'] .mn-btn--solid:hover { background: var(--brand); }
+
+/* contornado: a alternativa séria. */
+.mn-btn--outline {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  box-shadow: var(--sh1);
+}
+.mn-btn--outline:hover {
+  border-color: var(--rule-strong);
+  background: var(--surface);
+  transform: translateY(-1px);
+  box-shadow: var(--sh2);
+}
+.mn-btn--outline:active { transform: translateY(0); }
+
+/* texto: navegação lateral, nunca a ação principal. */
+.mn-btn--text {
+  padding-inline: 4px;
+  color: var(--ink);
+  background: none;
+}
+.mn-btn--text .mn-btn__label {
+  position: relative;
+  padding-bottom: 2px;
+}
+.mn-btn--text .mn-btn__label::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-2) var(--ease-out);
+}
+.mn-btn--text:hover .mn-btn__label::after { transform: scaleX(1); }
+
+/* sobre a faixa de tinta */
+.mn-band--ink .mn-btn--solid {
+  background: var(--paper);
+  color: var(--ink);
+}
+.mn-band--ink .mn-btn--solid:hover { background: #FFFFFF; }
+.mn-band--ink .mn-btn--outline {
+  background: transparent;
+  color: var(--paper);
+  border-color: rgba(255, 255, 255, .28);
+}
+.mn-band--ink .mn-btn--outline:hover { border-color: rgba(255, 255, 255, .6); }
+.mn-band--ink .mn-btn--text { color: var(--paper); }
+.mn-band--ink :focus-visible { outline-color: var(--paper); }
+
+/* ---------------------------------------------------------------------------
+   Cabeçalho de seção
+   ------------------------------------------------------------------------- */
+.mn-head { max-width: 46rem; }
+.mn-head--center { margin-inline: auto; text-align: center; }
+.mn-head--center .mn-head__lead { margin-inline: auto; }
+
+.mn-head__meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ink-3);
+  margin-bottom: 22px;
+}
+.mn-head--center .mn-head__meta { justify-content: center; }
+
+.mn-head__idx {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--brand);
+}
+.mn-head__idx::after {
+  content: '';
+  width: 26px;
+  height: 1px;
+  background: var(--rule-strong);
+}
+
+.mn-head__title { max-width: 24ch; }
+.mn-head--center .mn-head__title { max-width: 30ch; margin-inline: auto; }
+.mn-head__accent { color: var(--ink-2); }
+.mn-head__lead { margin-top: 28px; }
+
+/* ---------------------------------------------------------------------------
+   Selo
+   ------------------------------------------------------------------------- */
+.mn-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 11px 6px 9px;
+  border-radius: var(--r-pill);
+  border: 1px solid transparent;
+  line-height: 1;
+}
+.mn-badge__i { flex: none; }
+.mn-badge__t { letter-spacing: 0.1em; }
+
+.mn-badge--brand {
+  background: var(--brand-tint);
+  border-color: var(--brand-tint-2);
+  color: var(--brand);
+}
+.mn-badge--ai {
+  background: var(--ai-tint);
+  border-color: var(--ai-rule);
+  color: var(--ai);
+}
+.mn-badge--quiet {
+  background: var(--surface-2);
+  border-color: var(--rule);
+  color: var(--ink-2);
+}
+
+/* ---------------------------------------------------------------------------
+   Delta
+   Sinal + seta + cor. Nunca cor sozinha.
+   ------------------------------------------------------------------------- */
+.mn-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--t-xs);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.mn-delta.is-good { color: var(--pos); }
+.mn-delta.is-bad { color: var(--neg); }
+.mn-delta__label { color: var(--ink-3); font-weight: 400; }
+.mn-delta svg { flex: none; }
