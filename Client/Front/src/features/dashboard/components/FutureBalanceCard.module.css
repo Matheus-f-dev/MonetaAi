@@ -1,0 +1,22 @@
+.title {
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+}
+
+.subtitle {
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+  margin: var(--space-1) 0 var(--space-4);
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.futureLabel {
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+}

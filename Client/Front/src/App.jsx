@@ -11,7 +11,6 @@ const LandingPage = lazy(() => import('./presentation/pages/Home'));
 import LoginCard from './presentation/pages/Login';
 import Cadastro from './presentation/pages/Register';
 import RedefinirSenha from './presentation/pages/ChangePassword';
-import System from './presentation/pages/system';
 import Expenses from './presentation/pages/Expenses';
 import Incomes from './presentation/pages/Incomes';
 import Cards from './presentation/pages/Cards';
@@ -28,6 +27,7 @@ import AuthCallback from './presentation/pages/AuthCallback';
 import PrivacyPolicy from './presentation/pages/legal/PrivacyPolicy';
 import TermsOfService from './presentation/pages/legal/TermsOfService';
 import { AppShell } from './app-shell/AppShell';
+const DashboardPage = lazy(() => import('./features/dashboard/DashboardPage'));
 
 // Catálogo do design system: a atribuição inteira fica atrás de
 // import.meta.env.DEV, que o Vite substitui por `false` no build --
@@ -69,14 +69,13 @@ function App() {
                  reconstruir o conteúdo arriscava quebrar CSS acoplado
                  de um app em produção, tipo `.sys-layout .sys-topbar{
                  position: absolute }`). Migram pro AppShell quando a
-                 própria fase reconstrói a tela (Fase 2 em diante).
+                 própria fase reconstrói a tela.
 
               2) Páginas já na identidade nova -- filhas do <AppShell/>
                  (sidebar/topbar novos, tema, os 7 grupos de navegação
-                 da Fase 0). Hoje só o catálogo do design system; a
-                 primeira página de produto entra na Fase 2. */}
+                 da Fase 0). Fase 2 traz o dashboard (/system) como
+                 primeira página de produto de verdade. */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/system" element={<System />} />
             <Route path="/expenses" element={<Expenses />} />
             <Route path="/incomes" element={<Incomes />} />
             <Route path="/cartoes" element={<Cards />} />
@@ -90,11 +89,10 @@ function App() {
             <Route path="/impacto-financeiro" element={<ImpactoFinanceiro />} />
             <Route path="/agent" element={<Agent />} />
 
-            {import.meta.env.DEV && (
-              <Route element={<AppShell />}>
-                <Route path="/design-system" element={<DesignSystemPage />} />
-              </Route>
-            )}
+            <Route element={<AppShell />}>
+              <Route path="/system" element={<DashboardPage />} />
+              {import.meta.env.DEV && <Route path="/design-system" element={<DesignSystemPage />} />}
+            </Route>
           </Route>
 
           {/* Qualquer coisa fora daqui (URL digitada errada, link velho) -- home,
