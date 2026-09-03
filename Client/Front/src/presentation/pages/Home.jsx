@@ -1,45 +1,4 @@
-import '../styles/pages/home.css';
-import { useNavigate } from 'react-router-dom';
-import { CHAPTERS } from '../components/landing/content';
-import SiteHeader from '../components/landing/SiteHeader';
-import ScrollScrub from '../components/landing/ScrollScrub';
-import { CtaHero, CtaJourney } from '../components/landing/Ctas';
-import Mechanics from '../components/landing/Mechanics';
-import Capabilities from '../components/landing/Capabilities';
-import Assurances from '../components/landing/Assurances';
-import Plans from '../components/landing/Plans';
-import Questions from '../components/landing/Questions';
-import Closing from '../components/landing/Closing';
-import SiteFooter from '../components/landing/SiteFooter';
-
-export default function LandingPage() {
-  const navigate = useNavigate();
-
-  // Só o primeiro capítulo carrega CTA: os outros três são narrativa, e um
-  // botão em cada um transformaria a jornada numa fileira de botões.
-  const chapterActions = (index) =>
-    index === 0 ? (
-      <>
-        <CtaHero onNavigate={navigate} />
-        <CtaJourney />
-      </>
-    ) : null;
-
-  return (
-    <div className="landing">
-      <SiteHeader onNavigate={navigate} />
-
-      <main>
-        <ScrollScrub scenes={CHAPTERS} renderActions={chapterActions} />
-        <Mechanics />
-        <Capabilities />
-        <Assurances />
-        <Plans onNavigate={navigate} />
-        <Questions />
-        <Closing onNavigate={navigate} />
-      </main>
-
-      <SiteFooter onNavigate={navigate} />
-    </div>
-  );
-}
+// A rota "/" da aplicacao. A landing inteira vive em ../landing, com os seus
+// proprios tokens, componentes e dados de demonstracao, isolada do sistema de
+// estilos do painel logado.
+export { default } from '../landing/LandingPage';

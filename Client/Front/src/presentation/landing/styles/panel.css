@@ -1,0 +1,191 @@
+/* ============================================================================
+   Superfície de produto. Compartilhada pelo hero e pela seção do painel.
+   ==========================================================================*/
+.mn-panel {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--r5);
+  box-shadow: var(--sh3);
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* cromo: barra de janela, discreta, sem imitar sistema operacional nenhum */
+.mn-panel__chrome {
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+  padding: 12px 18px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--rule);
+}
+.mn-panel__dots { display: inline-flex; gap: 5px; flex: none; }
+.mn-panel__dots i {
+  width: 8px; height: 8px;
+  border-radius: 999px;
+  background: var(--rule-strong);
+}
+.mn-panel__path {
+  color: var(--ink-3);
+  letter-spacing: 0.04em;
+  text-transform: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mn-panel__period { margin-left: auto; color: var(--ink-3); flex: none; }
+
+/* fileira interna */
+.mn-prow {
+  padding: var(--s5) var(--s6);
+  border-bottom: 1px solid var(--rule-2);
+}
+.mn-prow:last-child { border-bottom: 0; }
+.mn-prow__label { color: var(--ink-3); margin-bottom: 12px; }
+
+/* ---------------------------------------------------------------------------
+   1 · captura: a frase crua virando lançamento resolvido
+   ------------------------------------------------------------------------- */
+.mn-cap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--s4);
+}
+/* o rótulo é o primeiro item da grade, então ele precisa ocupar a linha
+   inteira: sem isso a frase cai na coluna do meio e os chips empilham. */
+.mn-cap > .mn-prow__label { grid-column: 1 / -1; margin-bottom: 4px; }
+
+.mn-cap__in {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 11px 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--rule);
+  border-radius: var(--r3);
+}
+.mn-cap__icon { color: var(--ink-3); flex: none; }
+.mn-cap__text {
+  font-family: var(--font-mono) !important;
+  font-size: var(--t-xs);
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mn-cap__arrow { color: var(--brand); flex: none; }
+
+.mn-cap__out {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+.mn-chip {
+  padding: 6px 10px;
+  border-radius: var(--r-pill);
+  background: var(--brand-tint);
+  border: 1px solid var(--brand-tint-2);
+  color: var(--brand);
+  font-size: var(--t-xs);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* a fileira de captura vira coluna quando não cabe em três partes */
+@media (max-width: 720px) {
+  .mn-cap { grid-template-columns: 1fr; gap: var(--s3); }
+  .mn-cap__arrow { transform: rotate(90deg); margin-inline: auto; }
+}
+
+/* ---------------------------------------------------------------------------
+   2 · o mês fechado
+   ------------------------------------------------------------------------- */
+.mn-sum__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s3) var(--s4);
+  margin-bottom: var(--s5);
+}
+.mn-sum__label { color: var(--ink-3); margin-bottom: 8px; }
+/* a figura de destaque do painel. Sans, proporcional, uma só. */
+.mn-sum__value {
+  font-size: clamp(1.875rem, 3.4vw, 2.625rem);
+  font-weight: 600;
+  letter-spacing: -0.034em;
+  line-height: 1;
+  color: var(--ink);
+}
+
+/* ---------------------------------------------------------------------------
+   3 · KPIs
+   ------------------------------------------------------------------------- */
+.mn-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--s5);
+}
+.mn-kpi { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.mn-kpi + .mn-kpi { position: relative; }
+.mn-kpi + .mn-kpi::before {
+  content: '';
+  position: absolute;
+  left: calc(var(--s5) / -2);
+  top: 2px; bottom: 2px;
+  width: 1px;
+  background: var(--rule-2);
+}
+.mn-kpi__label { color: var(--ink-3); }
+.mn-kpi__body {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--s3);
+}
+.mn-kpi__value {
+  font-size: clamp(1rem, 1.5vw, 1.1875rem);
+  font-weight: 600;
+  letter-spacing: -0.024em;
+  color: var(--ink);
+  line-height: 1.1;
+}
+.mn-kpi .mn-spark { flex: none; }
+
+@media (max-width: 620px) {
+  .mn-kpis { grid-template-columns: 1fr; gap: var(--s4); }
+  .mn-kpi + .mn-kpi::before {
+    left: 0; right: 0; top: calc(var(--s4) / -2);
+    bottom: auto; width: auto; height: 1px;
+  }
+  .mn-kpi__body { align-items: center; }
+}
+
+/* ---------------------------------------------------------------------------
+   4 · a fileira de inteligência. Único lugar em cobre da superfície.
+   ------------------------------------------------------------------------- */
+.mn-prow--ai {
+  background: var(--ai-tint);
+  border-top: 1px solid var(--ai-rule);
+}
+.mn-ai {
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+  flex-wrap: wrap;
+}
+.mn-ai__text {
+  flex: 1 1 260px;
+  min-width: 0;
+  font-size: var(--t-sm);
+  color: var(--ink);
+  line-height: 1.45;
+}
+.mn-ai__text b { font-weight: 600; color: var(--ai); }

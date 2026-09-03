@@ -1,0 +1,166 @@
+/* ============================================================================
+   Cabeçalho
+   ==========================================================================*/
+.mn-mast {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  border-bottom: 1px solid transparent;
+  transition:
+    background-color var(--dur-2) var(--ease),
+    border-color var(--dur-2) var(--ease),
+    box-shadow var(--dur-2) var(--ease);
+}
+
+.mn-mast.is-solid {
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  border-bottom-color: var(--rule);
+  box-shadow: 0 1px 0 rgba(11, 18, 15, .02);
+}
+@supports (backdrop-filter: blur(12px)) {
+  .mn-mast.is-solid {
+    backdrop-filter: saturate(140%) blur(14px);
+  }
+}
+/* Painel aberto: o cabeçalho precisa ser opaco, senão o menu vaza por baixo. */
+.mn-mast.is-open { background: var(--paper); border-bottom-color: var(--rule); }
+
+.mn-mast__in {
+  display: flex;
+  align-items: center;
+  gap: var(--s6);
+  min-height: 68px;
+}
+
+/* ---- marca -------------------------------------------------------------- */
+.mn-mast__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: auto;
+  color: var(--ink);
+  border-radius: var(--r1);
+}
+.mn-mast__mark { color: var(--brand); flex: none; }
+.mn-mast__word {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+.mn-mast__ai { color: var(--brand); }
+
+/* ---- navegação ---------------------------------------------------------- */
+.mn-mast__nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.mn-mast__link {
+  position: relative;
+  padding: 9px 12px;
+  border-radius: var(--r2);
+  font-size: var(--t-sm);
+  font-weight: 500;
+  color: var(--ink-2);
+  transition: color var(--dur-1) var(--ease), background-color var(--dur-1) var(--ease);
+}
+.mn-mast__link:hover { color: var(--ink); background: var(--paper-2); }
+.mn-mast__link.is-current { color: var(--ink); }
+.mn-mast__link.is-current::after {
+  content: '';
+  position: absolute;
+  left: 12px; right: 12px; bottom: 2px;
+  height: 1.5px;
+  border-radius: 2px;
+  background: var(--brand);
+}
+
+.mn-mast__acts {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  margin-left: var(--s4);
+}
+
+/* ---- botão de menu ------------------------------------------------------ */
+.mn-burger {
+  display: none;
+  position: relative;
+  width: 44px;
+  height: 44px;
+  margin-right: -10px;
+  border-radius: var(--r2);
+}
+.mn-burger span {
+  position: absolute;
+  left: 12px;
+  width: 20px;
+  height: 1.5px;
+  border-radius: 2px;
+  background: var(--ink);
+  transition: transform var(--dur-2) var(--ease), opacity var(--dur-1) var(--ease);
+}
+.mn-burger span:first-child { top: 19px; }
+.mn-burger span:last-child { top: 25px; }
+.mn-mast.is-open .mn-burger span:first-child { transform: translateY(3px) rotate(45deg); }
+.mn-mast.is-open .mn-burger span:last-child { transform: translateY(-3px) rotate(-45deg); }
+
+/* ---- painel compacto ---------------------------------------------------- */
+.mn-mast__panel {
+  display: none;
+  position: relative;
+  z-index: 2;
+  padding: var(--s2) var(--gutter) var(--s8);
+  background: var(--paper);
+  border-bottom: 1px solid var(--rule);
+}
+.mn-mast__panel[hidden] { display: none; }
+
+.mn-mast__panel nav {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--rule);
+}
+.mn-mast__panel nav a {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 58px;
+  padding: 4px 2px;
+  border-bottom: 1px solid var(--rule);
+  font-size: 1.0625rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+.mn-mast__panel-n { color: var(--brand); }
+.mn-mast__panel nav a:hover { color: var(--brand); }
+
+.mn-mast__panel-acts {
+  display: grid;
+  gap: var(--s3);
+  margin-top: var(--s6);
+}
+.mn-mast__panel-acts .mn-btn { width: 100%; }
+
+.mn-mast__scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background: rgba(11, 18, 15, .34);
+  border-radius: 0;
+  cursor: default;
+}
+
+/* ---- ponto de virada ---------------------------------------------------- */
+@media (max-width: 1040px) {
+  .mn-mast__nav { gap: 0; }
+  .mn-mast__link { padding-inline: 9px; font-size: var(--t-xs); }
+}
+
+@media (max-width: 900px) {
+  .mn-mast__nav,
+  .mn-mast__acts { display: none; }
+  .mn-burger { display: block; }
+  .mn-mast__panel { display: block; }
+  .mn-mast__in { min-height: 62px; }
+}

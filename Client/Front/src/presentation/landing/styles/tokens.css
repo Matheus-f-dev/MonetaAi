@@ -1,0 +1,173 @@
+/* ============================================================================
+   MonetaAI  ·  Design system da landing
+   ----------------------------------------------------------------------------
+   Direção visual: "Ledger". Papel quente, tinta quase preta, uma hairline
+   estrutural em todo lugar e UMA cor de marca que só aparece onde há ação ou
+   dado. A inteligência tem a sua própria cor (cobre) e ela nunca invade o
+   resto da página.
+
+   Tudo aqui é escopado em `.mn` de propósito: o painel logado tem o seu
+   próprio sistema de tokens (styles/base/_variables.css) e os dois não se
+   misturam.
+
+   Paleta validada com o validador do skill dataviz (seis checagens,
+   claro e escuro), não escolhida a olho:
+     claro   superfície #FBFAF7 · série 1 #0E8A67 · série 2 #C2761F
+     escuro  superfície #0E1311 · série 1 #12A87E · série 2 #C87C24
+   Rampa ordinal (cenários de projeção) validada com --ordinal nos dois modos.
+   ==========================================================================*/
+
+.mn {
+  color-scheme: light;
+
+  /* ---- papel e tinta ---------------------------------------------------- */
+  --paper:        #FBFAF7;   /* plano da página */
+  --paper-2:      #F4F2EC;   /* faixa recuada */
+  --paper-3:      #EDEAE2;   /* faixa recuada, mais funda */
+  --surface:      #FFFFFF;   /* superfície de produto (cards, painéis) */
+  --surface-2:    #F7F6F1;   /* trilho interno da superfície */
+
+  --ink:          #0B120F;   /* 18.2:1 sobre papel */
+  --ink-2:        #57605C;   /*  6.2:1 */
+  --ink-3:        #6B7470;   /*  4.6:1 · rótulos e eixos */
+
+  --rule:         #DFDCD3;   /* hairline estrutural */
+  --rule-2:       #E8E5DC;   /* hairline mais leve, grade de gráfico */
+  --rule-strong:  #C9C5B9;   /* eixo, base de gráfico */
+
+  /* ---- marca · Moneta Emerald ------------------------------------------- */
+  --brand:        #0A5741;   /* 8.2:1 sobre papel · CTA, link, ativo */
+  --brand-hover:  #07422F;
+  --brand-mark:   #0E8A67;   /* slot 1 de dado */
+  --brand-soft:   #6FC0A6;   /* passo claro da rampa ordinal */
+  --brand-tint:   #EAF6F1;
+  --brand-tint-2: #D6ECE3;
+  --brand-ring:   rgba(10, 87, 65, .28);
+
+  /* ---- inteligência · Copper -------------------------------------------- */
+  --ai:           #8F4E12;   /* 6.2:1 sobre papel · texto e selo de IA */
+  --ai-mark:      #C2761F;   /* slot 2 de dado */
+  --ai-tint:      #FAF0E2;
+  --ai-rule:      #E9D5B4;
+
+  /* ---- estado (reservado, nunca usado como identidade de série) --------- */
+  --pos:          #0A6B3D;
+  --neg:          #A8322B;
+  --warn:         #8A5B14;
+  --pos-tint:     #E7F4EC;
+  --neg-tint:     #FBECEA;
+  --warn-tint:    #FBF1DF;
+
+  /* ---- cromo de gráfico ------------------------------------------------- */
+  --chart-surface: var(--surface);
+  --grid:          var(--rule-2);
+  --axis:          var(--rule-strong);
+  --series-1:      var(--brand-mark);
+  --series-2:      var(--ai-mark);
+  --series-mute:   #C3C7C2;   /* hue de de-ênfase para sparkline */
+  --ord-1:         #6FC0A6;   /* pessimista */
+  --ord-2:         #0E8A67;   /* realista   */
+  --ord-3:         #0A5741;   /* otimista   */
+
+  /* ---- tipografia ------------------------------------------------------- */
+  --font-sans:  'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  --font-mono:  'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --t-display: clamp(2.375rem, 5.6vw, 4.5rem);
+  --t-h2:      clamp(1.875rem, 4.2vw, 3.125rem);
+  --t-h3:      clamp(1.125rem, 1.5vw, 1.375rem);
+  --t-lead:    clamp(1.0625rem, 1.35vw, 1.3125rem);
+  --t-body:    1.0625rem;
+  --t-sm:      0.9375rem;
+  --t-xs:      0.8125rem;
+  --t-label:   0.6875rem;    /* mono, caixa alta, tracking largo */
+
+  --lh-display: 0.98;
+  --lh-h2:      1.04;
+  --lh-body:    1.62;
+
+  /* ---- espaço · base 4 -------------------------------------------------- */
+  --s1: 4px;   --s2: 8px;   --s3: 12px;  --s4: 16px;  --s5: 20px;
+  --s6: 24px;  --s8: 32px;  --s10: 40px; --s12: 48px; --s16: 64px;
+  --s20: 80px; --s24: 96px; --s32: 128px;
+  --band:      clamp(72px, 9vw, 148px);   /* respiro vertical de seção */
+  --gutter:    clamp(20px, 5vw, 56px);
+
+  /* ---- forma ------------------------------------------------------------ */
+  --r1: 4px;  --r2: 8px;  --r3: 12px;  --r4: 16px;  --r5: 22px;
+  --r-pill: 999px;
+
+  /* ---- elevação · "papel levantado", nunca fumaça ----------------------- */
+  --sh1: 0 1px 2px rgba(11, 18, 15, .05);
+  --sh2: 0 1px 3px rgba(11, 18, 15, .06), 0 10px 26px -14px rgba(11, 18, 15, .12);
+  --sh3: 0 2px 4px rgba(11, 18, 15, .05), 0 28px 64px -28px rgba(11, 18, 15, .22);
+
+  /* ---- medida ----------------------------------------------------------- */
+  --page:      1200px;
+  --page-wide: 1340px;
+  --measure:   62ch;
+
+  /* ---- movimento -------------------------------------------------------- */
+  --ease:     cubic-bezier(.22, .61, .36, 1);
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+  --dur-1: 140ms;
+  --dur-2: 260ms;
+  --dur-3: 620ms;
+}
+
+/* ============================================================================
+   Modo escuro. Passos escolhidos e validados PARA a superfície escura, não um
+   inverso automático do claro.
+
+   O atributo `data-appearance` é resolvido uma única vez em JS
+   (lib/useAppearance.js): preferência do sistema, com `[data-theme]` do app
+   vencendo quando existir. Um bloco só, sem triplicar a lista de tokens, e
+   reage a mudanças do sistema em tempo real.
+   ==========================================================================*/
+.mn[data-appearance='dark'] {
+  color-scheme: dark;
+
+  --paper:        #0A0E0D;
+  --paper-2:      #0E1311;
+  --paper-3:      #121816;
+  --surface:      #141A18;
+  --surface-2:    #191F1D;
+
+  --ink:          #F2F3F1;   /* 16.9:1 sobre a superfície escura */
+  --ink-2:        #A3ADA9;   /*  8.1:1 */
+  --ink-3:        #818B87;   /*  5.3:1 */
+
+  --rule:         #232B28;
+  --rule-2:       #1D2422;
+  --rule-strong:  #303935;
+
+  --brand:        #3FBF97;   /* 8.1:1 · link e texto de marca */
+  --brand-hover:  #62D0AE;
+  --brand-mark:   #12A87E;   /* slot 1 de dado, validado no escuro */
+  --brand-soft:   #A5D9C6;
+  --brand-tint:   #0F1F19;
+  --brand-tint-2: #14291F;
+  --brand-ring:   rgba(63, 191, 151, .34);
+
+  --ai:           #D99A4E;   /* 7.8:1 */
+  --ai-mark:      #C87C24;   /* slot 2 de dado, validado no escuro */
+  --ai-tint:      #201811;
+  --ai-rule:      #3A2C18;
+
+  --pos:          #35BE7C;
+  --neg:          #E0736A;
+  --warn:         #D6A24A;
+  --pos-tint:     #0E2318;
+  --neg-tint:     #2A1614;
+  --warn-tint:    #241C0E;
+
+  --series-mute:  #3A423F;
+  --ord-1:        #A5D9C6;
+  --ord-2:        #33A886;
+  --ord-3:        #0B6E52;
+
+  --sh1: 0 1px 2px rgba(0, 0, 0, .5);
+  --sh2: 0 1px 3px rgba(0, 0, 0, .55), 0 10px 26px -14px rgba(0, 0, 0, .7);
+  --sh3: 0 2px 4px rgba(0, 0, 0, .5),  0 28px 64px -28px rgba(0, 0, 0, .8);
+}
