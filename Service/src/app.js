@@ -15,6 +15,18 @@ const authRoutes = require('./routes/auth');
 
 const app = express();
 
+// Atrás de 1 proxy reverso (nginx, na VPS) -- sem isso, req.ip não reflete
+// o IP real de quem fez a requisição (vira sempre o IP do próprio nginx,
+// já que a conexão TCP que o Node vê é local), e o express-rate-limit
+// (authLimiter/apiLimiter em middleware/rateLimit.js) se recusa a
+// funcionar quando vê X-Forwarded-For sem essa configuração -- por
+// segurança, ele não confia num header que qualquer cliente pode forjar
+// pra contornar o limite, e derruba a request com
+// ERR_ERL_UNEXPECTED_X_FORWARDED_FOR em vez de aplicar o limite errado
+// silenciosamente. Isso batia em toda requisição real que passasse pelo
+// nginx, causando o crash-loop do PM2 em produção.
+app.set('trust proxy', 1);
+
 // Middlewares
 app.use(helmet());
 app.use(corsMiddleware);
