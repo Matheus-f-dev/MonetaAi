@@ -35,12 +35,18 @@ const formatter = new Intl.NumberFormat('pt-BR', {
 export function MoneyFigure({ value, sign = 'auto', size = 'md', showSign = false, className }: MoneyFigureProps) {
   const resolvedSign = sign === 'auto' ? (value < 0 ? 'negative' : value > 0 ? 'positive' : 'neutral') : sign;
   const absValue = Math.abs(value);
-  const signChar = value < 0 ? '−' : '+';
+  // Achado testando a Fase 2 (dashboard): quem chama com sign="negative"/
+  // "positive" explícito costuma já ter tirado o sinal do valor (ex.: uma
+  // lista de transação que já sabe o tipo e manda value=Math.abs(...)) --
+  // usar `value < 0` aqui pra decidir o caractere ignorava esse caso e
+  // mostrava "+" numa despesa. O sinal mostrado tem que vir da MESMA
+  // decisão que decide a cor (`resolvedSign`), nunca do valor bruto de novo.
+  const signChar = resolvedSign === 'negative' ? '−' : '+';
 
   return (
     <span
       className={[styles.figure, styles[resolvedSign], styles[size], className].filter(Boolean).join(' ')}
-      aria-label={`${value < 0 ? 'menos' : 'mais'} ${formatter.format(absValue)} reais`}
+      aria-label={`${resolvedSign === 'negative' ? 'menos' : 'mais'} ${formatter.format(absValue)} reais`}
     >
       {showSign && <span className={styles.sign}>{signChar}</span>}
       <span className={styles.currency}>R$</span>
