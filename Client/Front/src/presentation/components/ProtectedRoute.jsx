@@ -1,16 +1,4 @@
-import { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-
-// Rotas que não exigem sessão ativa — login, cadastro, páginas públicas e o
-// callback do Google (que é justamente quem CRIA a sessão).
-const PUBLIC_ROUTES = [
-  '/', '/login', '/cadastro', '/esqueci-senha',
-  '/auth/callback', '/privacy-policy', '/terms-of-service',
-  // Catálogo do design system (Fase 0 do redesign) -- só monta em dev
-  // (ver App.jsx). Público de propósito: é material de referência do
-  // time, não faz sentido exigir estar logado pra abrir.
-  ...(import.meta.env.DEV ? ['/design-system'] : [])
-];
+import { Navigate, Outlet } from 'react-router-dom';
 
 // Existe um token no localStorage e ele ainda não expirou? Decodifica só o
 // payload do JWT (sem checar assinatura — isso é sempre papel da API em
@@ -28,30 +16,23 @@ function hasValidSession() {
   }
 }
 
-export function ProtectedRoute({ children }) {
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  const currentPath = location.pathname;
-  const authorized = PUBLIC_ROUTES.includes(currentPath) || hasValidSession();
-
-  // O redirecionamento em si precisa ser um efeito (não dá pra chamar
-  // navigate() durante o render) -- mas a decisão de NÃO renderizar
-  // `children` é calculada acima, direto no render, de propósito: se isso
-  // dependesse só deste efeito, a página protegida (e os efeitos dela --
-  // ex.: fetch de saldo/transações) já teria montado no primeiro paint,
-  // antes do efeito abaixo rodar (efeito de componente filho dispara antes
-  // do efeito do pai). Não chegava a vazar dado nenhum de verdade -- a API
-  // também exige o JWT em cada chamada -- mas piscava a tela protegida por
-  // um frame pra quem não tinha sessão nenhuma. Retornando `null`
-  // enquanto `authorized` for falso evita esse flash.
-  useEffect(() => {
-    if (!authorized) {
-      navigate('/login', { replace: true });
-    }
-  }, [authorized, navigate]);
-
-  if (!authorized) return null;
-
-  return children;
+// Adaptado na Fase 1 do redesign pra árvore de rotas real (react-router
+// <Route> aninhado): antes era um componente que recebia `children` e
+// decidia renderizar ou não; agora é o `element` de um <Route> pai, e
+// `Outlet` renderiza o filho que casou com a URL. A lista de rotas
+// públicas sumiu de propósito -- não faz falta mais, porque com rotas de
+// verdade uma página pública simplesmente não é filha deste <Route>, em
+// vez de precisar aparecer numa lista de exceções aqui dentro.
+//
+// `<Navigate>` renderiza null enquanto redireciona (o próprio react-router
+// faz isso via efeito interno) -- então esta troca também elimina, de
+// graça, o flash de conteúdo protegido que a versão anterior corrigia na
+// mão (calculando `authorized` fora do efeito): aqui `Outlet` (a página
+// protegida) só é alcançado quando `hasValidSession()` já é verdadeiro,
+// nunca chega a montar pra depois ser desmontado.
+export function ProtectedRoute() {
+  if (!hasValidSession()) {
+    return <Navigate to="/login" replace />;
+  }
+  return <Outlet />;
 }

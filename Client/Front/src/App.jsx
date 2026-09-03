@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
 import './App.css';
 import './presentation/styles/pages/profile.css';
@@ -27,6 +27,8 @@ import Agent from './presentation/pages/Agent';
 import AuthCallback from './presentation/pages/AuthCallback';
 import PrivacyPolicy from './presentation/pages/legal/PrivacyPolicy';
 import TermsOfService from './presentation/pages/legal/TermsOfService';
+import { AppShell } from './app-shell/AppShell';
+
 // Catálogo do design system: a atribuição inteira fica atrás de
 // import.meta.env.DEV, que o Vite substitui por `false` no build --
 // aí o Rollup elimina o ramo morto e o import() dinâmico junto, e a
@@ -36,69 +38,73 @@ const DesignSystemPage = import.meta.env.DEV
   ? lazy(() => import('./design-system/pages/DesignSystemPage'))
   : null;
 
-function AppRouter() {
-  const location = useLocation();
-  
-  const renderComponent = () => {
-    const currentPath = location.pathname;
-
-    if (currentPath === '/') return <LandingPage />;
-
-    // Catálogo do design system do redesign (Fase 0) -- só existe em
-    // desenvolvimento; `import.meta.env.DEV` é estático, então o Vite
-    // remove a página inteira do bundle de produção no tree-shaking.
-    if (import.meta.env.DEV && currentPath === '/design-system') {
-      return <DesignSystemPage />;
-    }
-
-    // Rotas diretas
-    switch (currentPath) {
-      case '/login': return <LoginCard />;
-      case '/cadastro': return <Cadastro />;
-      case '/esqueci-senha': return <RedefinirSenha />;
-      case '/system': return <System />;
-      case '/expenses': return <Expenses />;
-      case '/incomes': return <Incomes />;
-      case '/cartoes': return <Cards />;
-      case '/gastos-fixos': return <FixedExpenses />;
-      case '/pessoas': return <People />;
-      case '/contas': return <Contas />;
-      case '/profile': return <Profile />;
-      case '/alerts': return <Alerts />;
-      case '/reports': return <Reports />;
-      case '/analytics': return <Analytics />;
-      case '/impacto-financeiro': return <ImpactoFinanceiro />;
-      case '/agent': return <Agent />;
-      case '/auth/callback': return <AuthCallback />;
-      case '/privacy-policy': return <PrivacyPolicy />;
-      case '/terms-of-service': return <TermsOfService />;
-    }
-
-    return <LandingPage />;
-  };
-  
-  return (
-    <ProtectedRoute>
-      <Suspense fallback={null}>
-        {renderComponent()}
-      </Suspense>
-    </ProtectedRoute>
-  );
-}
-
 function App() {
+  // Legado, ainda em uso -- aplica data-theme/data-color-scheme no
+  // `.sys-layout` de cada página antiga não redesenhada (a maioria do
+  // app, ainda). O tema do redesign (useAppTheme, dentro do AppShell)
+  // é independente disso e escreve no <html>, não no `.sys-layout` --
+  // os dois convivem sem conflito até a última página antiga sumir.
   useTheme();
-  
+
   return (
     <>
       <div className="background"></div>
-      <Routes>
-        <Route path="/*" element={<AppRouter />} />
-      </Routes>
+      <Suspense fallback={null}>
+        <Routes>
+          {/* Público -- sem sessão, sem shell. */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<LoginCard />} />
+          <Route path="/cadastro" element={<Cadastro />} />
+          <Route path="/esqueci-senha" element={<RedefinirSenha />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-of-service" element={<TermsOfService />} />
+
+          {/* Protegido -- <ProtectedRoute/> é a guarda (Fase 1: adaptada
+              pra árvore de rotas real, ver o arquivo). Duas camadas:
+
+              1) Páginas ainda não redesenhadas -- guardadas, mas com o
+                 próprio layout/sidebar interno intacto (ver decisão da
+                 Fase 1 no resumo: forçar o AppShell novo nelas sem
+                 reconstruir o conteúdo arriscava quebrar CSS acoplado
+                 de um app em produção, tipo `.sys-layout .sys-topbar{
+                 position: absolute }`). Migram pro AppShell quando a
+                 própria fase reconstrói a tela (Fase 2 em diante).
+
+              2) Páginas já na identidade nova -- filhas do <AppShell/>
+                 (sidebar/topbar novos, tema, os 7 grupos de navegação
+                 da Fase 0). Hoje só o catálogo do design system; a
+                 primeira página de produto entra na Fase 2. */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/system" element={<System />} />
+            <Route path="/expenses" element={<Expenses />} />
+            <Route path="/incomes" element={<Incomes />} />
+            <Route path="/cartoes" element={<Cards />} />
+            <Route path="/gastos-fixos" element={<FixedExpenses />} />
+            <Route path="/pessoas" element={<People />} />
+            <Route path="/contas" element={<Contas />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/alerts" element={<Alerts />} />
+            <Route path="/reports" element={<Reports />} />
+            <Route path="/analytics" element={<Analytics />} />
+            <Route path="/impacto-financeiro" element={<ImpactoFinanceiro />} />
+            <Route path="/agent" element={<Agent />} />
+
+            {import.meta.env.DEV && (
+              <Route element={<AppShell />}>
+                <Route path="/design-system" element={<DesignSystemPage />} />
+              </Route>
+            )}
+          </Route>
+
+          {/* Qualquer coisa fora daqui (URL digitada errada, link velho) -- home,
+              nunca uma tela em branco. */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
       <ToastContainer />
     </>
   );
 }
-
 
 export default App;

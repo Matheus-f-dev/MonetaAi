@@ -1,0 +1,67 @@
+.topbar {
+  height: var(--shell-topbar-h);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: 0 var(--space-6);
+  border-bottom: 1px solid var(--color-line);
+  background: var(--color-bg-raised);
+}
+
+.menuButton {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--color-ink);
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+.menuButton:hover {
+  background: var(--color-bg-sunken);
+}
+
+.greeting {
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+}
+
+.greetingName {
+  color: var(--color-ink);
+  font-weight: var(--weight-semibold);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-left: auto;
+}
+
+.iconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: none;
+  border: 1px solid var(--color-line);
+  color: var(--color-ink-muted);
+}
+
+.iconButton:hover {
+  background: var(--color-bg-sunken);
+  color: var(--color-ink);
+}
+
+@media (max-width: 900px) {
+  .menuButton {
+    display: flex;
+  }
+  .greeting {
+    display: none;
+  }
+}

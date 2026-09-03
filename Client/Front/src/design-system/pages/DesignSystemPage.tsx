@@ -61,21 +61,8 @@ function Section({ title, note, children }: { title: string; note?: string; chil
  * pra um time de 6 pessoas num projeto de faculdade.
  */
 export default function DesignSystemPage() {
-  // Sem data-theme explícito no root, quem decide é o prefers-color-scheme
-  // (ver tokens.css) -- ler só o atributo mostrava "claro" numa tela escura.
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
-    const attr = document.documentElement.getAttribute('data-theme');
-    if (attr === 'light' || attr === 'dark') return attr;
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  });
   const [modalOpen, setModalOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
-
-  function toggleTheme() {
-    const next = theme === 'light' ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', next);
-    setTheme(next);
-  }
 
   return (
     <div className={`ds-scope ${styles.page}`}>
@@ -90,9 +77,6 @@ export default function DesignSystemPage() {
               monoespaçada com algarismos tabulares, o elemento que dá identidade ao produto inteiro.
             </p>
           </div>
-          <Button variant="secondary" onClick={toggleTheme}>
-            Tema: {theme === 'light' ? 'claro' : 'escuro'}
-          </Button>
         </header>
 
         <Section title="Cor" note="Mesmos nomes de token nos dois temas — nenhuma tela referencia hex direto.">
