@@ -107,6 +107,14 @@
   min-height: 100vh;
   background: var(--bg);
   color: var(--text);
+  /* Achado testando a Fase 1 do redesign, bug pré-existente (não é coisa
+     nova): App.jsx renderiza <div class="background"> fixo com z-index
+     0. Elemento posicionado pinta acima de conteúdo estático por padrão,
+     não importa a ordem no DOM -- sem isso, o gradiente cobria a sidebar
+     e o conteúdo inteiros. Confirmado via document.elementFromPoint, não
+     é só a tela de captura desta sessão. */
+  position: relative;
+  z-index: 1;
 }
 
 /* ===== Sidebar ===== */
