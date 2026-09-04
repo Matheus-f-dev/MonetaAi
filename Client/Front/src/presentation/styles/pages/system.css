@@ -126,7 +126,10 @@
   flex-direction: column;
   gap: 18px;
 }
-.sys-brand{ font-weight: 800; font-size: 22px; color: #6d28d9; letter-spacing: .2px; }
+/* Era #6d28d9 fixo -- achado testando o seletor de cor (Perfil): a
+   marca "MonetaAi" na sidebar antiga nunca acompanhava a cor escolhida
+   porque não usava a variável nenhuma, só um hex cravado aqui. */
+.sys-brand{ font-weight: 800; font-size: 22px; color: var(--primary-color); letter-spacing: .2px; }
 .sys-side-group{ display:flex; flex-direction:column; gap:8px; }
 .sys-side-title{ font-size:12px; color: var(--muted); margin:4px 8px 6px; }
 .sys-side-nav{ display:grid; gap:4px; }

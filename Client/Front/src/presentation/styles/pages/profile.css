@@ -81,54 +81,59 @@
   background: linear-gradient(45deg, #f8f9fa 25%, #1a1d29 25%, #1a1d29 50%, #f8f9fa 50%, #f8f9fa 75%, #1a1d29 75%);
 }
 
-.color-options {
-  display: flex;
-  gap: 1rem;
-  width: 100%;
-}
-
-.color-card {
+.color-picker-row {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
   padding: 0.75rem 1rem;
   border: 2px solid var(--border-color);
   border-radius: 8px;
+}
+
+/* Input nativo de cor -- é ele quem abre a paleta com o seletor RGB/hex
+   do próprio navegador, não tem como (nem por que) recriar isso do zero. */
+.color-picker-input {
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  background: none;
+  flex-shrink: 0;
+}
+
+.color-picker-input::-webkit-color-swatch-wrapper {
+  padding: 2px;
+}
+
+.color-picker-input::-webkit-color-swatch {
+  border: none;
+  border-radius: 6px;
+}
+
+.color-picker-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
   flex: 1;
-  justify-content: center;
+  min-width: 160px;
 }
 
-.color-card:hover {
-  border-color: var(--primary-color) !important;
+.color-picker-hex {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-weight: 700;
+  color: var(--text-color);
 }
 
-.color-card.selected {
-  border-color: var(--primary-color);
-  background-color: var(--primary-light);
+.color-picker-hint {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
 }
 
-.color-circle {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-}
-
-.color-circle.purple {
-  background-color: #8b5cf6;
-}
-
-.color-circle.blue {
-  background-color: #3b82f6;
-}
-
-.color-circle.green {
-  background-color: #10b981;
-}
-
-.color-circle.pink {
-  background-color: #ec4899;
+.color-picker-reset {
+  white-space: nowrap;
 }
 
 .profile-select {
@@ -186,7 +191,7 @@
 }
 
 .theme-card:hover,
-.color-card:hover {
+.color-picker-row:hover {
   border-color: var(--primary-color) !important;
 }
 

@@ -13,6 +13,7 @@ import './presentation/styles/pages/system-hovers.css';
 // das duas linhas acima.
 import './presentation/styles/pages/system.css';
 import { useTheme } from './presentation/hooks/useTheme';
+import { useBrandColor } from './app-shell/useBrandColor';
 import { ProtectedRoute } from './presentation/components/ProtectedRoute';
 import { ToastContainer } from './presentation/components/system/ToastContainer';
 // Lazy: mantém a landing fora do bundle de quem só vai fazer login e usar o painel.
@@ -58,6 +59,10 @@ function App() {
   // é independente disso e escreve no <html>, não no `.sys-layout` --
   // os dois convivem sem conflito até a última página antiga sumir.
   useTheme();
+  // Chamado aqui (não só dentro de Profile.jsx, de onde o usuário
+  // escolhe a cor) pra aplicar em toda rota, mesmo entrando direto numa
+  // página que não passa por Profile primeiro -- ver o hook.
+  useBrandColor();
 
   return (
     <>

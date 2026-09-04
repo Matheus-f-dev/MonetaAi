@@ -1,74 +1,57 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Sidebar } from '../components/system/Sidebar';
 import { useToast } from '../hooks/useToast';
+import { useAppTheme } from '../../app-shell/useAppTheme';
+import { DEFAULT_BRAND_COLOR, useBrandColor } from '../../app-shell/useBrandColor';
 
 export default function Profile() {
   const { addToast } = useToast();
-  const [theme, setTheme] = useState('light');
-  const [colorScheme, setColorScheme] = useState('purple');
-  const [font, setFont] = useState('Roboto');
-  const [fontSize, setFontSize] = useState('medium');
+  // Claro/escuro: mesmo hook do topbar do app novo (useAppTheme), não um
+  // estado local próprio -- achado real testando com o app de verdade:
+  // os botões antigos só escreviam num atributo dentro de `.sys-layout`,
+  // que nada mais no app lia. Clicar aqui não fazia diferença nenhuma
+  // fora desta própria tela. Agora é a mesma fonte de verdade do toggle
+  // no topbar (que já funcionava): os dois sempre concordam.
+  const { preference: theme, setPreference: setTheme } = useAppTheme();
+  // Cor de destaque: idem -- a lista de 4 cores fixas (Roxo/Azul/Verde/
+  // Rosa) tinha exatamente o mesmo problema (só mudava um atributo que
+  // nada lia) E nem cobria "qualquer cor" -- troquei por um seletor de
+  // cor de verdade (input nativo do navegador, mostra a paleta RGB/hex
+  // pra escolher qualquer tom), que aplica em tempo real no app inteiro
+  // (telas novas E antigas -- ver useBrandColor).
+  const { color: brandColor, setColor: setBrandColor, resetColor: resetBrandColor } = useBrandColor();
+  const [font, setFont] = useState(() => localStorage.getItem('font') || 'Roboto');
+  const [fontSize, setFontSize] = useState(() => localStorage.getItem('fontSize') || 'medium');
 
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    const savedColorScheme = localStorage.getItem('colorScheme') || 'purple';
-    const savedFont = localStorage.getItem('font') || 'Roboto';
-    const savedFontSize = localStorage.getItem('fontSize') || 'medium';
-    
-    setTheme(savedTheme);
-    setColorScheme(savedColorScheme);
-    setFont(savedFont);
-    setFontSize(savedFontSize);
-    
-    applyTheme(savedTheme, savedColorScheme, savedFont, savedFontSize);
-  }, []);
-
-  const applyTheme = (selectedTheme, selectedColorScheme, selectedFont, selectedFontSize) => {
-    const sysLayout = document.querySelector('.sys-layout');
-    if (sysLayout) {
-      sysLayout.setAttribute('data-theme', selectedTheme);
-      sysLayout.setAttribute('data-color-scheme', selectedColorScheme);
-      sysLayout.setAttribute('data-font', selectedFont);
-      sysLayout.setAttribute('data-font-size', selectedFontSize);
-    }
-  };
+  // "system" (padrão antes de qualquer escolha explícita) não é nem
+  // "light" nem "dark" -- resolve pro que está de fato na tela agora,
+  // só pra decidir qual dos dois cartões mostrar como selecionado.
+  const effectiveTheme =
+    theme === 'system' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme;
 
   const handleThemeChange = (newTheme) => {
     setTheme(newTheme);
-    applyTheme(newTheme, colorScheme, font, fontSize);
-  };
-
-  const handleColorSchemeChange = (newColorScheme) => {
-    setColorScheme(newColorScheme);
-    applyTheme(theme, newColorScheme, font, fontSize);
   };
 
   const handleFontChange = (newFont) => {
     setFont(newFont);
-    applyTheme(theme, colorScheme, newFont, fontSize);
   };
 
   const handleFontSizeChange = (newFontSize) => {
     setFontSize(newFontSize);
-    applyTheme(theme, colorScheme, font, newFontSize);
   };
 
   const savePreferences = () => {
-    localStorage.setItem('theme', theme);
-    localStorage.setItem('colorScheme', colorScheme);
     localStorage.setItem('font', font);
     localStorage.setItem('fontSize', fontSize);
     addToast('Preferências salvas com sucesso!', 'success');
   };
 
   const resetToDefault = () => {
-    setTheme('light');
-    setColorScheme('purple');
+    setTheme('system');
+    resetBrandColor();
     setFont('Roboto');
     setFontSize('medium');
-    applyTheme('light', 'purple', 'Roboto', 'medium');
-    localStorage.removeItem('theme');
-    localStorage.removeItem('colorScheme');
     localStorage.removeItem('font');
     localStorage.removeItem('fontSize');
   };
@@ -86,16 +69,16 @@ export default function Profile() {
           <div className="profile-section">
             <h2>Tema</h2>
             <div className="theme-options">
-              <div 
-                className={`theme-card ${theme === 'light' ? 'selected' : ''}`}
+              <div
+                className={`theme-card ${effectiveTheme === 'light' ? 'selected' : ''}`}
                 onClick={() => handleThemeChange('light')}
               >
                 <div className="theme-text">Claro</div>
                 <div className="theme-preview light-preview"></div>
                 <span>Claro</span>
               </div>
-              <div 
-                className={`theme-card ${theme === 'dark' ? 'selected' : ''}`}
+              <div
+                className={`theme-card ${effectiveTheme === 'dark' ? 'selected' : ''}`}
                 onClick={() => handleThemeChange('dark')}
               >
                 <div className="theme-text">Escuro</div>
@@ -107,36 +90,24 @@ export default function Profile() {
           </div>
 
           <div className="profile-section">
-            <h2>Esquema de cores</h2>
-            <div className="color-options">
-              <div 
-                className={`color-card ${colorScheme === 'purple' ? 'selected' : ''}`}
-                onClick={() => handleColorSchemeChange('purple')}
-              >
-                <div className="color-circle purple"></div>
-                <span>Roxo (padrão)</span>
+            <h2>Cor de destaque</h2>
+            <div className="color-picker-row">
+              <input
+                type="color"
+                className="color-picker-input"
+                value={brandColor || DEFAULT_BRAND_COLOR}
+                onChange={(e) => setBrandColor(e.target.value)}
+                aria-label="Escolher cor de destaque"
+              />
+              <div className="color-picker-info">
+                <span className="color-picker-hex">{(brandColor || DEFAULT_BRAND_COLOR).toUpperCase()}</span>
+                <span className="color-picker-hint">Clique no quadrado pra escolher qualquer cor (paleta ou RGB/hex)</span>
               </div>
-              <div 
-                className={`color-card ${colorScheme === 'blue' ? 'selected' : ''}`}
-                onClick={() => handleColorSchemeChange('blue')}
-              >
-                <div className="color-circle blue"></div>
-                <span>Azul</span>
-              </div>
-              <div 
-                className={`color-card ${colorScheme === 'green' ? 'selected' : ''}`}
-                onClick={() => handleColorSchemeChange('green')}
-              >
-                <div className="color-circle green"></div>
-                <span>Verde</span>
-              </div>
-              <div 
-                className={`color-card ${colorScheme === 'pink' ? 'selected' : ''}`}
-                onClick={() => handleColorSchemeChange('pink')}
-              >
-                <div className="color-circle pink"></div>
-                <span>Rosa</span>
-              </div>
+              {brandColor && (
+                <button type="button" className="btn-secondary color-picker-reset" onClick={resetBrandColor}>
+                  Usar cor padrão
+                </button>
+              )}
             </div>
           </div>
 
