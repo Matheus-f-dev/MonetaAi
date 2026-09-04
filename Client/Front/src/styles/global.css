@@ -69,7 +69,14 @@
   cursor: pointer;
 }
 
-.ds-scope a {
+/* :where() zera a especificidade da própria regra (fica só a do `a`
+   sozinho) -- sem isso, "classe + elemento" (0,1,1) vencia qualquer
+   componente estilizado com uma única classe de CSS Module (0,1,0), tipo
+   o .item da Sidebar. Achado real testando o seletor de cor: todo link
+   do menu (não só o ativo) saía na cor de marca em vez do cinza neutro
+   pretendido -- mascarado até aqui porque o verde-marca padrão e o
+   cinza-tinta ficavam parecidos o bastante pra não chamar atenção. */
+:where(.ds-scope) a {
   color: var(--color-brand);
 }
 
