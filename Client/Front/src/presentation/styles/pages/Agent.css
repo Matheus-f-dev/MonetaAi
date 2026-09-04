@@ -4,6 +4,13 @@
   display: flex;
   min-height: 100vh;
   background: var(--bg-primary, #0f0f1a);
+  /* Mesmo bug do .background fixo (z-index 0) cobrindo conteúdo estático
+     já encontrado e corrigido em .sys-layout (Fase 1) e ChangePassword.css
+     (Fase 3) -- achado agora conferindo a página de novo na Fase 9,
+     dormente até aqui porque ninguém tinha vindo direto pra /agent com
+     a página recém-carregada. Mesmo fix de uma linha. */
+  position: relative;
+  z-index: 1;
 }
 
 .agent-page__main {
