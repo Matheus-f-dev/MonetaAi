@@ -12,9 +12,38 @@ import styles from './AppShell.module.css';
  * continuam com o próprio layout interno intacto até serem reconstruídas
  * de verdade -- ver a nota em App.jsx pro raciocínio completo.
  */
+const COLLAPSED_KEY = 'moneta-sidebar-collapsed';
+
+function readCollapsed(): boolean {
+  try {
+    return localStorage.getItem(COLLAPSED_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
 export function AppShell() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  // Achado testando com o app de verdade: em monitor largo, a sidebar
+  // sempre expandida some vertida numa fatia fixa de 248px que não dá
+  // pra recuperar -- não tinha jeito nenhum de encolher pra ganhar
+  // espaço pro conteúdo. Colapsa pra um trilho só de ícones (persistido
+  // em localStorage, é preferência por dispositivo, não por conta).
+  const [collapsed, setCollapsed] = useState(readCollapsed);
   const { preference, toggle } = useAppTheme();
+
+  function toggleCollapsed() {
+    setCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem(COLLAPSED_KEY, next ? '1' : '0');
+      } catch {
+        // localStorage indisponível -- o toggle ainda funciona pra
+        // sessão atual, só não persiste pro próximo carregamento.
+      }
+      return next;
+    });
+  }
 
   // Fecha o drawer automaticamente se a viewport crescer pra desktop --
   // sem isso, redimensionar a janela com o drawer aberto deixava ele
@@ -41,7 +70,7 @@ export function AppShell() {
       )}
 
       <div className={[styles.sidebarSlot, mobileOpen && styles.sidebarSlotOpen].filter(Boolean).join(' ')}>
-        <Sidebar onLogout={handleLogout} onNavigate={() => setMobileOpen(false)} />
+        <Sidebar onLogout={handleLogout} onNavigate={() => setMobileOpen(false)} collapsed={collapsed} onToggleCollapse={toggleCollapsed} />
       </div>
 
       <div className={styles.main}>

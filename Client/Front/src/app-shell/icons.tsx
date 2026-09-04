@@ -134,3 +134,13 @@ export function BellIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+// Um chevron só -- a direção vira com CSS (rotate 180deg) conforme o
+// estado, mesmo truque já usado no chevron de PessoasPage.
+export function CollapseIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M15 5l-7 7 7 7" />
+    </svg>
+  );
+}

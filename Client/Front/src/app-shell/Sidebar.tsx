@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { NAV_GROUPS } from './navConfig';
 import {
   AutomationIcon,
+  CollapseIcon,
   InsightsIcon,
   LogoutIcon,
   MovementIcon,
@@ -27,14 +28,31 @@ export interface SidebarProps {
   onLogout: () => void;
   /** Fecha o drawer no mobile depois de navegar -- no desktop é um no-op. */
   onNavigate?: () => void;
+  /** Trilho só de ícones (desktop). No mobile o drawer ignora isso --
+   * sempre abre expandido, controlado pelo hamburguer, não pelo colapso. */
+  collapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
-export function Sidebar({ onLogout, onNavigate }: SidebarProps) {
+export function Sidebar({ onLogout, onNavigate, collapsed = false, onToggleCollapse }: SidebarProps) {
   return (
-    <nav className={styles.sidebar} aria-label="Navegação principal">
-      <div className={styles.brand}>
-        <span className={styles.brandMark} aria-hidden="true">M</span>
-        Moneta
+    <nav className={[styles.sidebar, collapsed && styles.sidebarCollapsed].filter(Boolean).join(' ')} aria-label="Navegação principal">
+      <div className={styles.brandRow}>
+        <div className={styles.brand}>
+          <span className={styles.brandMark} aria-hidden="true">M</span>
+          <span className={styles.brandText}>Moneta</span>
+        </div>
+        {onToggleCollapse && (
+          <button
+            type="button"
+            className={styles.collapseToggle}
+            onClick={onToggleCollapse}
+            aria-label={collapsed ? 'Expandir menu' : 'Recolher menu'}
+            title={collapsed ? 'Expandir menu' : 'Recolher menu'}
+          >
+            <CollapseIcon className={collapsed ? styles.collapseIconFlipped : undefined} />
+          </button>
+        )}
       </div>
 
       <div className={styles.groups}>
@@ -48,6 +66,8 @@ export function Sidebar({ onLogout, onNavigate }: SidebarProps) {
                   key={item.path}
                   to={item.path}
                   onClick={onNavigate}
+                  title={collapsed ? item.label : undefined}
+                  aria-label={item.label}
                   className={({ isActive }) => [styles.item, isActive && styles.itemActive].filter(Boolean).join(' ')}
                 >
                   {GroupIcon && (
@@ -55,7 +75,7 @@ export function Sidebar({ onLogout, onNavigate }: SidebarProps) {
                       <GroupIcon />
                     </span>
                   )}
-                  {item.label}
+                  <span className={styles.itemLabel}>{item.label}</span>
                 </NavLink>
               ))}
             </div>
@@ -64,11 +84,11 @@ export function Sidebar({ onLogout, onNavigate }: SidebarProps) {
       </div>
 
       <div className={styles.footer}>
-        <button type="button" className={styles.item} onClick={onLogout}>
+        <button type="button" className={styles.item} onClick={onLogout} title={collapsed ? 'Sair' : undefined} aria-label="Sair">
           <span className={styles.itemIcon} aria-hidden="true">
             <LogoutIcon />
           </span>
-          Sair
+          <span className={styles.itemLabel}>Sair</span>
         </button>
       </div>
     </nav>

@@ -9,6 +9,15 @@
   padding: var(--space-5) var(--space-4);
   height: 100%;
   overflow-y: auto;
+  overflow-x: hidden;
+  transition: width var(--duration-slow) var(--ease-standard), padding var(--duration-slow) var(--ease-standard);
+}
+
+.brandRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1);
 }
 
 .brand {
@@ -20,6 +29,34 @@
   font-weight: var(--weight-bold);
   font-size: var(--text-md);
   color: var(--color-brand);
+  min-width: 0;
+}
+
+.brandText {
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.collapseToggle {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: none;
+  border: none;
+  color: var(--color-ink-faint);
+}
+
+.collapseToggle:hover {
+  background: var(--color-bg-sunken);
+  color: var(--color-ink);
+}
+
+.collapseIconFlipped {
+  transform: rotate(180deg);
 }
 
 .brandMark {
@@ -34,6 +71,7 @@
   font-family: var(--font-mono);
   font-weight: var(--weight-bold);
   font-size: var(--text-sm);
+  flex-shrink: 0;
 }
 
 .groups {
@@ -57,6 +95,7 @@
   letter-spacing: 0.04em;
   padding: 0 var(--space-2);
   margin-bottom: var(--space-1);
+  white-space: nowrap;
 }
 
 .item {
@@ -69,6 +108,7 @@
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
   text-decoration: none;
+  white-space: nowrap;
   transition: background-color var(--duration-fast) var(--ease-standard),
               color var(--duration-fast) var(--ease-standard);
 }
@@ -99,4 +139,52 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
+}
+
+/* Trilho só de ícones -- só no desktop. O drawer do mobile (AppShell,
+   <900px) sempre abre expandido, ignora completamente esse estado --
+   por isso TODA regra do colapso (largura incluída) fica atrás deste
+   media query, não só a largura. Achado testando com o app de verdade
+   em monitor largo: sem isso não tinha nenhum jeito de encolher a
+   sidebar fixa de 248px pra ganhar espaço pro conteúdo. */
+@media (min-width: 901px) {
+  .sidebarCollapsed {
+    width: 76px;
+    padding-left: var(--space-2);
+    padding-right: var(--space-2);
+  }
+
+  .sidebarCollapsed .brandRow {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .sidebarCollapsed .brand {
+    padding: 0;
+  }
+
+  .sidebarCollapsed .brandText {
+    display: none;
+  }
+
+  .sidebarCollapsed .groupLabel {
+    display: none;
+  }
+
+  .sidebarCollapsed .item {
+    justify-content: center;
+    padding: 0.5rem;
+  }
+
+  /* O texto continua no DOM (aria-label garante o nome acessível
+     independente disso) -- só sai da tela visualmente, pra caber no
+     trilho estreito sem quebrar layout. */
+  .sidebarCollapsed .itemLabel {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
 }

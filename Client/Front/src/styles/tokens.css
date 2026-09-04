@@ -102,7 +102,11 @@
   /* ---------- Layout do shell ---------- */
   --shell-sidebar-w: 248px;
   --shell-topbar-h: 64px;
-  --shell-content-max-w: 1180px;
+  /* Sem teto -- cada tela ocupa a largura toda disponível dentro do
+     padding do shell. Achado testando em monitor largo: 1180px fixo
+     deixava uma faixa enorme de tela vazia à direita do conteúdo,
+     mesmo com a sidebar aberta. */
+  --shell-content-max-w: none;
 }
 
 /* ---------- Cor: modo escuro ---------- */
