@@ -9,10 +9,31 @@ O sistema permite que usuários organizem suas finanças de maneira simples e ef
 MonetaAi/
 ├── Client/Front/                 # Frontend React (MVC Adaptado)
 │   ├── src/
-│   │   ├── presentation/         # Views Layer
+│   │   ├── design-system/        # Redesign pós-login (Fase 0) -- tokens de tema
+│   │   │   │                       (claro/escuro), componentes-base (Button, Card,
+│   │   │   │                       Input, Select, Modal, Table, Badge, MoneyFigure,
+│   │   │   │                       QueryState, EmptyState, Skeleton) e o catálogo
+│   │   │   │                       navegável (/design-system, só em dev)
+│   │   ├── app-shell/             # Layout do app logado redesenhado -- sidebar,
+│   │   │   │                       topbar, sino de notificações, tema (Fases 0-5)
+│   │   ├── features/              # Cada domínio do redesign, uma pasta: api.ts
+│   │   │   │                       (fetch tipado) + queries.ts (hooks TanStack
+│   │   │   │                       Query) + as páginas .tsx da fase que o construiu
+│   │   │   ├── dashboard/         # Fase 2 -- Painel
+│   │   │   ├── movements/         # Fase 3 -- Gastos, Receitas, Gastos Fixos,
+│   │   │   │                       Receita Recorrente, Importar Extrato
+│   │   │   ├── wealth/            # Fase 4 -- Contas, Cartões, Orçamento, Metas
+│   │   │   ├── people/            # Fase 5 -- Pessoas
+│   │   │   ├── alerts/            # Fase 5 -- Alertas
+│   │   │   └── insights/          # Fase 6 -- Análises, Relatórios, Impacto Financeiro
+│   │   ├── presentation/         # Views Layer (páginas ainda não redesenhadas --
+│   │   │   │                       Agente de IA e Perfil, Fases 7-8 -- e os hooks/
+│   │   │   │                       validadores que as features acima reaproveitam)
 │   │   │   ├── pages/            # Views (Páginas React)
 │   │   │   ├── components/       # Componentes reutilizáveis
-│   │   │   │   └── system/       # Componentes do sistema
+│   │   │   │   └── system/       # Componentes do sistema (só o que Agent/Profile
+│   │   │   │                       ainda usam -- Sidebar, Toast, AgentChat; o resto
+│   │   │   │                       foi removido como código órfão na Fase 9)
 │   │   │   ├── hooks/            # Controllers (Custom Hooks)
 │   │   │   └── styles/           # Estilos CSS organizados
 │   │   │       ├── base/         # Estilos base
@@ -244,21 +265,22 @@ EXTRAS FUNCIONALIDADES
 ### 2. **Factory Method Pattern** ✅ FUNCIONANDO
 - **Backend:** `Service/src/services/TransactionFactory.js` - Criação de transações
 - **Frontend:** `Client/Front/src/core/services/TransactionFactory.js` - Validação e criação
-- **Uso:** TransactionController, TransactionModal
+- **Uso:** TransactionController, `features/movements/components/TransactionModal.tsx` (redesign da Fase 3)
 - **Benefício:** Centraliza criação e aplica regras específicas por tipo
 
 ### 3. **Observer Pattern** ✅ FUNCIONANDO
 - **Backend:** `Service/src/services/TransactionObserver.js` - Subject e Observers
 - **AlertObserver:** `Service/src/services/AlertObserver.js` - Monitora limites de gastos
 - **Controller:** `Service/src/controllers/TransactionController.js` - Notifica observers
-- **Frontend:** `Client/Front/src/presentation/hooks/useTransactionData.js` - Hook customizado
+- **Frontend:** `Client/Front/src/core/services/ObserverService.js` - Subject e Observers (`HighExpenseObserver`, `ActivityLogObserver`, `PatternAnalysisObserver`)
+- **Chamado em:** `Client/Front/src/features/movements/components/TransactionsListPage.tsx` (`observerService.notify(...)`, ao criar uma transação) — redesign da Fase 3, mesmo serviço de antes, só a tela que chama mudou
 - **Uso nos Alertas Personalizados:** Sistema de alertas automáticos que monitora gastos por categoria
 - **Benefício:** Alertas automáticos por categoria, notificações em tempo real, monitoramento de limites
 
 ### 4. **Strategy Pattern** ✅ FUNCIONANDO
 - **Validação:** `Client/Front/src/core/services/ValidationStrategy.js` - Estratégias de validação
 - **Filtros:** `Client/Front/src/core/services/FilterStrategy.js` - Estratégias de filtros
-- **Uso:** Login.jsx, Register.jsx, TransactionModal.jsx, useTransactionData.js
+- **Uso:** Login.jsx, Register.jsx, `features/movements/components/TransactionModal.tsx` (redesign da Fase 3 — mesma `ValidationContext`+`AmountValidation` de antes)
 - **Benefício:** Validações e filtros intercambiáveis e reutilizáveis
 
 ### Benefícios dos Padrões GoF
@@ -302,9 +324,12 @@ console.log(api1 === api2); // Deve retornar: true
 ### Hooks Customizados (Controllers Frontend)
 - `useAuth.js` - Controle de autenticação
 - `useTransactionData.js` - Gerenciamento de transações (Observer Pattern)
-- `useReports.js` - Lógica de relatórios
-- `useAlerts.js` - Controle de alertas
-- `useSystemSimple.js` - Dados do sistema principal
+- `useReports.js` / `useAnalytics.js` / `useReceitas.js` / `useEconomias.js` / `useTendencias.js` / `useImpactoFinanceiro.js` - Cálculo dos dados de Insights (Fase 6), consumidos pelas telas novas em `features/insights/`
+
+> Nota (Fase 9): `useSystemSimple.js`, `useTransactions.js`, `useAlertNotifications.js`,
+> `useAlerts.js`, `useSystemData.js`, `useFixedExpenses.js` e `useFilters.js` existiam
+> só pra páginas antigas já removidas (ou já não tinham nenhum lugar chamando) —
+> removidos junto com o resto do código órfão da Fase 9.
 
 ### Arquivos dos Padrões GoF
 ```
@@ -330,17 +355,16 @@ Client/Front/
 │   │       ├── TransactionFactory.js # Factory Method (Frontend)
 │   │       ├── ValidationStrategy.js # Strategy Pattern (Validação)
 │   │       └── FilterStrategy.js     # Strategy Pattern (Filtros)
+│   ├── features/movements/components/
+│   │   └── TransactionModal.tsx      # Usa Factory + Strategy (redesign, Fase 3)
+│   ├── features/movements/components/
+│   │   └── TransactionsListPage.tsx  # Chama observerService.notify() (redesign, Fase 3)
 │   └── presentation/
-│       ├── components/system/
-│       │   ├── ObserverLog.jsx       # Observer Pattern (View)
-│       │   └── TransactionModal.jsx  # Usa Factory + Strategy
 │       ├── hooks/
-│       │   ├── useTransactionData.js # Observer Pattern (método create) + Singleton
-│       │   └── useTransactions.js    # Hook de transações
+│       │   └── useTransactionData.js # Observer Pattern (método create) + Singleton
 │       └── pages/
 │           ├── Login.jsx             # Strategy Pattern
-│           ├── Register.jsx          # Strategy Pattern
-│           └── system.jsx            # Integra Observer
+│           └── Register.jsx          # Strategy Pattern
 ```
 
 
