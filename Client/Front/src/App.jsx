@@ -3,6 +3,15 @@ import { Suspense, lazy } from 'react';
 import './App.css';
 import './presentation/styles/pages/profile.css';
 import './presentation/styles/pages/system-hovers.css';
+// Fase 9: pages/system.jsx (a antiga tela de dashboard, dona deste
+// import antes) foi removida -- mas o arquivo em si não é só CSS
+// daquela tela. Define :root com as variáveis de tema (--bg, --card,
+// --text, --line, --primary...) e as classes .sys-layout/.sys-sidebar/
+// .sys-side-* que Profile.jsx, Agent.jsx e o Sidebar.jsx que os dois
+// ainda usam continuam precisando (nenhum dos dois migrou pro AppShell
+// ainda -- ficam pras Fases 7 e 8). Import direto aqui, mesmo padrão
+// das duas linhas acima.
+import './presentation/styles/pages/system.css';
 import { useTheme } from './presentation/hooks/useTheme';
 import { ProtectedRoute } from './presentation/components/ProtectedRoute';
 import { ToastContainer } from './presentation/components/system/ToastContainer';

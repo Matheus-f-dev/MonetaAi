@@ -1,61 +1,21 @@
-# Componentes do Sistema
+# Componentes do Sistema (legado)
 
-Esta pasta contém todos os componentes da página sistema, organizados de forma modular e reutilizável.
+Esta pasta guardava os componentes da antiga tela de dashboard
+(`pages/system.jsx`). Essa página saiu de rota na Fase 2 do redesign
+(substituída por `features/dashboard/DashboardPage.tsx`) e foi removida
+de vez na Fase 9, junto com os componentes que só ela usava.
 
-## Estrutura dos Componentes
+O que sobra aqui ainda está em uso de verdade — por `Agent.jsx` e
+`Profile.jsx`, as duas únicas páginas que ainda não migraram pro
+AppShell novo (ficam para as Fases 7 e 8):
 
-### Componentes Principais
-- **Sidebar**: Barra lateral com navegação principal
-- **Topbar**: Cabeçalho com saudação e ações
-- **Tabs**: Abas de navegação (Visão Geral, Saldo Futuro, Atividades)
+- **Sidebar** / **SideItem**: navegação lateral dessas páginas antigas.
+- **Toast** / **ToastContainer**: sistema de notificação usado pelo
+  app inteiro, novo e antigo (`ToastContainer` fica montado em
+  `App.jsx`).
+- **AgentChat**: chat do Agente de IA, usado por `Agent.jsx`.
+- **Icons**: ícones SVG compartilhados pelo que sobrou aqui.
 
-### Componentes de Conteúdo
-- **KPICards**: Cards com indicadores principais (Saldo, Receitas, Despesas)
-- **ChartCard**: Card com gráfico de receitas e despesas
-- **SidePanel**: Painel lateral que agrupa ProgressCard e BillsCard
-- **ProgressCard**: Card com progresso mensal de gastos
-- **BillsCard**: Card com próximas contas a pagar
-- **TransactionsTable**: Tabela de transações recentes
-
-### Componentes Auxiliares
-- **SideItem**: Item individual da sidebar
-- **Icons**: Todos os ícones SVG utilizados no sistema
-
-## Como Usar
-
-```jsx
-import { 
-  Sidebar, 
-  Topbar, 
-  Tabs, 
-  KPICards, 
-  ChartCard, 
-  SidePanel, 
-  TransactionsTable 
-} from '../components/system';
-
-// Uso na página
-<div className="sys-layout">
-  <Sidebar />
-  <main className="sys-main">
-    <Topbar userName={userName} />
-    <Tabs />
-    <section className="sys-panel">
-      <KPICards balance={balance} income={income} expenses={expenses} />
-      <div className="sys-grid">
-        <ChartCard chartData={chartData} chartOptions={chartOptions} />
-        <SidePanel progress={progress} salary={salary} bills={bills} />
-      </div>
-      <TransactionsTable transactions={transactions} />
-    </section>
-  </main>
-</div>
-```
-
-## Benefícios da Componentização
-
-1. **Reutilização**: Componentes podem ser reutilizados em outras páginas
-2. **Manutenibilidade**: Cada componente tem responsabilidade única
-3. **Testabilidade**: Componentes podem ser testados individualmente
-4. **Legibilidade**: Código mais limpo e organizado
-5. **Escalabilidade**: Fácil adicionar novos componentes ou modificar existentes
+Nenhuma tela nova do redesign deve importar desta pasta -- o
+design system (`src/design-system`) e os componentes de cada feature
+(`src/features/*`) são a base a partir da Fase 0.
