@@ -11,9 +11,7 @@ const LandingPage = lazy(() => import('./presentation/pages/Home'));
 import LoginCard from './presentation/pages/Login';
 import Cadastro from './presentation/pages/Register';
 import RedefinirSenha from './presentation/pages/ChangePassword';
-import People from './presentation/pages/People';
 import Profile from './presentation/pages/Profile';
-import Alerts from './presentation/pages/Alerts';
 import Reports from './presentation/pages/Reports';
 import Analytics from './presentation/pages/Analytics';
 import ImpactoFinanceiro from './presentation/pages/ImpactoFinanceiro';
@@ -32,6 +30,8 @@ const ContasPage = lazy(() => import('./features/wealth/ContasPage'));
 const CartoesPage = lazy(() => import('./features/wealth/CartoesPage'));
 const OrcamentoPage = lazy(() => import('./features/wealth/OrcamentoPage'));
 const MetasPage = lazy(() => import('./features/wealth/MetasPage'));
+const PessoasPage = lazy(() => import('./features/people/PessoasPage'));
+const AlertsPage = lazy(() => import('./features/alerts/AlertsPage'));
 
 // Catálogo do design system: a atribuição inteira fica atrás de
 // import.meta.env.DEV, que o Vite substitui por `false` no build --
@@ -82,11 +82,14 @@ function App() {
                  Receita Recorrente, Importar Extrato); Fase 4 traz
                  Patrimônio (Contas, Cartões, Orçamento, Metas) --
                  Contas e Cartões migram da camada 1 pra esta, Orçamento
-                 e Metas são telas novas (backend já existia, sem UI). */}
+                 e Metas são telas novas (backend já existia, sem UI);
+                 Fase 5 traz Pessoas e Alertas -- Pessoas e Alertas
+                 migram da camada 1, mais o NotificationsBell (Topbar,
+                 visível em toda página do app novo) substituindo o
+                 aviso de alerta disparado que só existia na tela de
+                 dashboard antiga (fora de rota desde a Fase 2). */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/pessoas" element={<People />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/alerts" element={<Alerts />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/impacto-financeiro" element={<ImpactoFinanceiro />} />
@@ -103,6 +106,8 @@ function App() {
               <Route path="/cartoes" element={<CartoesPage />} />
               <Route path="/orcamento" element={<OrcamentoPage />} />
               <Route path="/metas" element={<MetasPage />} />
+              <Route path="/pessoas" element={<PessoasPage />} />
+              <Route path="/alerts" element={<AlertsPage />} />
               {import.meta.env.DEV && <Route path="/design-system" element={<DesignSystemPage />} />}
             </Route>
           </Route>

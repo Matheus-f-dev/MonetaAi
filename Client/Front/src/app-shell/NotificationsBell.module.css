@@ -1,0 +1,118 @@
+.wrap {
+  position: relative;
+}
+
+.iconButton {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: none;
+  border: 1px solid var(--color-line);
+  color: var(--color-ink-muted);
+}
+
+.iconButton:hover {
+  background: var(--color-bg-sunken);
+  color: var(--color-ink);
+}
+
+.badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: var(--radius-full);
+  background: var(--color-negative);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: var(--weight-bold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  width: min(360px, 90vw);
+  max-height: 420px;
+  overflow-y: auto;
+  background: var(--color-bg-raised);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-3);
+  z-index: 101;
+}
+
+/* No mobile o sino fica perto da borda direita da tela -- `right: 0`
+   relativo ao próprio botão empurrava o dropdown pra fora da viewport
+   pela esquerda (achado testando a Fase 5). Vira posição fixa ancorada
+   na viewport inteira, mesmo breakpoint que o Topbar já usa pro drawer. */
+@media (max-width: 900px) {
+  .dropdown {
+    position: fixed;
+    top: calc(var(--shell-topbar-h) + var(--space-2));
+    left: var(--space-4);
+    right: var(--space-4);
+    width: auto;
+  }
+}
+
+.dropdownTitle {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  padding: var(--space-1) var(--space-2) var(--space-2);
+}
+
+.empty {
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+  padding: var(--space-3) var(--space-2);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.item {
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+.item:hover {
+  background: var(--color-bg-sunken);
+}
+
+.itemTitle {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+}
+
+.itemDetail {
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+  margin-top: 2px;
+}
+
+.itemDate {
+  font-size: var(--text-xs);
+  color: var(--color-ink-faint);
+  margin-top: 2px;
+  font-family: var(--font-mono);
+}

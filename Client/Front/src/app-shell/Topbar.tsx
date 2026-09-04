@@ -1,4 +1,5 @@
 import { MenuIcon, MoonIcon, SunIcon } from './icons';
+import { NotificationsBell } from './NotificationsBell';
 import type { ThemePreference } from './useAppTheme';
 import styles from './Topbar.module.css';
 
@@ -33,6 +34,7 @@ export function Topbar({ onOpenMenu, themePreference, onToggleTheme }: TopbarPro
       </p>
 
       <div className={styles.actions}>
+        <NotificationsBell />
         <button
           type="button"
           className={styles.iconButton}
