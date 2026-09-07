@@ -1,14 +1,29 @@
 /* ============================================================
    Tokens de design — Moneta, redesign pós-login (Fase 0)
    ============================================================
-   Direção: "livro-razão" (ledger). O produto inteiro nasce de uma
-   conversa no WhatsApp virando um lançamento contábil -- a identidade
-   visual devia parecer as duas coisas ao mesmo tempo: precisa como um
-   extrato, cálida como uma conversa. Nada de roxo-SaaS-de-IA (a paleta
-   antiga usava #8b5cf6, a cor mais batida de produto de IA hoje) --
-   base em tinta verde-escura (não preto/azul-ardósia frio), destaque
-   em âmbar (carimbo/selo, não decoração), positivo/negativo com
-   personalidade de carimbo de tinta, não semáforo genérico.
+   Direção: "livro-razão" (ledger) — a MESMA identidade da landing nova
+   (src/presentation/landing/styles/tokens.css), não uma variação
+   parecida por coincidência: papel quente, tinta quase preta, hairline
+   estrutural, UMA cor de marca (verde-esmeralda) que só aparece onde há
+   ação ou dado, e uma segunda cor (cobre) reservada pra tudo que é
+   "inteligência" (Agente de IA, insights automáticos) -- nunca a mesma
+   cor da marca, nunca decoração.
+
+   Paleta importada 1:1 da landing (ela já valida com o validador do
+   skill dataviz -- seis checagens, claro e escuro -- não escolhida a
+   olho de novo aqui). Onde o painel precisa de um token que a landing
+   não expõe (bg-sunken, ink-faint, line-strong...), deriva da mesma
+   família de cor, não de um valor novo.
+
+   Tipografia: Hanken Grotesk + Zilla Slab + JetBrains Mono -- a dupla
+   que index.html já anuncia pro painel logado desde que a landing nova
+   entrou (comentário ao lado do <link> de fontes), só nunca tinha sido
+   ligada aqui. Zilla Slab (serifa) faz o papel de "único toque de
+   personalidade tipográfica" em título de página -- o equivalente do
+   itálico em Instrument Serif na landing, adaptado: lá é meia manchete
+   em itálico dentro de texto corrido: aqui, uma tela densa de dado, o
+   toque certo é o título inteiro numa serifa de "extrato oficial", sem
+   itálico, sem se repetir dentro do corpo.
 
    O elemento assinatura do sistema é a figura monetária: todo valor em
    R$ no produto usa fonte monoespaçada com algarismos tabulares (ver
@@ -19,37 +34,37 @@
 
 :root {
   /* ---------- Cor: modo claro ("papel de recibo") ---------- */
-  --color-bg: #faf8f4;
+  --color-bg: #fbfaf7;
   --color-bg-raised: #ffffff;
-  --color-bg-sunken: #f2ede4;
+  --color-bg-sunken: #f4f2ec;
 
-  --color-ink: #16211c;           /* texto principal -- verde-tinta, não preto puro */
-  --color-ink-muted: #6b6459;     /* texto secundário -- cinza quente, não ardósia */
-  --color-ink-faint: #a39d8e;     /* texto terciário/placeholder */
+  --color-ink: #0b120f;           /* 18.2:1 sobre papel -- mesmo valor da landing */
+  --color-ink-muted: #57605c;     /* 6.2:1 */
+  --color-ink-faint: #6b7470;     /* 4.6:1 -- rótulos e eixos */
 
-  --color-line: #e7e1d6;          /* linha de régua/borda -- cor de pauta de caderno */
-  --color-line-strong: #d6cfc0;
+  --color-line: #dfdcd3;          /* hairline estrutural -- o elemento da direção visual */
+  --color-line-strong: #c9c5b9;
 
-  --color-brand: #1f4d3a;         /* tinta verde-pinho -- marca, texto de ênfase, botão primário */
-  --color-brand-strong: #163a2b;
-  --color-brand-soft: #e3ece6;
+  --color-brand: #0a5741;         /* Moneta Emerald -- marca, texto de ênfase, botão primário */
+  --color-brand-strong: #07422f;
+  --color-brand-soft: #eaf6f1;
 
-  --color-accent: #b9812c;        /* âmbar/latão -- selo, destaque, estado ativo. Usado com parcimônia. */
-  --color-accent-strong: #96681e;
-  --color-accent-soft: #f6ecd8;
+  --color-accent: #8f4e12;        /* Copper -- selo/texto de IA. Usado com parcimônia, nunca como marca. */
+  --color-accent-strong: #723e0e;
+  --color-accent-soft: #faf0e2;
 
-  --color-positive: #2f6f4e;      /* receita/entrada -- verde-carimbo */
-  --color-positive-soft: #e2efe6;
-  --color-negative: #a23b2e;      /* despesa/saída -- vermelho-lacre, não vermelho-erro genérico */
-  --color-negative-soft: #f6e6e2;
-  --color-warning: #a3701f;
-  --color-warning-soft: #f5ecd9;
+  --color-positive: #0a6b3d;      /* receita/entrada -- verde-carimbo */
+  --color-positive-soft: #e7f4ec;
+  --color-negative: #a8322b;      /* despesa/saída -- vermelho-lacre, não vermelho-erro genérico */
+  --color-negative-soft: #fbecea;
+  --color-warning: #8a5b14;
+  --color-warning-soft: #fbf1df;
 
-  --color-focus-ring: #1f4d3a;
+  --color-focus-ring: #0a5741;
 
   /* ---------- Tipografia ---------- */
-  --font-display: 'Sora', 'Segoe UI', system-ui, sans-serif;
-  --font-body: 'Karla', 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Zilla Slab', Georgia, 'Times New Roman', serif;
+  --font-body: 'Hanken Grotesk', 'Segoe UI', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
   --text-xs: 0.75rem;    /* 12px -- legendas, timestamps */
@@ -82,16 +97,16 @@
   --space-12: 3rem;
   --space-16: 4rem;
 
-  /* ---------- Raio -- estruturado, não bolha ---------- */
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
+  /* ---------- Raio -- estruturado, não bolha (escala da landing, --r2/--r3/--r4) ---------- */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
   --radius-full: 999px;
 
-  /* ---------- Elevação ---------- */
-  --shadow-sm: 0 1px 2px rgba(22, 33, 28, 0.06);
-  --shadow-md: 0 4px 16px rgba(22, 33, 28, 0.08);
-  --shadow-lg: 0 12px 32px rgba(22, 33, 28, 0.14);
+  /* ---------- Elevação -- "papel levantado", nunca fumaça (mesma fórmula da landing) ---------- */
+  --shadow-sm: 0 1px 2px rgba(11, 18, 15, 0.05);
+  --shadow-md: 0 1px 3px rgba(11, 18, 15, 0.06), 0 10px 26px -14px rgba(11, 18, 15, 0.12);
+  --shadow-lg: 0 2px 4px rgba(11, 18, 15, 0.05), 0 28px 64px -28px rgba(11, 18, 15, 0.22);
 
   /* ---------- Motion ---------- */
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
@@ -109,69 +124,69 @@
   --shell-content-max-w: none;
 }
 
-/* ---------- Cor: modo escuro ---------- */
+/* ---------- Cor: modo escuro (passos escolhidos pra superfície escura, não um inverso automático) ---------- */
 :root[data-theme='dark'] {
-  --color-bg: #14201b;
-  --color-bg-raised: #1b2b23;
-  --color-bg-sunken: #0f1814;
+  --color-bg: #0a0e0d;
+  --color-bg-raised: #141a18;
+  --color-bg-sunken: #0e1311;
 
-  --color-ink: #eef2ee;
-  --color-ink-muted: #a7b3ac;
-  --color-ink-faint: #6d7972;
+  --color-ink: #f2f3f1;           /* 16.9:1 */
+  --color-ink-muted: #a3ada9;     /* 8.1:1 */
+  --color-ink-faint: #818b87;     /* 5.3:1 */
 
-  --color-line: #2a3a32;
-  --color-line-strong: #38493f;
+  --color-line: #232b28;
+  --color-line-strong: #303935;
 
-  --color-brand: #7fd1a8;
-  --color-brand-strong: #a3e4c1;
-  --color-brand-soft: #1e3a2c;
+  --color-brand: #3fbf97;         /* 8.1:1 -- link e texto de marca */
+  --color-brand-strong: #62d0ae;
+  --color-brand-soft: #0f1f19;
 
-  --color-accent: #e0b567;
-  --color-accent-strong: #f0cd8c;
-  --color-accent-soft: #35301e;
+  --color-accent: #d99a4e;        /* 7.8:1 */
+  --color-accent-strong: #e8c295;
+  --color-accent-soft: #201811;
 
-  --color-positive: #6fc496;
-  --color-positive-soft: #1b3327;
-  --color-negative: #e08774;
-  --color-negative-soft: #3a2420;
-  --color-warning: #e0b567;
-  --color-warning-soft: #35301e;
+  --color-positive: #35be7c;
+  --color-positive-soft: #0e2318;
+  --color-negative: #e0736a;
+  --color-negative-soft: #2a1614;
+  --color-warning: #d6a24a;
+  --color-warning-soft: #241c0e;
 
-  --color-focus-ring: #7fd1a8;
+  --color-focus-ring: #3fbf97;
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.55), 0 10px 26px -14px rgba(0, 0, 0, 0.7);
+  --shadow-lg: 0 2px 4px rgba(0, 0, 0, 0.5), 0 28px 64px -28px rgba(0, 0, 0, 0.8);
 }
 
 /* prefers-color-scheme só decide quando não há escolha explícita salva
    (mesma convenção que useTheme.js já usa hoje via atributo no root). */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --color-bg: #14201b;
-    --color-bg-raised: #1b2b23;
-    --color-bg-sunken: #0f1814;
-    --color-ink: #eef2ee;
-    --color-ink-muted: #a7b3ac;
-    --color-ink-faint: #6d7972;
-    --color-line: #2a3a32;
-    --color-line-strong: #38493f;
-    --color-brand: #7fd1a8;
-    --color-brand-strong: #a3e4c1;
-    --color-brand-soft: #1e3a2c;
-    --color-accent: #e0b567;
-    --color-accent-strong: #f0cd8c;
-    --color-accent-soft: #35301e;
-    --color-positive: #6fc496;
-    --color-positive-soft: #1b3327;
-    --color-negative: #e08774;
-    --color-negative-soft: #3a2420;
-    --color-warning: #e0b567;
-    --color-warning-soft: #35301e;
-    --color-focus-ring: #7fd1a8;
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
-    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
+    --color-bg: #0a0e0d;
+    --color-bg-raised: #141a18;
+    --color-bg-sunken: #0e1311;
+    --color-ink: #f2f3f1;
+    --color-ink-muted: #a3ada9;
+    --color-ink-faint: #818b87;
+    --color-line: #232b28;
+    --color-line-strong: #303935;
+    --color-brand: #3fbf97;
+    --color-brand-strong: #62d0ae;
+    --color-brand-soft: #0f1f19;
+    --color-accent: #d99a4e;
+    --color-accent-strong: #e8c295;
+    --color-accent-soft: #201811;
+    --color-positive: #35be7c;
+    --color-positive-soft: #0e2318;
+    --color-negative: #e0736a;
+    --color-negative-soft: #2a1614;
+    --color-warning: #d6a24a;
+    --color-warning-soft: #241c0e;
+    --color-focus-ring: #3fbf97;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.55), 0 10px 26px -14px rgba(0, 0, 0, 0.7);
+    --shadow-lg: 0 2px 4px rgba(0, 0, 0, 0.5), 0 28px 64px -28px rgba(0, 0, 0, 0.8);
   }
 }
 

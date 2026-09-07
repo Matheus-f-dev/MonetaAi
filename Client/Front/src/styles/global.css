@@ -14,7 +14,12 @@
    não colidem com as antigas (--bg, --card, --primary...).
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Karla:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap');
+/* Fontes carregadas globalmente em index.html (um pedido só, pra landing
+   E pro painel -- ver o comentário lá): Hanken Grotesk e Zilla Slab são a
+   dupla do painel logado, a mesma dupla que index.html já anuncia desde
+   que a landing nova entrou. Sem @import próprio aqui -- pediria a fonte
+   duas vezes e ainda corria o risco de a segunda vencer com um peso
+   diferente. */
 
 .ds-scope,
 .ds-scope *,

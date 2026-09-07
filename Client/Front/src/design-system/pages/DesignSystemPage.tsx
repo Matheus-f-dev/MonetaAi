@@ -72,9 +72,10 @@ export default function DesignSystemPage() {
             <p className={styles.eyebrow}>Moneta · design system</p>
             <h1 className={styles.pageTitle}>Livro-razão</h1>
             <p className={styles.lede}>
-              Tokens e componentes-base do app pós-login. A direção nasce da metáfora do livro-razão:
-              tinta verde-escura, papel quente, carimbo âmbar — e todo valor em reais em fonte
-              monoespaçada com algarismos tabulares, o elemento que dá identidade ao produto inteiro.
+              Tokens e componentes-base do app pós-login. Mesma direção da landing: papel quente,
+              tinta quase preta, hairline estrutural, verde-esmeralda de marca e cobre reservado pra
+              inteligência — e todo valor em reais em fonte monoespaçada com algarismos tabulares, o
+              elemento que dá identidade ao produto inteiro.
             </p>
           </div>
         </header>
@@ -95,7 +96,7 @@ export default function DesignSystemPage() {
 
         <Section
           title="Tipografia"
-          note="Sora nos títulos, Karla no corpo, JetBrains Mono nos números. Três papéis, sem sobreposição."
+          note="Zilla Slab nos títulos, Hanken Grotesk no corpo, JetBrains Mono nos números. Três papéis, sem sobreposição -- mesma dupla de interface da landing (Instrument Sans/Instrument Serif), trocada pela que index.html já reserva pro painel."
         >
           <div>
             {TYPE_SCALE.map((t) => (

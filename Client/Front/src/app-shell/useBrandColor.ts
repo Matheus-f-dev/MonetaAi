@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { deriveBrandShades } from './brandColor';
 
 const STORAGE_KEY = 'moneta:brand-color';
-export const DEFAULT_BRAND_COLOR = '#1f4d3a';
+export const DEFAULT_BRAND_COLOR = '#0a5741';
 
 function readStored(): string | null {
   try {
