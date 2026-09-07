@@ -1,63 +1,68 @@
-/* ===== Reset/tema local ===== */
+/* ===== Reset/tema local =====
+   Paleta alinhada com src/styles/tokens.css (o mesmo "Ledger" da landing
+   e do painel novo) -- Agent.jsx e Profile.jsx são as duas últimas telas
+   que ainda vivem deste sistema (Fases 7/8 do redesign, não feitas
+   ainda), mas não tinham por que continuar num slate-azul/roxo que mais
+   nenhuma outra tela do produto usa. */
 :root{
   --sidebar-w: 200px;
 
-  --bg: #f8fafc;         /* slate-50 */
+  --bg: #fbfaf7;         /* --color-bg */
   --card: #ffffff;
-  --line: #e2e8f0;       /* slate-200 */
-  --text: #0f172a;       /* slate-900 */
-  --muted: #64748b;      /* slate-500 */
-  --muted2:#94a3b8;      /* slate-400 */
+  --line: #dfdcd3;       /* --color-line */
+  --text: #0b120f;       /* --color-ink */
+  --muted: #57605c;      /* --color-ink-muted */
+  --muted2:#6b7470;      /* --color-ink-faint */
 
   /* Variáveis para ImpactoFinanceiro */
-  --background: #f8fafc;
-  --text-primary: #0f172a;
-  --text-secondary: #64748b;
+  --background: #fbfaf7;
+  --text-primary: #0b120f;
+  --text-secondary: #57605c;
   --card-background: #ffffff;
-  --border: #e2e8f0;
+  --border: #dfdcd3;
   --input-background: #ffffff;
-  --primary: #8b5cf6;
-  --primary-dark: #7c3aed;
-  --primary-light: #f3f4f6;
-  --primary-color: #8b5cf6;
-  --secondary: #f1f5f9;
-  --secondary-dark: #e2e8f0;
-  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --primary: #0a5741;
+  --primary-dark: #07422f;
+  --primary-light: #eaf6f1;
+  --primary-color: #0a5741;
+  --secondary: #f4f2ec;
+  --secondary-dark: #dfdcd3;
+  --shadow: 0 1px 3px rgba(11, 18, 15, 0.06), 0 10px 26px -14px rgba(11, 18, 15, 0.12);
 }
 
 [data-theme="dark"] {
-  --bg: #0f172a !important;
-  --card: #1e293b !important;
-  --line: #334155 !important;
-  --text: #f1f5f9 !important;
-  --muted: #94a3b8 !important;
-  --muted2: #64748b !important;
+  --bg: #0a0e0d !important;
+  --card: #141a18 !important;
+  --line: #232b28 !important;
+  --text: #f2f3f1 !important;
+  --muted: #a3ada9 !important;
+  --muted2: #818b87 !important;
 
   --primary: var(--primary-color) !important;
   --primary-50: var(--primary-light) !important;
   --primary-100: var(--primary-light) !important;
   --primary-200: var(--primary-light) !important;
 
-  --success:#16a34a;
-  --danger:#ef4444;
+  --success:#35be7c;
+  --danger:#e0736a;
 
   --radius: 14px;
-  --shadow: 0 8px 24px rgba(15,23,42,.06);
+  --shadow: 0 1px 3px rgba(0, 0, 0, .55), 0 10px 26px -14px rgba(0, 0, 0, .7);
 
   /* Variáveis para ImpactoFinanceiro - Modo Escuro */
-  --background: #0f172a !important;
-  --text-primary: #f1f5f9 !important;
-  --text-secondary: #94a3b8 !important;
-  --card-background: #1e293b !important;
-  --border: #334155 !important;
-  --input-background: #1e293b !important;
-  --primary: #8b5cf6 !important;
-  --primary-dark: #7c3aed !important;
-  --primary-light: #1e293b !important;
-  --primary-color: #8b5cf6 !important;
-  --secondary: #334155 !important;
-  --secondary-dark: #475569 !important;
-  --shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
+  --background: #0a0e0d !important;
+  --text-primary: #f2f3f1 !important;
+  --text-secondary: #a3ada9 !important;
+  --card-background: #141a18 !important;
+  --border: #232b28 !important;
+  --input-background: #141a18 !important;
+  --primary: #3fbf97 !important;
+  --primary-dark: #62d0ae !important;
+  --primary-light: #0f1f19 !important;
+  --primary-color: #3fbf97 !important;
+  --secondary: #0e1311 !important;
+  --secondary-dark: #232b28 !important;
+  --shadow: 0 2px 4px rgba(0, 0, 0, .5), 0 28px 64px -28px rgba(0, 0, 0, .8) !important;
 }
 
 /* Esquemas de cores */
@@ -115,6 +120,20 @@
      é só a tela de captura desta sessão. */
   position: relative;
   z-index: 1;
+  /* Achado alinhando esta tela (Perfil) com a nova identidade: o
+     mecanismo de fonte daqui depende de useTheme.js escrever
+     `data-font` em `.sys-layout` -- um efeito que só roda uma vez,
+     no primeiro carregamento de App(), não a cada navegação de rota.
+     Entrar em /profile vindo de outra tela por navegação client-side
+     (não um reload) nunca disparava esse efeito de novo, e o atributo
+     nunca chegava a existir -- tudo aqui caía no serif padrão do
+     navegador (App.css tem `* { font-family: inherit !important }`
+     global, que cancela até a fonte do próprio body). Uma declaração
+     direto aqui, sem depender de atributo nenhum, garante a fonte da
+     marca sempre -- o mecanismo de `[data-font="X"]` continua
+     funcionando por cima pra quem escolhe Roboto/Inter/Poppins/Open
+     Sans no seletor de fonte. */
+  font-family: 'Hanken Grotesk', 'Segoe UI', sans-serif !important;
 }
 
 /* ===== Sidebar ===== */

@@ -1,11 +1,16 @@
 import { useState } from 'react';
 import { Sidebar } from '../components/system/Sidebar';
+import { useTheme } from '../hooks/useTheme';
 import { useToast } from '../hooks/useToast';
 import { useAppTheme } from '../../app-shell/useAppTheme';
 import { DEFAULT_BRAND_COLOR, useBrandColor } from '../../app-shell/useBrandColor';
 
 export default function Profile() {
   const { addToast } = useToast();
+  // Só pelo `applyTheme` (pra fonte/tamanho de fonte refletirem na hora,
+  // sem esperar reload) -- tema e cor de destaque já são outros hooks,
+  // ver embaixo.
+  const { applyTheme } = useTheme();
   // Claro/escuro: mesmo hook do topbar do app novo (useAppTheme), não um
   // estado local próprio -- achado real testando com o app de verdade:
   // os botões antigos só escreviam num atributo dentro de `.sys-layout`,
@@ -20,7 +25,7 @@ export default function Profile() {
   // pra escolher qualquer tom), que aplica em tempo real no app inteiro
   // (telas novas E antigas -- ver useBrandColor).
   const { color: brandColor, setColor: setBrandColor, resetColor: resetBrandColor } = useBrandColor();
-  const [font, setFont] = useState(() => localStorage.getItem('font') || 'Roboto');
+  const [font, setFont] = useState(() => localStorage.getItem('font') || '');
   const [fontSize, setFontSize] = useState(() => localStorage.getItem('fontSize') || 'medium');
 
   // "system" (padrão antes de qualquer escolha explícita) não é nem
@@ -35,10 +40,12 @@ export default function Profile() {
 
   const handleFontChange = (newFont) => {
     setFont(newFont);
+    applyTheme(effectiveTheme, newFont, fontSize);
   };
 
   const handleFontSizeChange = (newFontSize) => {
     setFontSize(newFontSize);
+    applyTheme(effectiveTheme, font, newFontSize);
   };
 
   const savePreferences = () => {
@@ -50,8 +57,11 @@ export default function Profile() {
   const resetToDefault = () => {
     setTheme('system');
     resetBrandColor();
-    setFont('Roboto');
+    setFont('');
     setFontSize('medium');
+    // font vazio -- .sys-layout já tem Hanken Grotesk como padrão direto
+    // no CSS, sem precisar de nenhum atributo (ver system.css).
+    applyTheme(effectiveTheme, null, 'medium');
     localStorage.removeItem('font');
     localStorage.removeItem('fontSize');
   };
@@ -118,6 +128,7 @@ export default function Profile() {
               onChange={(e) => handleFontChange(e.target.value)}
               className="profile-select"
             >
+              <option value="">Hanken Grotesk (padrão)</option>
               <option value="Roboto">Roboto</option>
               <option value="Inter">Inter</option>
               <option value="Poppins">Poppins</option>

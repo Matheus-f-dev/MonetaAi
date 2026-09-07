@@ -1,4 +1,11 @@
-/* AgentChat.css */
+/* AgentChat.css
+   --primary-color/--accent-color vêm de App.css :root, alinhados com a
+   mesma paleta "Ledger" do resto do produto (ver tokens.css). O segundo
+   tom do gradiente (--accent-color, cobre) era um lilás cravado
+   (#a78bfa) sem nenhuma ligação com a marca -- só o --primary-color já
+   usava variável, o gradiente inteiro saía verde->lilás depois da
+   troca de paleta. Emerald->cobre: as duas cores que o app já reserva
+   pra "produto" e "inteligência", combinação que faz sentido bem aqui. */
 
 .agent-chat {
   display: flex;
@@ -29,7 +36,7 @@
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary-color, #8b5cf6), #a78bfa);
+  background: linear-gradient(135deg, var(--primary-color, #0a5741), var(--accent-color, #8f4e12));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -94,7 +101,7 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary-color, #8b5cf6), #a78bfa);
+  background: linear-gradient(135deg, var(--primary-color, #0a5741), var(--accent-color, #8f4e12));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -119,7 +126,7 @@
 }
 
 .agent-chat__msg--user .agent-chat__bubble {
-  background: linear-gradient(135deg, var(--primary-color, #8b5cf6), #a78bfa);
+  background: linear-gradient(135deg, var(--primary-color, #0a5741), var(--accent-color, #8f4e12));
   border-bottom-right-radius: 4px;
   color: #fff;
 }
@@ -176,7 +183,7 @@
 .agent-chat__suggestion {
   background: var(--card);
   border: 1px solid var(--line);
-  color: var(--primary-color, #8b5cf6);
+  color: var(--primary-color, #0a5741);
   border-radius: 20px;
   padding: 6px 14px;
   font-size: 0.78rem;
@@ -186,8 +193,8 @@
 }
 
 .agent-chat__suggestion:hover {
-  background: var(--primary-color, #8b5cf6);
-  border-color: var(--primary-color, #8b5cf6);
+  background: var(--primary-color, #0a5741);
+  border-color: var(--primary-color, #0a5741);
   color: #fff;
 }
 
@@ -220,7 +227,7 @@
 }
 
 .agent-chat__input:focus {
-  border-color: var(--primary-color, #8b5cf6);
+  border-color: var(--primary-color, #0a5741);
 }
 
 .agent-chat__input::placeholder {
@@ -236,7 +243,7 @@
   width: 40px;
   height: 40px;
   border-radius: 12px;
-  background: linear-gradient(135deg, var(--primary-color, #8b5cf6), #a78bfa);
+  background: linear-gradient(135deg, var(--primary-color, #0a5741), var(--accent-color, #8f4e12));
   border: none;
   color: #fff;
   cursor: pointer;

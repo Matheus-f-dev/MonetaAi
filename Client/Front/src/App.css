@@ -1,16 +1,19 @@
 :root {
-    --primary-color: #2563eb;
-    --primary-hover: #1d4ed8;
-    --primary-light: rgba(37, 99, 235, 0.08);
-    --background-light: #f8fafc;
-    --text-color: #1e293b;
-    --text-secondary: #64748b;
+    /* Mesma paleta "Ledger" de src/styles/tokens.css (landing e painel
+       novo) -- era slate-azul/roxo, de um sistema de cor que mais
+       nenhuma outra tela do produto usa. */
+    --primary-color: #0a5741;
+    --primary-hover: #07422f;
+    --primary-light: rgba(10, 87, 65, 0.08);
+    --background-light: #fbfaf7;
+    --text-color: #0b120f;
+    --text-secondary: #57605c;
     --bg-primary: #ffffff;
-    --bg-secondary: #f8fafc;
-    --border-color: #e2e8f0;
-    --box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-    --accent-color: #10b981;
-    --accent-hover: #059669;
+    --bg-secondary: #f4f2ec;
+    --border-color: #dfdcd3;
+    --box-shadow: 0 1px 3px rgba(11, 18, 15, 0.06);
+    --accent-color: #8f4e12;
+    --accent-hover: #723e0e;
     --neutral-50: #f8fafc;
     --neutral-100: #f1f5f9;
     --neutral-200: #e2e8f0;
@@ -24,12 +27,12 @@
 }
 
 .sys-layout[data-theme="dark"] {
-    --text-color: #f9fafb !important;
-    --text-secondary: #9ca3af !important;
-    --bg-primary: #1f2937 !important;
-    --bg-secondary: #374151 !important;
-    --border-color: #4b5563 !important;
-    --background-light: #1f2937 !important;
+    --text-color: #f2f3f1 !important;
+    --text-secondary: #a3ada9 !important;
+    --bg-primary: #141a18 !important;
+    --bg-secondary: #0e1311 !important;
+    --border-color: #232b28 !important;
+    --background-light: #0a0e0d !important;
 }
 
 [data-color-scheme="purple"] {
@@ -96,7 +99,12 @@
 
 body {
     margin: 0;
-    font-family: 'Roboto', Arial, sans-serif;
+    /* Era Roboto -- Hanken Grotesk é a fonte de corpo que index.html já
+       reserva pro painel logado (mesmo comentário de tokens.css). Login/
+       Cadastro/landing ficam de fora por design (CSS antigo, fora do
+       escopo do redesign) -- eles pedem a própria fonte por cima disso
+       quando precisam (ver home.css/ChangePassword). */
+    font-family: 'Hanken Grotesk', Arial, sans-serif;
     background-color: var(--bg-primary);
     color: var(--text-color);
     transition: all 0.3s ease;

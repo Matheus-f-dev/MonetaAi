@@ -4,6 +4,14 @@
   display: flex;
   min-height: 100vh;
   background: var(--bg-primary, #0f0f1a);
+  /* Achado alinhando esta tela com a nova identidade: App.css tem
+     `* { font-family: inherit !important }` global, que cancela até a
+     declaração de font-family do próprio `body` (`*` também bate nele)
+     -- sem um !important pelo menos tão específico quanto esse aqui na
+     raiz da própria página, tudo dentro dela cai no serif padrão do
+     navegador (Times New Roman), nem a fonte antiga (Roboto) nem a nova
+     nunca chegavam a aplicar de verdade. */
+  font-family: 'Hanken Grotesk', 'Segoe UI', sans-serif !important;
   /* Mesmo bug do .background fixo (z-index 0) cobrindo conteúdo estático
      já encontrado e corrigido em .sys-layout (Fase 1) e ChangePassword.css
      (Fase 3) -- achado agora conferindo a página de novo na Fase 9,
@@ -31,7 +39,12 @@
   font-weight: 700;
   color: var(--text-primary, #f1f5f9);
   margin: 0 0 6px;
-  background: linear-gradient(135deg, #6366f1, #a78bfa);
+  /* Era um gradiente índigo/lilás cravado, sem nenhuma relação com a
+     paleta do resto do app -- achado alinhando esta tela com a mesma
+     identidade "Ledger". Emerald (marca) -> cobre (o tom que o sistema
+     inteiro reserva pra conteúdo de IA): as duas cores do produto,
+     escolha certa pra título de página do Agente. */
+  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

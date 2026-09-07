@@ -13,37 +13,38 @@
    ============================================================ */
 
 :root {
-  /* --- paleta canônica (igual à já usada em system.css) --- */
-  --bg: #f8fafc;
+  /* --- paleta canônica (igual à já usada em system.css, mesma paleta de
+     src/styles/tokens.css -- ver o comentário lá em cima) --- */
+  --bg: #fbfaf7;
   --card: #ffffff;
-  --line: #e2e8f0;
-  --text: #0f172a;
-  --muted: #64748b;
-  --muted2: #94a3b8;
+  --line: #dfdcd3;
+  --text: #0b120f;
+  --muted: #57605c;
+  --muted2: #6b7470;
 
-  --background: #f8fafc;
-  --text-primary: #0f172a;
-  --text-secondary: #64748b;
+  --background: #fbfaf7;
+  --text-primary: #0b120f;
+  --text-secondary: #57605c;
   --card-background: #ffffff;
-  --border: #e2e8f0;
+  --border: #dfdcd3;
   --input-background: #ffffff;
-  --primary: #8b5cf6;
-  --primary-dark: #7c3aed;
-  --primary-light: #f3f4f6;
-  --primary-color: #8b5cf6;
-  --secondary: #f1f5f9;
-  --secondary-dark: #e2e8f0;
-  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --primary: #0a5741;
+  --primary-dark: #07422f;
+  --primary-light: #eaf6f1;
+  --primary-color: #0a5741;
+  --secondary: #f4f2ec;
+  --secondary-dark: #dfdcd3;
+  --shadow: 0 1px 3px rgba(11, 18, 15, 0.06), 0 10px 26px -14px rgba(11, 18, 15, 0.12);
   --radius: 14px;
   --sidebar-w: 200px;
 
   /* --- semânticas de estado, usadas por chips/status --- */
-  --success: #16a34a;
-  --success-soft: #dcfce7;
-  --danger: #ef4444;
-  --danger-soft: #fee2e2;
-  --warning: #d97706;
-  --warning-soft: #fef3c7;
+  --success: #0a6b3d;
+  --success-soft: #e7f4ec;
+  --danger: #a8322b;
+  --danger-soft: #fbecea;
+  --warning: #8a5b14;
+  --warning-soft: #fbf1df;
 
   /* --- aliases legados (nomes usados por Alerts/Analytics/ActivityHistory) --- */
   --text-color: var(--text-primary);
@@ -53,37 +54,37 @@
   --bg-hover: var(--secondary);
   --border-color: var(--border);
   --box-shadow: var(--shadow);
-  --shadow-sm: 0 1px 2px rgba(15, 23, 42, .06);
-  --shadow-md: 0 4px 10px rgba(15, 23, 42, .08);
-  --shadow-lg: 0 10px 24px rgba(15, 23, 42, .12);
+  --shadow-sm: 0 1px 2px rgba(11, 18, 15, .06);
+  --shadow-md: 0 1px 3px rgba(11, 18, 15, .06), 0 10px 26px -14px rgba(11, 18, 15, .12);
+  --shadow-lg: 0 2px 4px rgba(11, 18, 15, .05), 0 28px 64px -28px rgba(11, 18, 15, .22);
   --primary-hover: var(--primary-dark);
   --hover-color: var(--primary-dark);
 }
 
 [data-theme="dark"] {
-  --bg: #0f172a;
-  --card: #1e293b;
-  --line: #334155;
-  --text: #f1f5f9;
-  --muted: #94a3b8;
-  --muted2: #64748b;
+  --bg: #0a0e0d;
+  --card: #141a18;
+  --line: #232b28;
+  --text: #f2f3f1;
+  --muted: #a3ada9;
+  --muted2: #818b87;
 
-  --background: #0f172a;
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --card-background: #1e293b;
-  --border: #334155;
-  --input-background: #1e293b;
-  --secondary: #334155;
-  --secondary-dark: #475569;
-  --shadow: 0 8px 24px rgba(0, 0, 0, .3);
+  --background: #0a0e0d;
+  --text-primary: #f2f3f1;
+  --text-secondary: #a3ada9;
+  --card-background: #141a18;
+  --border: #232b28;
+  --input-background: #141a18;
+  --secondary: #0e1311;
+  --secondary-dark: #232b28;
+  --shadow: 0 1px 3px rgba(0, 0, 0, .55), 0 10px 26px -14px rgba(0, 0, 0, .7);
 
-  --success: #4ade80;
-  --success-soft: #14321f;
-  --danger: #f87171;
-  --danger-soft: #3a1620;
-  --warning: #fbbf24;
-  --warning-soft: #3a2c10;
+  --success: #35be7c;
+  --success-soft: #0e2318;
+  --danger: #e0736a;
+  --danger-soft: #2a1614;
+  --warning: #d6a24a;
+  --warning-soft: #241c0e;
 
   --text-color: var(--text-primary);
   --background-color: var(--background);
@@ -92,7 +93,7 @@
   --bg-hover: var(--secondary);
   --border-color: var(--border);
   --box-shadow: var(--shadow);
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .35);
-  --shadow-md: 0 4px 10px rgba(0, 0, 0, .4);
-  --shadow-lg: 0 10px 24px rgba(0, 0, 0, .5);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, .5);
+  --shadow-md: 0 1px 3px rgba(0, 0, 0, .55), 0 10px 26px -14px rgba(0, 0, 0, .7);
+  --shadow-lg: 0 2px 4px rgba(0, 0, 0, .5), 0 28px 64px -28px rgba(0, 0, 0, .8);
 }
