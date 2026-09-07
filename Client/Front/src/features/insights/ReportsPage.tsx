@@ -213,9 +213,9 @@ export default function ReportsPage() {
                 data={{
                   labels: chartData.labels,
                   datasets: [
-                    { label: 'Receitas', data: chartData.receitas, backgroundColor: '#10b981', borderRadius: 4 },
-                    { label: 'Despesas', data: chartData.despesas, backgroundColor: '#ef4444', borderRadius: 4 },
-                    { label: 'Saldo', data: chartData.saldo, backgroundColor: '#8b5cf6', borderRadius: 4 }
+                    { label: 'Receitas', data: chartData.receitas, backgroundColor: '#0a6b3d', borderRadius: 4 },
+                    { label: 'Despesas', data: chartData.despesas, backgroundColor: '#a8322b', borderRadius: 4 },
+                    { label: 'Saldo', data: chartData.saldo, backgroundColor: '#0a5741', borderRadius: 4 }
                   ]
                 }}
                 options={barOptions}

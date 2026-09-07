@@ -164,8 +164,8 @@ function buildProjecao(analise: { valor: number; analise: { tempoParaJuntar?: nu
       {
         label: 'Economia acumulada',
         data: dados,
-        borderColor: '#8b5cf6',
-        backgroundColor: 'rgba(139, 92, 246, 0.12)',
+        borderColor: '#0a5741',
+        backgroundColor: 'rgba(10, 87, 65, 0.12)',
         borderWidth: 2,
         fill: true,
         tension: 0.4,
@@ -174,7 +174,7 @@ function buildProjecao(analise: { valor: number; analise: { tempoParaJuntar?: nu
       {
         label: 'Meta',
         data: new Array(labels.length).fill(valorMeta),
-        borderColor: '#ef4444',
+        borderColor: '#a8322b',
         backgroundColor: 'transparent',
         borderWidth: 2,
         borderDash: [5, 5],

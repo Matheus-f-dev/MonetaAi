@@ -40,8 +40,11 @@ type Tab = (typeof TABS)[number]['value'];
 // Paleta categórica fixa -- a tabela antiga só cobria ~7 das 20
 // categorias do app (o resto caía tudo em cinza). Ciclar por índice
 // cobre qualquer categoria, incluindo as que o usuário só descobre com
-// o tempo.
-const PALETTE = ['#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#06b6d4', '#ec4899', '#84cc16', '#f97316', '#6366f1'];
+// o tempo. Começa nas duas cores de marca (emerald/cobre, alinhadas com
+// tokens.css -- era violeta na primeira posição, a fatia mais provável
+// de ser a maior e a que mais chama atenção) e completa com tons que
+// não competem com elas.
+const PALETTE = ['#0a5741', '#8f4e12', '#3b82f6', '#a8322b', '#0e8a67', '#06b6d4', '#c2761f', '#84cc16', '#8a5b14', '#6b7470'];
 
 function categoryColor(index: number): string {
   return PALETTE[index % PALETTE.length];
@@ -163,7 +166,7 @@ export default function AnalyticsPage() {
               <ChartHeader title="Evolução de gastos" subtitle={period} />
               <div className={styles.chartWrap}>
                 <Bar
-                  data={{ labels: evolutionData.map((d: any) => d.month), datasets: [{ data: evolutionData.map((d: any) => d.value), backgroundColor: '#8b5cf6', borderRadius: 4 }] }}
+                  data={{ labels: evolutionData.map((d: any) => d.month), datasets: [{ data: evolutionData.map((d: any) => d.value), backgroundColor: '#0a5741', borderRadius: 4 }] }}
                   options={barOptions()}
                 />
               </div>
@@ -193,7 +196,7 @@ export default function AnalyticsPage() {
               <ChartHeader title="Evolução de despesas" subtitle={period} />
               <div className={styles.chartWrap}>
                 <Bar
-                  data={{ labels: evolutionData.map((d: any) => d.month), datasets: [{ data: evolutionData.map((d: any) => d.value), backgroundColor: '#ef4444', borderRadius: 4 }] }}
+                  data={{ labels: evolutionData.map((d: any) => d.month), datasets: [{ data: evolutionData.map((d: any) => d.value), backgroundColor: '#a8322b', borderRadius: 4 }] }}
                   options={barOptions()}
                 />
               </div>
@@ -217,7 +220,7 @@ export default function AnalyticsPage() {
                 <Bar
                   data={{
                     labels: receitasEvolutionData.map((d: any) => d.month),
-                    datasets: [{ data: receitasEvolutionData.map((d: any) => d.value), backgroundColor: '#10b981', borderRadius: 4 }]
+                    datasets: [{ data: receitasEvolutionData.map((d: any) => d.value), backgroundColor: '#0a6b3d', borderRadius: 4 }]
                   }}
                   options={barOptions()}
                 />
@@ -268,7 +271,7 @@ export default function AnalyticsPage() {
                     datasets: [
                       {
                         data: economiasEvolutionData.map((d: any) => d.economia),
-                        backgroundColor: economiasEvolutionData.map((d: any) => (d.economia >= 0 ? '#10b981' : '#ef4444')),
+                        backgroundColor: economiasEvolutionData.map((d: any) => (d.economia >= 0 ? '#0a6b3d' : '#a8322b')),
                         borderRadius: 4
                       }
                     ]
@@ -296,8 +299,8 @@ export default function AnalyticsPage() {
                   data={{
                     labels: dadosMensais.map((d: any) => d.month),
                     datasets: [
-                      { label: 'Receitas', data: dadosMensais.map((d: any) => d.receitas), backgroundColor: '#10b981', borderRadius: 4 },
-                      { label: 'Despesas', data: dadosMensais.map((d: any) => d.despesas), backgroundColor: '#ef4444', borderRadius: 4 }
+                      { label: 'Receitas', data: dadosMensais.map((d: any) => d.receitas), backgroundColor: '#0a6b3d', borderRadius: 4 },
+                      { label: 'Despesas', data: dadosMensais.map((d: any) => d.despesas), backgroundColor: '#a8322b', borderRadius: 4 }
                     ]
                   }}
                   options={{ ...barOptions(), plugins: { ...barOptions().plugins, legend: { display: true, position: 'bottom' } } }}
