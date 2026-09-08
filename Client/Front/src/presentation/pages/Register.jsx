@@ -6,6 +6,7 @@ import { ValidationContext, EmailValidation, PasswordValidation, AmountValidatio
 import { useToast } from '../hooks/useToast';
 import { useTerms } from '../hooks/useTerms';
 import TermsModal from '../components/TermsModal';
+import { Mark } from '../landing/ui/Icon';
 
 export default function Cadastro() {
   const [nome, setNome] = useState('');
@@ -96,7 +97,7 @@ export default function Cadastro() {
 
       <aside className="auth-visual">
         <div className="auth-brand">
-          <span className="auth-brand-mark">M</span>
+          <Mark size={22} className="auth-brand-mark" />
           <span>Moneta</span>
         </div>
 
@@ -144,15 +145,15 @@ export default function Cadastro() {
           }}
           onBlur={e => verificarEmail(e.target.value)}
           style={{
-            borderColor: emailStatus === 'exists' ? 'red' : 
-                        emailStatus === 'available' ? 'green' : ''
+            borderColor: emailStatus === 'exists' ? 'var(--auth-neg)' :
+                        emailStatus === 'available' ? 'var(--auth-pos)' : ''
           }}
         />
         {emailStatus && (
           <p style={{
             fontSize: '12px',
             margin: '5px 0 0 0',
-            color: emailStatus === 'exists' ? 'red' : 'green'
+            color: emailStatus === 'exists' ? 'var(--auth-neg)' : 'var(--auth-pos)'
           }}>
             {emailStatus === 'exists' ? '✗ Este email já está em uso' : '✓ Email disponível'}
           </p>
@@ -193,8 +194,8 @@ export default function Cadastro() {
             value={confirmar}
             onChange={e => setConfirmar(e.target.value)}
             style={{
-              borderColor: confirmar && senha ? 
-                (senha === confirmar ? 'green' : 'red') : ''
+              borderColor: confirmar && senha ?
+                (senha === confirmar ? 'var(--auth-pos)' : 'var(--auth-neg)') : ''
             }}
           />
           <button
@@ -215,7 +216,7 @@ export default function Cadastro() {
           <p style={{
             fontSize: '12px',
             margin: '5px 0 0 0',
-            color: senha === confirmar ? 'green' : 'red'
+            color: senha === confirmar ? 'var(--auth-pos)' : 'var(--auth-neg)'
           }}>
             {senha === confirmar ? '✓ Senhas coincidem' : '✗ Senhas não coincidem'}
           </p>
@@ -235,7 +236,7 @@ export default function Cadastro() {
           {loading ? 'Cadastrando...' : 'Cadastrar'}
         </button>
         <p id="mensagem" style={{
-          color: message.includes('sucesso') ? '#1f6e46' : '#d2401f'
+          color: message.includes('sucesso') ? 'var(--auth-pos)' : 'var(--auth-neg)'
         }}>{message}</p>
       </form>
 

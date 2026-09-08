@@ -1,29 +1,38 @@
 /* ═══════════════════════════════════════════════════
-   Login & Cadastro — mesma identidade visual da Home
-   (violeta/ouro/vermelho, Zilla Slab + Hanken Grotesk).
-   Compartilhado por Login.jsx e Register.jsx.
+   Login, Cadastro & Esqueci a senha — mesma identidade
+   "Ledger" da landing (papel quente, tinta quase preta,
+   emerald como única cor de marca), Zilla Slab + Hanken
+   Grotesk (o par tipográfico do painel logado -- ver o
+   comentário em index.html: a landing usa Instrument
+   Sans/Serif, o resto do produto usa este par; auth fica
+   do lado "produto", não do lado "marketing").
+   Compartilhado por Login.jsx, Register.jsx e
+   ChangePassword.jsx -- mesmas classes, uma fonte só de
+   verdade.
 ═══════════════════════════════════════════════════ */
 
 :root {
-  --auth-paper:      #f6f1e4;
-  --auth-card:       #fffdf6;
-  --auth-ink:        #1b1730;
-  --auth-ink-soft:   #55506e;
-  --auth-ink-faint:  #8a84a0;
-  --auth-line:       rgba(27, 23, 48, .14);
+  --auth-paper:      #FBFAF7;
+  --auth-card:       #FFFFFF;
+  --auth-ink:        #0B120F;
+  --auth-ink-soft:   #57605C;
+  --auth-ink-faint:  #6B7470;
+  --auth-line:       #DFDCD3;
 
-  --auth-indigo:      #4b2e83;
-  --auth-indigo-deep: #2e1b54;
-  --auth-indigo-soft: #e9e1f5;
-  --auth-gold:        #c68a2e;
-  --auth-gold-bright: #e0a83f;
-  --auth-vermelho:    #d2401f;
+  --auth-brand:       #0A5741;   /* Moneta Emerald -- ação, link, ênfase */
+  --auth-brand-hover:  #07422F;
+  --auth-brand-soft:  #EAF6F1;
+  --auth-brand-mark:  #0E8A67;   /* "slot 1 de dado" -- só em cima de dado real (as 3 estatísticas) */
+  --auth-brand-bright: #3FBF97;  /* passo escuro do emerald, só sobre o próprio painel de tinta abaixo */
+
+  --auth-pos: #0A6B3D;
+  --auth-neg: #A8322B;
 
   --auth-font-display: 'Zilla Slab', Georgia, serif;
   --auth-font-body:    'Hanken Grotesk', 'Segoe UI', sans-serif;
   --auth-font-mono:    'JetBrains Mono', ui-monospace, monospace;
 
-  --auth-shadow: 0 26px 60px rgba(27,23,48,.20);
+  --auth-shadow: 0 2px 4px rgba(11, 18, 15, .05), 0 28px 64px -28px rgba(11, 18, 15, .22);
 }
 
 .auth-layout {
@@ -41,15 +50,14 @@
   z-index: 1;
 }
 
-@media (max-width: 860px) {
-  .auth-layout { grid-template-columns: 1fr; }
-  .auth-visual { display: none; }
-}
-
-/* ── painel de marca (esquerda) ── */
+/* ── painel de marca (esquerda): tinta, não índigo -- o mesmo par
+   papel/tinta que estrutura a landing inteira, só invertido (aqui a tinta
+   vira o fundo, não o texto). O único acento de cor é o emerald "de dado"
+   nas três estatísticas -- o resto do painel é papel sobre tinta, sem
+   mais nada disputando atenção. */
 .auth-visual {
-  background: linear-gradient(155deg, var(--auth-indigo-deep), var(--auth-indigo) 70%);
-  color: #fff;
+  background: linear-gradient(160deg, #071009, var(--auth-ink) 78%);
+  color: var(--auth-paper);
   padding: 56px 48px;
   display: flex;
   flex-direction: column;
@@ -62,7 +70,7 @@
   content: '';
   position: absolute; right: -120px; bottom: -120px;
   width: 340px; height: 340px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(224,168,63,.35), transparent 70%);
+  background: radial-gradient(circle, rgba(14, 138, 103, .28), transparent 70%);
 }
 
 .auth-brand {
@@ -70,12 +78,13 @@
   font-family: var(--auth-font-display); font-style: italic; font-size: 1.3rem;
   position: relative; z-index: 1;
 }
+
+/* Mesmo glifo da landing (presentation/landing/ui/Icon.jsx -> Mark), não
+   um crachá "M" inventado -- é o único jeito de "seguir o design da
+   landing" ser literal, não só uma cor parecida. */
 .auth-brand-mark {
-  width: 34px; height: 34px; border-radius: 50%;
-  background: linear-gradient(155deg, var(--auth-gold-bright), var(--auth-gold) 60%, #8a5c17);
-  color: var(--auth-indigo-deep);
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--auth-font-display); font-style: normal; font-size: 1.15rem; font-weight: 700;
+  color: var(--auth-paper);
+  flex-shrink: 0;
 }
 
 .auth-visual-copy { position: relative; z-index: 1; max-width: 40ch; }
@@ -83,17 +92,17 @@
   font-family: var(--auth-font-display); font-weight: 600; font-size: 2rem;
   line-height: 1.15; margin: 0 0 14px; text-wrap: balance;
 }
-.auth-visual-copy p { color: rgba(255,255,255,.78); font-size: 1rem; line-height: 1.55; }
+.auth-visual-copy p { color: rgba(251, 250, 247, .74); font-size: 1rem; line-height: 1.55; }
 
 .auth-visual-proof {
   position: relative; z-index: 1;
   display: flex; gap: 32px;
-  border-top: 1px solid rgba(255,255,255,.18);
+  border-top: 1px solid rgba(251, 250, 247, .16);
   padding-top: 24px;
 }
 .auth-visual-proof div { display: flex; flex-direction: column; gap: 2px; }
-.auth-visual-proof b { font-family: var(--auth-font-display); font-weight: 600; font-size: 1.5rem; color: var(--auth-gold-bright); }
-.auth-visual-proof span { font-size: 0.76rem; color: rgba(255,255,255,.7); }
+.auth-visual-proof b { font-family: var(--auth-font-display); font-weight: 600; font-size: 1.5rem; color: var(--auth-brand-bright); }
+.auth-visual-proof span { font-size: 0.76rem; color: rgba(251, 250, 247, .68); }
 
 /* ── painel de formulário (direita) ── */
 .auth-form-side {
@@ -117,13 +126,13 @@
   font-size: 0.82rem; font-weight: 600; color: var(--auth-ink-faint);
   margin-bottom: 20px;
 }
-.login-card .back-link:hover { color: var(--auth-indigo); }
+.login-card .back-link:hover { color: var(--auth-brand); }
 
 .login-card h2 {
   font-family: var(--auth-font-display); font-weight: 600; font-size: 1.7rem;
   margin: 0 0 6px; color: var(--auth-ink); text-wrap: balance;
 }
-.login-card h2 .brand-name { color: var(--auth-indigo); font-style: italic; }
+.login-card h2 .brand-name { color: var(--auth-brand); font-style: italic; }
 
 .login-card > p {
   font-size: 0.9rem; color: var(--auth-ink-soft); margin: 0 0 28px;
@@ -144,8 +153,8 @@
   transition: border-color .15s ease, box-shadow .15s ease;
 }
 .login-form input:focus {
-  border-color: var(--auth-indigo);
-  box-shadow: 0 0 0 3px var(--auth-indigo-soft);
+  border-color: var(--auth-brand);
+  box-shadow: 0 0 0 3px var(--auth-brand-soft);
 }
 
 .password-wrapper { position: relative; }
@@ -159,12 +168,12 @@
 
 .login-btn {
   width: 100%; margin-top: 20px;
-  background: var(--auth-indigo); color: #fff;
+  background: var(--auth-brand); color: #fff;
   font-family: var(--auth-font-body); font-weight: 700; font-size: 0.95rem;
   padding: 13px; border: none; border-radius: 10px;
   cursor: pointer; transition: background .15s ease, transform .15s ease;
 }
-.login-btn:hover:not(:disabled) { background: var(--auth-indigo-deep); transform: translateY(-1px); }
+.login-btn:hover:not(:disabled) { background: var(--auth-brand-hover); transform: translateY(-1px); }
 .login-btn:disabled { opacity: 0.65; cursor: not-allowed; }
 
 .divider {
@@ -183,7 +192,7 @@
   cursor: pointer; transition: all .15s ease;
   display: flex; align-items: center; justify-content: center; gap: 10px;
 }
-.google-login-btn:hover:not(:disabled) { border-color: var(--auth-ink-faint); box-shadow: 0 2px 8px rgba(27,23,48,.08); }
+.google-login-btn:hover:not(:disabled) { border-color: var(--auth-ink-faint); box-shadow: 0 2px 8px rgba(11,18,15,.08); }
 .google-login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 .google-icon { width: 18px; height: 18px; }
 
@@ -192,12 +201,23 @@
   font-size: 0.82rem;
 }
 .footer-links a, .link-btn {
-  color: var(--auth-indigo); text-decoration: none;
+  color: var(--auth-brand); text-decoration: none;
   background: none; border: none; cursor: pointer; font-size: 0.82rem; padding: 0;
   font-family: var(--auth-font-body); font-weight: 600;
 }
-.footer-links a:hover, .link-btn:hover { color: var(--auth-indigo-deep); text-decoration: underline; }
+.footer-links a:hover, .link-btn:hover { color: var(--auth-brand-hover); text-decoration: underline; }
 
 #mensagem {
   margin-top: 14px; font-size: 0.85rem; text-align: center;
+}
+
+/* Por baixo do topo do arquivo de propósito: mesma especificidade
+   (0,1,0) da regra base de .auth-visual/.auth-layout acima -- em CSS,
+   quem vem depois no arquivo vence o empate, `@media` não muda isso.
+   Ficando antes (como estava originalmente), o painel escuro nunca
+   sumia no mobile mesmo com a media query batendo -- achado real
+   testando com viewport de telefone, não só lendo o CSS. */
+@media (max-width: 860px) {
+  .auth-layout { grid-template-columns: 1fr; }
+  .auth-visual { display: none; }
 }

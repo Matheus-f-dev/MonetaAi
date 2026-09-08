@@ -6,6 +6,7 @@ import { ValidationContext, EmailValidation, PasswordValidation } from '../../co
 import { useToast } from '../hooks/useToast';
 import { useTerms } from '../hooks/useTerms';
 import TermsModal from '../components/TermsModal';
+import { Mark } from '../landing/ui/Icon';
 
 export default function LoginCard() {
   const [email, setEmail] = useState('');
@@ -86,7 +87,7 @@ export default function LoginCard() {
 
       <aside className="auth-visual">
         <div className="auth-brand">
-          <span className="auth-brand-mark">M</span>
+          <Mark size={22} className="auth-brand-mark" />
           <span>Moneta</span>
         </div>
 
@@ -172,7 +173,7 @@ export default function LoginCard() {
           </button>
 
           <p id="mensagem" style={{
-            color: message.includes('sucesso') ? '#1f6e46' : '#d2401f'
+            color: message.includes('sucesso') ? 'var(--auth-pos)' : 'var(--auth-neg)'
           }}>{message}</p>
         </form>
 
@@ -206,7 +207,7 @@ export default function LoginCard() {
           </button>
 
           <p id="mensagem" style={{
-            color: message.includes('sucesso') ? '#1f6e46' : '#d2401f'
+            color: message.includes('sucesso') ? 'var(--auth-pos)' : 'var(--auth-neg)'
           }}>{message}</p>
         </form>
 
