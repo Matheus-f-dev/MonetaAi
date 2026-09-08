@@ -4,10 +4,22 @@
   gap: var(--space-4);
 }
 
+/* Mesmo tratamento do rótulo "SALDO CONSOLIDADO" no mockup do hero da
+   landing (base.css: .mn-mono) -- mono, caixa alta, tracking largo. É o
+   ÚNICO lugar do painel logado que usa esse grau de ênfase: reservado
+   pros 3 números que a própria landing promete mostrar, não espalhado
+   em todo título de card (esses continuam com o rótulo mais discreto de
+   sempre -- ver Sidebar .groupLabel/Table th, tracking bem mais leve). */
 .label {
-  font-size: var(--text-sm);
-  font-weight: var(--weight-semibold);
-  color: var(--color-ink);
+  /* !important pelo mesmo motivo documentado em MoneyFigure.module.css:
+     o `* { font-family: inherit !important }` global (App.css legado)
+     sobrepõe qualquer família diferente da herdada. Sai na Fase 9. */
+  font-family: var(--font-mono) !important;
+  font-size: 0.6875rem;
+  font-weight: var(--weight-medium);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
 }
 
 .sublabel {
@@ -15,3 +27,19 @@
   color: var(--color-ink-muted);
   margin-bottom: var(--space-3);
 }
+
+.delta {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3em;
+  margin-top: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-ink-faint);
+}
+
+.deltaArrow {
+  font-size: 0.7em;
+}
+
+.positive .deltaArrow { color: var(--color-positive); }
+.negative .deltaArrow { color: var(--color-negative); }

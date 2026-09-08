@@ -56,28 +56,37 @@ function recolor(chartData: ChartData) {
   };
 }
 
-const chartOptions: ChartOptions<'line'> = {
-  responsive: true,
-  maintainAspectRatio: false,
-  interaction: { mode: 'index', intersect: false },
-  plugins: {
-    legend: { display: false },
-    tooltip: {
-      callbacks: {
-        label: (ctx) =>
-          `${ctx.dataset.label}: ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(ctx.parsed.y))}`
+// Função, não objeto de módulo -- precisa reler o token a cada render,
+// igual ao recolor() abaixo. Um `const` de topo executaria readToken()
+// uma vez só, na carga do módulo, e travaria a cor da grade no tema que
+// estivesse ativo naquele instante (claro/escuro nunca mais trocaria).
+function buildChartOptions(): ChartOptions<'line'> {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (ctx) =>
+            `${ctx.dataset.label}: ${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(ctx.parsed.y))}`
+        }
       }
-    }
-  },
-  scales: {
-    y: {
-      beginAtZero: true,
-      ticks: { callback: (v) => `R$ ${v}` },
-      grid: { color: 'rgba(107, 100, 89, 0.12)' }
     },
-    x: { grid: { display: false } }
-  }
-};
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: { callback: (v) => `R$ ${v}` },
+        // Cor fixa antes -- não acompanhava tema nem o teto de contraste
+        // validado da própria paleta. --color-line é o hairline estrutural
+        // da direção "Ledger" (o mesmo papel que fecha os cards perforated).
+        grid: { color: readToken('--color-line') || 'rgba(107, 100, 89, 0.12)' }
+      },
+      x: { grid: { display: false } }
+    }
+  };
+}
 
 export interface SpendingChartProps {
   data: ChartData | undefined;
@@ -123,7 +132,7 @@ export function SpendingChart({ data, filter, onFilterChange, isLoading, isError
         emptyTitle="Sem movimentação no período"
         emptyDescription="Registre um gasto ou receita — pelo site ou pelo WhatsApp — pra ver o gráfico ganhar forma."
       >
-        <div className={styles.chartWrap}>{data && <Line data={recolor(data)} options={chartOptions} />}</div>
+        <div className={styles.chartWrap}>{data && <Line data={recolor(data)} options={buildChartOptions()} />}</div>
       </QueryState>
     </Card>
   );

@@ -15,7 +15,7 @@ import {
   useTransactionsQuery,
   useUserProfileQuery
 } from './queries';
-import { selectRecentActivity, selectUpcomingBills } from './selectors';
+import { selectMonthlyNet, selectRecentActivity, selectUpcomingBills } from './selectors';
 import styles from './DashboardPage.module.css';
 
 const PROJECTION_MONTHS = 6;
@@ -42,6 +42,7 @@ export default function DashboardPage() {
   const salary = userQuery.data?.salario ?? 0;
   const monthlyProgress = useMonthlyProgress(transactionsQuery.data ?? [], salary);
 
+  const monthlyNet = transactionsQuery.data ? selectMonthlyNet(transactionsQuery.data) : undefined;
   const recentActivity = transactionsQuery.data ? selectRecentActivity(transactionsQuery.data) : undefined;
   const upcomingBills = fixedExpensesQuery.data ? selectUpcomingBills(fixedExpensesQuery.data) : undefined;
 
@@ -56,6 +57,7 @@ export default function DashboardPage() {
 
       <KpiSection
         balance={balanceQuery.data}
+        monthlyNet={monthlyNet}
         isLoading={balanceQuery.isLoading}
         isError={balanceQuery.isError}
         onRetry={balanceQuery.refetch}
