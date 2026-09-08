@@ -197,3 +197,31 @@
     --duration-slow: 0ms;
   }
 }
+
+/* ---------- Tamanho da fonte (Perfil > Tipografia) ----------
+   Redeclara só --text-* (nunca --space-*, senão o layout inteiro
+   "respira" só porque o texto cresceu) e só dentro de `.ds-scope` -- o
+   `data-font-scale` fica no <html> (useFontPreference.ts), mas a
+   redeclaração em si tem que estar embaixo de `.ds-scope` pra não vazar
+   pra landing/auth, que têm a própria escala de tipografia (--t-*/
+   --auth-font-*) sem relação nenhuma com esta. Sem bloco "medium": os
+   valores base do :root acima já são o médio/padrão. */
+:root[data-font-scale='small'] .ds-scope {
+  --text-xs: 0.6875rem;
+  --text-sm: 0.8125rem;
+  --text-base: 0.9375rem;
+  --text-md: 1.0625rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.625rem;
+  --text-2xl: 2.0625rem;
+}
+
+:root[data-font-scale='large'] .ds-scope {
+  --text-xs: 0.8125rem;
+  --text-sm: 0.9375rem;
+  --text-base: 1.0625rem;
+  --text-md: 1.1875rem;
+  --text-lg: 1.4375rem;
+  --text-xl: 1.875rem;
+  --text-2xl: 2.4375rem;
+}

@@ -1,19 +1,8 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
 import './App.css';
-import './presentation/styles/pages/profile.css';
-import './presentation/styles/pages/system-hovers.css';
-// Fase 9: pages/system.jsx (a antiga tela de dashboard, dona deste
-// import antes) foi removida -- mas o arquivo em si não é só CSS
-// daquela tela. Define :root com as variáveis de tema (--bg, --card,
-// --text, --line, --primary...) e as classes .sys-layout/.sys-sidebar/
-// .sys-side-* que Profile.jsx, Agent.jsx e o Sidebar.jsx que os dois
-// ainda usam continuam precisando (nenhum dos dois migrou pro AppShell
-// ainda -- ficam pras Fases 7 e 8). Import direto aqui, mesmo padrão
-// das duas linhas acima.
-import './presentation/styles/pages/system.css';
-import { useTheme } from './presentation/hooks/useTheme';
 import { useBrandColor } from './app-shell/useBrandColor';
+import { useFontPreference } from './app-shell/useFontPreference';
 import { ProtectedRoute } from './presentation/components/ProtectedRoute';
 import { ToastContainer } from './presentation/components/system/ToastContainer';
 // Lazy: mantém a landing fora do bundle de quem só vai fazer login e usar o painel.
@@ -21,7 +10,6 @@ const LandingPage = lazy(() => import('./presentation/pages/Home'));
 import LoginCard from './presentation/pages/Login';
 import Cadastro from './presentation/pages/Register';
 import RedefinirSenha from './presentation/pages/ChangePassword';
-import Profile from './presentation/pages/Profile';
 import AuthCallback from './presentation/pages/AuthCallback';
 import PrivacyPolicy from './presentation/pages/legal/PrivacyPolicy';
 import TermsOfService from './presentation/pages/legal/TermsOfService';
@@ -42,6 +30,7 @@ const AnalyticsPage = lazy(() => import('./features/insights/AnalyticsPage'));
 const ReportsPage = lazy(() => import('./features/insights/ReportsPage'));
 const ImpactoFinanceiroPage = lazy(() => import('./features/insights/ImpactoFinanceiroPage'));
 const AgentPage = lazy(() => import('./features/agent/AgentPage'));
+const ProfilePage = lazy(() => import('./features/profile/ProfilePage'));
 
 // Catálogo do design system: a atribuição inteira fica atrás de
 // import.meta.env.DEV, que o Vite substitui por `false` no build --
@@ -53,16 +42,13 @@ const DesignSystemPage = import.meta.env.DEV
   : null;
 
 function App() {
-  // Legado, ainda em uso -- aplica data-theme/data-color-scheme no
-  // `.sys-layout` de cada página antiga não redesenhada (a maioria do
-  // app, ainda). O tema do redesign (useAppTheme, dentro do AppShell)
-  // é independente disso e escreve no <html>, não no `.sys-layout` --
-  // os dois convivem sem conflito até a última página antiga sumir.
-  useTheme();
-  // Chamado aqui (não só dentro de Profile.jsx, de onde o usuário
-  // escolhe a cor) pra aplicar em toda rota, mesmo entrando direto numa
-  // página que não passa por Profile primeiro -- ver o hook.
+  // Cor de destaque e fonte/tamanho de fonte -- aplicados aqui (não só
+  // dentro de ProfilePage, de onde o usuário escolhe) pra valer em toda
+  // rota, mesmo entrando direto numa página que não passa pelo Perfil
+  // primeiro. Tema (claro/escuro/sistema) é o próprio useAppTheme, já
+  // chamado dentro do AppShell -- não precisa de novo aqui.
   useBrandColor();
+  useFontPreference();
 
   return (
     <>
@@ -79,41 +65,17 @@ function App() {
           <Route path="/terms-of-service" element={<TermsOfService />} />
 
           {/* Protegido -- <ProtectedRoute/> é a guarda (Fase 1: adaptada
-              pra árvore de rotas real, ver o arquivo). Duas camadas:
-
-              1) Páginas ainda não redesenhadas -- guardadas, mas com o
-                 próprio layout/sidebar interno intacto (ver decisão da
-                 Fase 1 no resumo: forçar o AppShell novo nelas sem
-                 reconstruir o conteúdo arriscava quebrar CSS acoplado
-                 de um app em produção, tipo `.sys-layout .sys-topbar{
-                 position: absolute }`). Migram pro AppShell quando a
-                 própria fase reconstrói a tela.
-
-              2) Páginas já na identidade nova -- filhas do <AppShell/>
-                 (sidebar/topbar novos, tema, os 7 grupos de navegação
-                 da Fase 0). Fase 2 trouxe o dashboard; Fase 3 trouxe
-                 Movimentações inteira (Gastos, Receitas, Gastos Fixos,
-                 Receita Recorrente, Importar Extrato); Fase 4 traz
-                 Patrimônio (Contas, Cartões, Orçamento, Metas) --
-                 Contas e Cartões migram da camada 1 pra esta, Orçamento
-                 e Metas são telas novas (backend já existia, sem UI);
-                 Fase 5 traz Pessoas e Alertas -- Pessoas e Alertas
-                 migram da camada 1, mais o NotificationsBell (Topbar,
-                 visível em toda página do app novo) substituindo o
-                 aviso de alerta disparado que só existia na tela de
-                 dashboard antiga (fora de rota desde a Fase 2); Fase 6
-                 traz Insights (Análises, Relatórios com exportação
-                 CSV/PDF nova, Impacto Financeiro) -- os hooks que
-                 calculam os dados continuam os mesmos, só a UI (e os
-                 gráficos SVG desenhados à mão) trocam de identidade;
-                 Fase 7 traz Automação (Agente de IA) -- migra da
-                 camada 1, mesmo contrato de backend do widget antigo
-                 (POST único por mensagem, sem streaming), só a casca
-                 troca. Só falta Perfil (Fase 8) pra camada 1 zerar de
-                 vez. */}
+              pra árvore de rotas real, ver o arquivo). Todas as rotas daqui
+              pra baixo já são filhas do <AppShell/> (sidebar/topbar novos,
+              tema, os 7 grupos de navegação da Fase 0) -- a camada 1
+              (páginas com layout próprio, fora do AppShell) que existia
+              nas Fases 1-7 zerou na Fase 8 (Perfil foi a última: Fase 2
+              trouxe o dashboard, Fase 3 Movimentações inteira, Fase 4
+              Patrimônio, Fase 5 Pessoas/Alertas, Fase 6 Insights, Fase 7
+              Automação, Fase 8 Perfil). `.sys-layout`/Sidebar antiga/
+              useTheme.js não têm mais nenhum renderer no app -- saíram
+              junto (ver commit desta fase). */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/profile" element={<Profile />} />
-
             <Route element={<AppShell />}>
               <Route path="/system" element={<DashboardPage />} />
               <Route path="/expenses" element={<ExpensesPage />} />
@@ -131,6 +93,7 @@ function App() {
               <Route path="/reports" element={<ReportsPage />} />
               <Route path="/impacto-financeiro" element={<ImpactoFinanceiroPage />} />
               <Route path="/agent" element={<AgentPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
               {import.meta.env.DEV && <Route path="/design-system" element={<DesignSystemPage />} />}
             </Route>
           </Route>
