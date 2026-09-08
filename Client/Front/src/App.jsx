@@ -22,7 +22,6 @@ import LoginCard from './presentation/pages/Login';
 import Cadastro from './presentation/pages/Register';
 import RedefinirSenha from './presentation/pages/ChangePassword';
 import Profile from './presentation/pages/Profile';
-import Agent from './presentation/pages/Agent';
 import AuthCallback from './presentation/pages/AuthCallback';
 import PrivacyPolicy from './presentation/pages/legal/PrivacyPolicy';
 import TermsOfService from './presentation/pages/legal/TermsOfService';
@@ -42,6 +41,7 @@ const AlertsPage = lazy(() => import('./features/alerts/AlertsPage'));
 const AnalyticsPage = lazy(() => import('./features/insights/AnalyticsPage'));
 const ReportsPage = lazy(() => import('./features/insights/ReportsPage'));
 const ImpactoFinanceiroPage = lazy(() => import('./features/insights/ImpactoFinanceiroPage'));
+const AgentPage = lazy(() => import('./features/agent/AgentPage'));
 
 // Catálogo do design system: a atribuição inteira fica atrás de
 // import.meta.env.DEV, que o Vite substitui por `false` no build --
@@ -105,10 +105,14 @@ function App() {
                  traz Insights (Análises, Relatórios com exportação
                  CSV/PDF nova, Impacto Financeiro) -- os hooks que
                  calculam os dados continuam os mesmos, só a UI (e os
-                 gráficos SVG desenhados à mão) trocam de identidade. */}
+                 gráficos SVG desenhados à mão) trocam de identidade;
+                 Fase 7 traz Automação (Agente de IA) -- migra da
+                 camada 1, mesmo contrato de backend do widget antigo
+                 (POST único por mensagem, sem streaming), só a casca
+                 troca. Só falta Perfil (Fase 8) pra camada 1 zerar de
+                 vez. */}
           <Route element={<ProtectedRoute />}>
             <Route path="/profile" element={<Profile />} />
-            <Route path="/agent" element={<Agent />} />
 
             <Route element={<AppShell />}>
               <Route path="/system" element={<DashboardPage />} />
@@ -126,6 +130,7 @@ function App() {
               <Route path="/analytics" element={<AnalyticsPage />} />
               <Route path="/reports" element={<ReportsPage />} />
               <Route path="/impacto-financeiro" element={<ImpactoFinanceiroPage />} />
+              <Route path="/agent" element={<AgentPage />} />
               {import.meta.env.DEV && <Route path="/design-system" element={<DesignSystemPage />} />}
             </Route>
           </Route>
