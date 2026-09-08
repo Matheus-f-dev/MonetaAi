@@ -67,6 +67,60 @@ function withLightness(hex: string, targetL: number, satMul = 1): string {
   return rgbToHex(nr, ng, nb);
 }
 
+// WCAG 2.x -- luminância relativa (soma ponderada por canal, G pesa quase
+// 6x mais que B) e a razão de contraste que vem dela. É o que expõe o bug
+// real que a checagem antiga (só o "L" do HSL) não pegava: um verde/
+// amarelo bem saturado tem HSL-lightness "médio" (~50%, não dispara o
+// corte ingênuo de >55) mas luminância PERCEBIDA altíssima -- pra quem
+// olha, é quase tão "claro" quanto um cinza de L~80%. #00FF9D é o caso
+// que expôs isso: passava direto pelo corte antigo e ficava com o texto
+// do item ativo da sidebar quase invisível sobre o próprio fundo suave
+// (os dois claros demais, contraste real abaixo de 2:1).
+function srgbToLinear(c: number): number {
+  const cs = c / 255;
+  return cs <= 0.03928 ? cs / 12.92 : Math.pow((cs + 0.055) / 1.055, 2.4);
+}
+
+function relativeLuminance(hex: string): number {
+  const [r, g, b] = hexToRgb(hex);
+  return 0.2126 * srgbToLinear(r) + 0.7152 * srgbToLinear(g) + 0.0722 * srgbToLinear(b);
+}
+
+function contrastRatio(hexA: string, hexB: string): number {
+  const la = relativeLuminance(hexA);
+  const lb = relativeLuminance(hexB);
+  const lighter = Math.max(la, lb);
+  const darker = Math.min(la, lb);
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+// Reescurece/clareia (sempre a partir do HUE/SAT originais, nunca do
+// resultado do passo anterior -- evita acumular deriva de matiz a cada
+// iteração) até bater o contraste mínimo contra TODOS os fundos onde essa
+// cor aparece como texto/ícone. `darken=true` cobre o tema claro (o único
+// jeito de description de contraste insuficiente contra um fundo claro é
+// a cor estar clara demais); `darken=false` cobre o escuro (só falha por
+// estar escura demais). Um teto de 24 passos de 3% cobre 0-100% de sobra.
+function ensureContrast(originalHex: string, startHex: string, backgrounds: string[], minRatio: number, darken: boolean): string {
+  let candidate = startHex;
+  let l = rgbToHsl(...hexToRgb(startHex))[2];
+  let iterations = 0;
+  while (iterations < 24 && backgrounds.some((bg) => contrastRatio(candidate, bg) < minRatio)) {
+    l = darken ? Math.max(0, l - 3) : Math.min(100, l + 3);
+    candidate = withLightness(originalHex, l);
+    iterations++;
+    if (l <= 0 || l >= 100) break;
+  }
+  return candidate;
+}
+
+// Os dois extremos fixos da direção "Ledger" (styles/tokens.css) -- server
+// como pano de fundo de referência pra texto solto na cor de marca (nome
+// da marca na sidebar, links), separado do par brand/brandSoft (que tem
+// seu próprio contraste garantido abaixo).
+const PAPER_LIGHT = '#fbfaf7';
+const PAPER_DARK = '#0a0e0d';
+
 export interface BrandShades {
   brand: string;
   brandStrong: string;
@@ -79,28 +133,26 @@ export interface BrandShades {
  * "forte" é mais escura no tema claro mas mais CLARA no tema escuro (é
  * assim que os tokens fixos originais também funcionam: tinta mais forte
  * no claro precisa escurecer pra destacar, no escuro precisa clarear).
- * Também corrige o caso de a cor escolhida ser clara demais pro texto no
- * tema claro (ou escura demais pro tema escuro) -- não é uma garantia de
- * contraste AA pra qualquer cor, mas evita os casos mais óbvios de
- * ilegibilidade sem exigir nada do usuário.
+ * `brand` sai com contraste de verdade garantido (WCAG, não só HSL-L)
+ * contra os dois fundos onde ele aparece como texto/ícone: o papel do
+ * tema e o próprio `brandSoft` (par usado em item ativo de nav, avatar
+ * de PessoasPage etc.) -- não é uma prova formal de AA pra qualquer
+ * conteúdo, mas fecha o buraco real que cores saturadas tipo verde/
+ * amarelo abriam no corte antigo.
  */
 export function deriveBrandShades(hex: string, isDark: boolean): BrandShades {
   const [r, g, b] = hexToRgb(hex);
   const [, , l] = rgbToHsl(r, g, b);
 
   if (isDark) {
-    const brand = l < 55 ? withLightness(hex, 68) : hex;
-    return {
-      brand,
-      brandStrong: withLightness(hex, 82, 0.9),
-      brandSoft: withLightness(hex, 20, 0.55)
-    };
+    const brandSoft = withLightness(hex, 20, 0.55);
+    let brand = l < 55 ? withLightness(hex, 68) : hex;
+    brand = ensureContrast(hex, brand, [brandSoft, PAPER_DARK], 4.5, false);
+    return { brand, brandStrong: withLightness(hex, 82, 0.9), brandSoft };
   }
 
-  const brand = l > 55 ? withLightness(hex, 32) : hex;
-  return {
-    brand,
-    brandStrong: withLightness(hex, 20, 1.05),
-    brandSoft: withLightness(hex, 92, 0.35)
-  };
+  const brandSoft = withLightness(hex, 92, 0.35);
+  let brand = l > 55 ? withLightness(hex, 32) : hex;
+  brand = ensureContrast(hex, brand, [brandSoft, PAPER_LIGHT], 4.5, true);
+  return { brand, brandStrong: withLightness(hex, 20, 1.05), brandSoft };
 }
