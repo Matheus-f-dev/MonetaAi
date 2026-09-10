@@ -1,4 +1,5 @@
-import { type ReactElement } from 'react';
+import { useState, type FocusEvent, type MouseEvent, type ReactElement } from 'react';
+import { createPortal } from 'react-dom';
 import { NavLink } from 'react-router-dom';
 import { NAV_GROUPS } from './navConfig';
 import {
@@ -34,7 +35,33 @@ export interface SidebarProps {
   onToggleCollapse?: () => void;
 }
 
+interface TooltipState {
+  label: string;
+  top: number;
+  left: number;
+}
+
 export function Sidebar({ onLogout, onNavigate, collapsed = false, onToggleCollapse }: SidebarProps) {
+  // Tooltip próprio pros itens colapsados (trilho só de ícones) -- não o
+  // `title` nativo do navegador, que aparecia como uma caixa branca crua,
+  // fora do tema, exatamente o "jogo de cor" que não combina que motivou o
+  // resto deste redesign. Não é só estética: dentro de um grupo (ex.
+  // "Automação"), TODO item compartilha o mesmo ícone (um por grupo, não
+  // por item -- ver GROUP_ICON) -- sem rótulo nenhum, "Agente IA" e
+  // "Alertas" ficam visualmente idênticos no trilho colapsado. `aria-label`
+  // continua cobrindo leitor de tela independente disso.
+  const [tooltip, setTooltip] = useState<TooltipState | null>(null);
+
+  function showTooltip(e: MouseEvent<HTMLElement> | FocusEvent<HTMLElement>, label: string) {
+    if (!collapsed) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    setTooltip({ label, top: rect.top + rect.height / 2, left: rect.right + 8 });
+  }
+
+  function hideTooltip() {
+    setTooltip(null);
+  }
+
   return (
     <nav className={[styles.sidebar, collapsed && styles.sidebarCollapsed].filter(Boolean).join(' ')} aria-label="Navegação principal">
       <div className={styles.brandRow}>
@@ -66,9 +93,12 @@ export function Sidebar({ onLogout, onNavigate, collapsed = false, onToggleColla
                   key={item.path}
                   to={item.path}
                   onClick={onNavigate}
-                  title={collapsed ? item.label : undefined}
                   aria-label={item.label}
                   className={({ isActive }) => [styles.item, isActive && styles.itemActive].filter(Boolean).join(' ')}
+                  onMouseEnter={(e) => showTooltip(e, item.label)}
+                  onMouseLeave={hideTooltip}
+                  onFocus={(e) => showTooltip(e, item.label)}
+                  onBlur={hideTooltip}
                 >
                   {GroupIcon && (
                     <span className={styles.itemIcon} aria-hidden="true">
@@ -84,13 +114,35 @@ export function Sidebar({ onLogout, onNavigate, collapsed = false, onToggleColla
       </div>
 
       <div className={styles.footer}>
-        <button type="button" className={styles.item} onClick={onLogout} title={collapsed ? 'Sair' : undefined} aria-label="Sair">
+        <button
+          type="button"
+          className={styles.item}
+          onClick={onLogout}
+          aria-label="Sair"
+          onMouseEnter={(e) => showTooltip(e, 'Sair')}
+          onMouseLeave={hideTooltip}
+          onFocus={(e) => showTooltip(e, 'Sair')}
+          onBlur={hideTooltip}
+        >
           <span className={styles.itemIcon} aria-hidden="true">
             <LogoutIcon />
           </span>
           <span className={styles.itemLabel}>Sair</span>
         </button>
       </div>
+
+      {/* Portal pro <body>: .sidebar tem overflow-x/y próprios (a
+          transição de largura do colapso precisa deles), que cortariam
+          um tooltip posicionado à direita do próprio trilho. Fixed +
+          portal escapa de qualquer clipping ancestral, sem depender de
+          nenhum overflow:visible que arriscaria vazar o resto do menu. */}
+      {tooltip &&
+        createPortal(
+          <div className={styles.tooltip} role="tooltip" style={{ top: tooltip.top, left: tooltip.left }}>
+            {tooltip.label}
+          </div>,
+          document.body
+        )}
     </nav>
   );
 }
