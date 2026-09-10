@@ -74,6 +74,25 @@
   cursor: pointer;
 }
 
+/* :where() zera a especificidade da própria regra (mesma técnica do
+   `:where(.ds-scope) a` logo abaixo) -- sem isso, `.ds-scope button`
+   (0,1,1) venceria QUALQUER botão de uma classe de CSS Module só (0,1,0),
+   apagando o próprio background/border que Button.module.css e outros
+   definem pra cada variant. Com :where() a regra cai pra (0,0,1), perde
+   pra qualquer classe de componente, e só sobra pra reset de verdade:
+   um <button> cru sem nenhuma classe de estilo própria (achado real
+   testando com o app: o "Sair" da Sidebar é um <button>, não um <a> como
+   o resto do menu, e sem isso o navegador aplicava o próprio chrome
+   nativo -- fundo branco/cinza, borda -- por cima do `.item` da Sidebar,
+   que nunca precisou resetar isso porque só via uso em <a>). */
+:where(.ds-scope) button {
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: inherit;
+  appearance: none;
+}
+
 /* :where() zera a especificidade da própria regra (fica só a do `a`
    sozinho) -- sem isso, "classe + elemento" (0,1,1) vencia qualquer
    componente estilizado com uma única classe de CSS Module (0,1,0), tipo
