@@ -55,6 +55,7 @@ export interface Transaction {
   data?: string;
   criadoEm?: string;
   isTransferencia?: boolean;
+  split?: { participantes: Array<{ nome: string; valor: number; pago: boolean }> } | null;
 }
 
 export async function fetchTransactions(userId: string): Promise<Transaction[]> {

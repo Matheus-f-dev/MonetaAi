@@ -101,7 +101,15 @@ export function TransactionsListPage({ tipo, title, subtitle, emptyDescription }
   }
 
   function openEdit(t: Transaction) {
-    setEditing({ id: t.id, descricao: t.descricao, valor: t.valor, categoria: t.categoria, tipo: t.tipo, accountId: undefined });
+    setEditing({
+      id: t.id,
+      descricao: t.descricao,
+      valor: t.valor,
+      categoria: t.categoria,
+      tipo: t.tipo,
+      accountId: undefined,
+      split: t.split
+    });
     setModalOpen(true);
   }
 
@@ -120,7 +128,17 @@ export function TransactionsListPage({ tipo, title, subtitle, emptyDescription }
       if (editing) {
         await updateMutation.mutateAsync({
           id: editing.id,
-          payload: { tipo: payload.tipo, valor: Math.abs(payload.valor), descricao: payload.descricao, categoria: payload.categoria }
+          payload: {
+            tipo: payload.tipo,
+            valor: Math.abs(payload.valor),
+            descricao: payload.descricao,
+            categoria: payload.categoria,
+            // `split` só entra quando o modal de fato mandou um (criar/editar
+            // divisão, ou `{ participantes: [] }` pra remover) -- senão fica
+            // de fora do payload, preservando o que já existia (ver o
+            // comentário em TransactionModal.handleSubmit).
+            ...(payload.split ? { split: payload.split } : {})
+          }
         });
         addToast('Transação atualizada com sucesso!', 'success');
       } else {

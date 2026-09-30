@@ -107,8 +107,25 @@ class TransactionService {
   }
 
   async updateTransaction(userId, transactionId, updateData) {
-    const updatedData = await this.repository.update(userId, transactionId, updateData);
-    return Transaction.fromRepository(updatedData);
+    // `split` não é coluna de `transactions` -- precisa sair do objeto
+    // antes de virar um UPDATE de SQL direto (senão o knex tenta gravar
+    // numa coluna que não existe). Separado aqui, igual createTransaction
+    // já separa `transaction.split?.participantes` na criação.
+    const { split, ...rest } = updateData;
+
+    // Achado testando de verdade (editar uma despesa e salvar quebrava com
+    // 500): a coluna `tipo` tem uma CHECK constraint só pra 'receita'/
+    // 'despesa' minúsculo, mas o modal manda 'Despesa'/'Receita'
+    // capitalizado. Na criação isso nunca dava erro porque `new
+    // Transaction(data)` normaliza sozinho (_validate() força minúsculo);
+    // aqui o update vai direto pro SQL cru, sem passar pelo model -- edição
+    // nunca tinha sido testada de ponta a ponta até agora.
+    if (rest.tipo) {
+      rest.tipo = rest.tipo.toLowerCase() === 'receita' ? 'receita' : 'despesa';
+    }
+
+    const updatedData = await this.repository.update(userId, transactionId, rest, split?.participantes);
+    return updatedData ? Transaction.fromRepository(updatedData) : null;
   }
 
   async deleteTransaction(userId, transactionId) {

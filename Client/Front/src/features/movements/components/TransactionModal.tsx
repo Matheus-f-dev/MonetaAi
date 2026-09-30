@@ -24,6 +24,9 @@ export interface EditingTransaction {
   categoria?: string;
   tipo?: string;
   accountId?: string;
+  /** Divisão já existente, se a transação já tinha uma -- pré-preenche a
+   * seção de divisão ao abrir pra editar (ver useEffect abaixo). */
+  split?: { participantes: Array<{ nome: string; valor: number; pago: boolean }> } | null;
 }
 
 export interface TransactionModalProps {
@@ -56,6 +59,11 @@ const emptyForm = {
   accountId: ''
 };
 
+const EMPTY_PARTICIPANTS = [
+  { nome: '', valor: '' },
+  { nome: '', valor: '' }
+];
+
 const CATEGORY_OPTIONS = CATEGORIES.map((c) => ({ value: c, label: c }));
 
 /**
@@ -70,6 +78,15 @@ const CATEGORY_OPTIONS = CATEGORIES.map((c) => ({ value: c, label: c }));
  *   -- chamado aqui só pra validar que o tipo é reconhecido antes de
  *   montar o payload de verdade que vai pro backend, igual o modal
  *   antigo fazia.
+ *
+ * Divisão de despesa (pedido do usuário): passou a funcionar também ao
+ * EDITAR uma despesa já lançada, não só ao criar -- antes a seção inteira
+ * ficava escondida em modo de edição, e nem o backend aceitava `split`
+ * no PUT (só no POST). "Rachadinha" é o gerador rápido (quantidade de
+ * pessoas -> N linhas com o valor dividido igual) por cima da mesma
+ * lista de participantes de sempre -- cada linha continua editável na
+ * mão pros "casos especiais" (delimitar um valor diferente pra alguém,
+ * ou transferir a parte de uma pessoa pra outra pagar).
  */
 export function TransactionModal({
   isOpen,
@@ -86,10 +103,8 @@ export function TransactionModal({
   const [formData, setFormData] = useState(emptyForm);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [splitEnabled, setSplitEnabled] = useState(false);
-  const [participants, setParticipants] = useState([
-    { nome: '', valor: '' },
-    { nome: '', valor: '' }
-  ]);
+  const [participants, setParticipants] = useState(EMPTY_PARTICIPANTS);
+  const [headcount, setHeadcount] = useState('2');
   const isEditing = Boolean(editingTransaction);
 
   useEffect(() => {
@@ -106,12 +121,24 @@ export function TransactionModal({
         parcelas: '1',
         accountId: editingTransaction.accountId || ''
       });
+
+      const existing = editingTransaction.split?.participantes;
+      if (existing?.length) {
+        setSplitEnabled(true);
+        setParticipants(existing.map((p) => ({ nome: p.nome, valor: String(p.valor) })));
+        setHeadcount(String(existing.length));
+      } else {
+        setSplitEnabled(false);
+        setParticipants(EMPTY_PARTICIPANTS);
+        setHeadcount('2');
+      }
     } else {
       setFormData({ ...emptyForm, tipo: defaultTipo });
+      setSplitEnabled(false);
+      setParticipants(EMPTY_PARTICIPANTS);
+      setHeadcount('2');
     }
     setValidationError(null);
-    setSplitEnabled(false);
-    setParticipants([{ nome: '', valor: '' }, { nome: '', valor: '' }]);
   }, [isOpen, editingTransaction, defaultTipo]);
 
   function updateParticipant(index: number, field: 'nome' | 'valor', value: string) {
@@ -124,6 +151,32 @@ export function TransactionModal({
 
   function removeParticipant(index: number) {
     setParticipants((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  // "Transferir pra outra pessoa" -- o caso especial que o usuário pediu:
+  // em vez de marcar como "não paga" ou excluir sem mais, a parte dessa
+  // pessoa some daqui e vira um acréscimo na parte de quem vai cobrir.
+  function transferTo(index: number, targetIndex: number) {
+    setParticipants((prev) => {
+      const amount = parseFloat(prev[index]?.valor) || 0;
+      const withTransfer = prev.map((p, i) => {
+        if (i !== targetIndex) return p;
+        const currentValue = parseFloat(p.valor) || 0;
+        return { ...p, valor: (currentValue + amount).toFixed(2) };
+      });
+      return withTransfer.filter((_, i) => i !== index);
+    });
+  }
+
+  // Rachadinha -- gera N linhas (preservando nome de quem já estava
+  // digitado, quando dá) com o valor total dividido igualmente. Mesma
+  // conta de "Dividir valor igualmente" (abaixo), só que decide também a
+  // QUANTIDADE de linhas, não só redivide as que já existem.
+  function generateEqualSplit() {
+    const n = Math.max(1, parseInt(headcount, 10) || 1);
+    const total = parseFloat(formData.valor) || 0;
+    const share = (total / n).toFixed(2);
+    setParticipants((prev) => Array.from({ length: n }, (_, i) => ({ nome: prev[i]?.nome || '', valor: share })));
   }
 
   function splitEqually() {
@@ -177,6 +230,15 @@ export function TransactionModal({
     const [year, month, day] = formData.data.split('-');
     const dataHora = `${day}/${month}/${year}, ${new Date().toLocaleTimeString('pt-BR')}`;
 
+    // `undefined` (chave ausente) preserva a divisão já existente no
+    // backend; `{ participantes: [] }` some com ela -- é o que permite
+    // desmarcar "Dividir com outras pessoas" numa edição pra remover a
+    // divisão de vez, sem precisar apagar e recriar a transação.
+    const splitPayload =
+      formData.tipo === 'Despesa' && (splitEnabled || (isEditing && editingTransaction?.split))
+        ? { participantes: splitEnabled ? validParticipants.map((p) => ({ ...p, pago: false })) : [] }
+        : undefined;
+
     const payload: Omit<TransactionPayload, 'userId'> = {
       tipo: formData.tipo,
       valor: formData.tipo === 'Receita' ? Math.abs(parseFloat(formData.valor)) : -Math.abs(parseFloat(formData.valor)),
@@ -186,9 +248,7 @@ export function TransactionModal({
       ...(formData.accountId ? { accountId: formData.accountId } : {}),
       ...(formData.tipo === 'Despesa' && formData.cardId ? { cardId: formData.cardId } : {}),
       ...(formData.tipo === 'Despesa' && formData.cardId && parcelas > 1 ? { parcelas } : {}),
-      ...(formData.tipo === 'Despesa' && splitEnabled && validParticipants.length > 0
-        ? { split: { participantes: validParticipants.map((p) => ({ ...p, pago: false })) } }
-        : {})
+      ...(splitPayload ? { split: splitPayload } : {})
     };
 
     onSubmit(payload);
@@ -284,7 +344,7 @@ export function TransactionModal({
           />
         )}
 
-        {formData.tipo === 'Despesa' && !isEditing && (
+        {formData.tipo === 'Despesa' && (
           <div>
             <label className={styles.splitToggle}>
               <input type="checkbox" checked={splitEnabled} onChange={(e) => setSplitEnabled(e.target.checked)} />
@@ -293,6 +353,29 @@ export function TransactionModal({
 
             {splitEnabled && (
               <div className={styles.splitBox} style={{ marginTop: 8 }}>
+                <div className={styles.rachadinha}>
+                  <span className={styles.rachadinhaLabel}>Rachadinha</span>
+                  <div className={styles.rachadinhaRow}>
+                    <input
+                      className={styles.rachadinhaInput}
+                      type="number"
+                      min="1"
+                      placeholder="Quantas pessoas?"
+                      value={headcount}
+                      onChange={(e) => setHeadcount(e.target.value)}
+                      aria-label="Quantidade de pessoas"
+                    />
+                    <button type="button" className={styles.linkButton} onClick={generateEqualSplit}>
+                      Gerar divisão igual
+                    </button>
+                  </div>
+                  <p className={styles.rachadinhaHint}>
+                    Preenche {Math.max(1, parseInt(headcount, 10) || 1)} pessoa(s) com o valor dividido igualmente --
+                    dá pra editar nome e valor de cada uma depois, ou transferir a parte de alguém pra outra pessoa
+                    pagar.
+                  </p>
+                </div>
+
                 <datalist id="known-people">
                   {knownNames.map((name) => (
                     <option key={name} value={name} />
@@ -318,6 +401,29 @@ export function TransactionModal({
                       value={p.valor}
                       onChange={(e) => updateParticipant(index, 'valor', e.target.value)}
                     />
+                    {participants.length > 1 && (
+                      <select
+                        className={styles.splitTransfer}
+                        value=""
+                        onChange={(e) => {
+                          const targetIndex = Number(e.target.value);
+                          if (!Number.isNaN(targetIndex)) transferTo(index, targetIndex);
+                        }}
+                        aria-label={`Transferir a parte de ${p.nome || 'esta pessoa'} pra outra pessoa pagar`}
+                      >
+                        <option value="" disabled>
+                          Transferir pra...
+                        </option>
+                        {participants
+                          .map((other, i) => ({ other, i }))
+                          .filter(({ i }) => i !== index)
+                          .map(({ other, i }) => (
+                            <option key={i} value={i}>
+                              {other.nome || `Pessoa ${i + 1}`}
+                            </option>
+                          ))}
+                      </select>
+                    )}
                     <button
                       type="button"
                       className={styles.splitRemove}

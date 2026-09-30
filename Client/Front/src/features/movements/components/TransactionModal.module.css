@@ -57,7 +57,7 @@
 
 .splitRow {
   display: grid;
-  grid-template-columns: 1fr 100px auto;
+  grid-template-columns: 1fr 100px 140px auto;
   gap: var(--space-2);
   align-items: center;
 }
@@ -68,6 +68,56 @@
   border-radius: var(--radius-sm);
   background: var(--color-bg-raised);
   font-size: var(--text-sm);
+}
+
+/* "Transferir pra..." -- o caso especial de mover a parte de uma pessoa
+   pra outra pagar. Select nativo mesmo (mesma convenção do resto do
+   formulário) -- some da linha quando só sobra 1 participante, não tem
+   pra quem transferir. */
+.splitTransfer {
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-raised);
+  color: var(--color-ink-muted);
+  font-size: var(--text-xs);
+}
+
+/* Rachadinha -- gerador rápido por cima da mesma lista de participantes
+   (não é uma tela/estado separado, só preenche as linhas abaixo). */
+.rachadinha {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-line);
+}
+
+.rachadinhaLabel {
+  font-family: var(--font-display);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+  color: var(--color-ink);
+}
+
+.rachadinhaRow {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.rachadinhaInput {
+  width: 120px;
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-raised);
+  font-size: var(--text-sm);
+}
+
+.rachadinhaHint {
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
 }
 
 .splitRemove {
@@ -109,5 +159,17 @@
 @media (max-width: 700px) {
   .row {
     grid-template-columns: 1fr;
+  }
+
+  /* 4 colunas (nome, valor, transferir, remover) não cabem numa tela de
+     celular -- nome quebra pra linha própria, o resto fica numa segunda
+     fileira compacta. */
+  .splitRow {
+    grid-template-columns: 1fr;
+    gap: var(--space-1);
+  }
+
+  .rachadinhaRow {
+    flex-wrap: wrap;
   }
 }
