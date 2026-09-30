@@ -12,6 +12,17 @@ dist
 dist-ssr
 *.local
 
+# Nunca ignorado antes -- foi commitado por engano e a VPS de produção
+# sobrescreveu o próprio arquivo com a URL real, o que travava
+# `git pull` toda vez que este arquivo mudasse no repo (a mesma causa
+# raiz do Service/.gitignore já ignorar .env "por segurança" -- aqui o
+# valor não é segredo nenhum, mas o problema de arquivo local editado
+# divergindo do repo é o mesmo). .env.production substitui -- Vite já
+# prioriza ele automaticamente em `vite build` (mode=production por
+# padrão), sem precisar editar nada na VPS nunca mais.
+.env
+.env.local
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

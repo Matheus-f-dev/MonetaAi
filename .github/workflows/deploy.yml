@@ -1,0 +1,36 @@
+name: Deploy para produção
+
+# Só dispara em push/merge pra main -- o mesmo portão que qualquer PR já
+# passa antes de ir pro ar (decisão deliberada, não a branch de feature
+# em uso no dia a dia). `workflow_dispatch` deixa disparar à mão pela aba
+# Actions do GitHub, pra reexecutar um deploy sem precisar de commit novo.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+# Evita dois deploys rodando ao mesmo tempo se dois pushes em main
+# chegarem em sequência rápida -- `cancel-in-progress: false` porque um
+# deploy pela metade (backend reiniciado, frontend não buildado ainda)
+# é pior que só esperar o de antes terminar.
+concurrency:
+  group: deploy-producao
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH (roda deploy.sh na VPS)
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          port: ${{ secrets.VPS_PORT }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          # deploy.sh já faz `git pull` como primeiro passo -- é ele quem
+          # traz a versão nova do próprio script antes de rodar o resto,
+          # então chamar o caminho fixo aqui é suficiente; não precisa
+          # copiar o arquivo do workflow pra VPS antes.
+          script: bash /opt/MonetaAi/deploy.sh
+          script_stop: true
