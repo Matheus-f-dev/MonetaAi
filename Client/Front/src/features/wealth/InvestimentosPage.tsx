@@ -13,13 +13,14 @@ import { Line } from 'react-chartjs-2';
 import { Badge, Button, Card, Input, Modal, MoneyFigure, QueryState, Select, Skeleton } from '../../design-system';
 import { useToast } from '../../presentation/hooks/useToast';
 import { INVESTMENT_CATEGORIES } from '../../shared/categories';
-import type { Investment, TipoAporte } from './api';
+import type { Investment, TipoAporte, TipoAtivo } from './api';
 import { HORIZON_OPTIONS, projectPortfolio } from './investmentProjection';
 import {
   useCreateInvestmentMutation,
   useCurrentUserId,
   useDeleteInvestmentMutation,
   useInvestmentsQuery,
+  useMarketQuoteQuery,
   useUpdateInvestmentMutation
 } from './queries';
 import styles from './InvestimentosPage.module.css';
@@ -32,9 +33,55 @@ const TIPO_APORTE_OPTIONS: Array<{ value: TipoAporte; label: string }> = [
   { value: 'unico', label: 'Aporte único' }
 ];
 
+const TIPO_ATIVO_OPTIONS: Array<{ value: TipoAtivo; label: string }> = [
+  { value: 'renda_fixa', label: 'Renda fixa' },
+  { value: 'acao', label: 'Ação' },
+  { value: 'fii', label: 'Fundo imobiliário (FII)' },
+  { value: 'cripto', label: 'Criptomoeda' },
+  { value: 'imovel', label: 'Imóvel' },
+  { value: 'outro', label: 'Outro' }
+];
+
+const TIPO_ATIVO_LABEL: Record<TipoAtivo, string> = Object.fromEntries(
+  TIPO_ATIVO_OPTIONS.map((o) => [o.value, o.label])
+) as Record<TipoAtivo, string>;
+
+// CoinGecko identifica a moeda pelo id interno, não pelo ticker (BTC) --
+// lista curada das mais comuns pra não precisar resolver símbolo -> id
+// na mão (ver MarketDataService.fetchCryptoPrice no backend).
+const CRYPTO_OPTIONS = [
+  { value: 'bitcoin', label: 'Bitcoin (BTC)' },
+  { value: 'ethereum', label: 'Ethereum (ETH)' },
+  { value: 'tether', label: 'Tether (USDT)' },
+  { value: 'binancecoin', label: 'BNB' },
+  { value: 'solana', label: 'Solana (SOL)' },
+  { value: 'ripple', label: 'XRP' },
+  { value: 'usd-coin', label: 'USD Coin (USDC)' },
+  { value: 'cardano', label: 'Cardano (ADA)' },
+  { value: 'dogecoin', label: 'Dogecoin (DOGE)' },
+  { value: 'tron', label: 'TRON (TRX)' },
+  { value: 'avalanche-2', label: 'Avalanche (AVAX)' },
+  { value: 'chainlink', label: 'Chainlink (LINK)' },
+  { value: 'polkadot', label: 'Polkadot (DOT)' },
+  { value: 'litecoin', label: 'Litecoin (LTC)' },
+  { value: 'shiba-inu', label: 'Shiba Inu (SHIB)' }
+];
+
+const FILTER_OPTIONS: Array<{ value: TipoAtivo | 'todos'; label: string }> = [
+  { value: 'todos', label: 'Todos' },
+  ...TIPO_ATIVO_OPTIONS
+];
+
+function isAtivoMercado(tipo: TipoAtivo): boolean {
+  return tipo === 'acao' || tipo === 'fii' || tipo === 'cripto';
+}
+
 const emptyForm = {
   nome: '',
   categoria: INVESTMENT_CATEGORIES[0],
+  tipoAtivo: 'renda_fixa' as TipoAtivo,
+  ticker: '',
+  quantidade: '',
   tipoAporte: 'mensal' as TipoAporte,
   valorInicial: '',
   aporteMensal: '',
@@ -119,6 +166,101 @@ function buildChartOptions(): ChartOptions<'line'> {
   };
 }
 
+interface InvestmentCardProps {
+  investment: Investment;
+  onEdit: (investment: Investment) => void;
+  onDelete: (id: string) => void;
+}
+
+// Ativo de mercado (ação/fii/cripto) ganha card próprio -- o valor não é
+// digitado à mão, vem de quantidade × cotação ao vivo (useMarketQuoteQuery
+// chama /api/market/quote, que por sua vez chama brapi.dev ou CoinGecko).
+function InvestmentCard({ investment, onEdit, onDelete }: InvestmentCardProps) {
+  const mercado = isAtivoMercado(investment.tipoAtivo);
+  const quoteQuery = useMarketQuoteQuery(
+    mercado ? (investment.tipoAtivo as 'acao' | 'fii' | 'cripto') : null,
+    mercado ? investment.ticker : null
+  );
+
+  const quantidade = investment.quantidade ?? 0;
+  const preco = quoteQuery.data?.preco ?? 0;
+  const valorAtual = quantidade * preco;
+  const variacao = quoteQuery.data?.variacaoPercentual ?? 0;
+
+  return (
+    <Card perforated>
+      <div className={styles.cardTop}>
+        <span className={styles.nome}>{investment.nome}</span>
+        <Badge tone="brand">{investment.categoria}</Badge>
+      </div>
+      <div className={styles.meta}>
+        {TIPO_ATIVO_LABEL[investment.tipoAtivo]}
+        {investment.ticker && ` · ${investment.ticker.toUpperCase()}`}
+        {' · '}
+        desde {new Date(investment.dataInicio).toLocaleDateString('pt-BR')}
+      </div>
+
+      {mercado ? (
+        <div className={styles.cardBody}>
+          <div className={styles.row}>
+            <span>Quantidade</span>
+            <span>{quantidade}</span>
+          </div>
+          <div className={styles.row}>
+            <span>Preço atual</span>
+            {quoteQuery.isLoading ? (
+              <span className={styles.percent}>carregando...</span>
+            ) : quoteQuery.isError ? (
+              <span className={styles.quoteError}>indisponível</span>
+            ) : (
+              <MoneyFigure value={preco} sign="neutral" size="sm" />
+            )}
+          </div>
+          <div className={styles.row}>
+            <span>Valor atual</span>
+            <MoneyFigure value={valorAtual} sign="neutral" size="sm" />
+          </div>
+          {quoteQuery.data && (
+            <div className={styles.row}>
+              <span>Variação {investment.tipoAtivo === 'cripto' ? '24h' : 'do dia'}</span>
+              <Badge tone={variacao >= 0 ? 'positive' : 'negative'}>
+                {variacao >= 0 ? '+' : ''}
+                {variacao.toFixed(2)}%
+              </Badge>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className={styles.cardBody}>
+          <div className={styles.row}>
+            <span>Valor inicial</span>
+            <MoneyFigure value={investment.valorInicial} sign="neutral" size="sm" />
+          </div>
+          {investment.tipoAporte === 'mensal' && (
+            <div className={styles.row}>
+              <span>Aporte mensal</span>
+              <MoneyFigure value={investment.aporteMensal} sign="neutral" size="sm" />
+            </div>
+          )}
+          <div className={styles.row}>
+            <span>Retorno esperado</span>
+            <span className={styles.percent}>{investment.taxaRetornoAnual.toFixed(2)}% a.a.</span>
+          </div>
+        </div>
+      )}
+
+      <div className={styles.cardActions}>
+        <Button size="sm" variant="ghost" onClick={() => onEdit(investment)}>
+          Editar
+        </Button>
+        <Button size="sm" variant="ghost" onClick={() => onDelete(investment.id)}>
+          Excluir
+        </Button>
+      </div>
+    </Card>
+  );
+}
+
 export default function InvestimentosPage() {
   const userId = useCurrentUserId();
   const { addToast } = useToast();
@@ -131,20 +273,36 @@ export default function InvestimentosPage() {
   const investments = investmentsQuery.data ?? [];
 
   const [horizon, setHorizon] = useState(HORIZON_OPTIONS[2].value);
+  const [filtro, setFiltro] = useState<TipoAtivo | 'todos'>('todos');
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Investment | null>(null);
   const [form, setForm] = useState(emptyForm);
 
-  const chartData = useMemo(() => buildChartData(investments, horizon), [investments, horizon]);
+  const investmentsFiltrados = useMemo(
+    () => (filtro === 'todos' ? investments : investments.filter((inv) => inv.tipoAtivo === filtro)),
+    [investments, filtro]
+  );
+
+  // Juros compostos só faz sentido pra quem tem taxa de retorno esperada
+  // (renda_fixa/imovel/outro) -- ação/fii/cripto têm valor ditado pelo
+  // mercado, projetar "juros" em cima deles seria inventar um número.
+  const investmentsParaProjecao = useMemo(() => investments.filter((inv) => !isAtivoMercado(inv.tipoAtivo)), [investments]);
+
+  const chartData = useMemo(() => buildChartData(investmentsParaProjecao, horizon), [investmentsParaProjecao, horizon]);
   const chartOptions = useMemo(() => buildChartOptions(), []);
 
   const aporteMensalTotal = useMemo(
-    () => investments.filter((inv) => inv.tipoAporte === 'mensal').reduce((acc, inv) => acc + inv.aporteMensal, 0),
-    [investments]
+    () =>
+      investmentsParaProjecao
+        .filter((inv) => inv.tipoAporte === 'mensal')
+        .reduce((acc, inv) => acc + inv.aporteMensal, 0),
+    [investmentsParaProjecao]
   );
 
   const projectedFinal = chartData.datasets[1]?.data.at(-1) ?? 0;
   const contributedFinal = chartData.datasets[0]?.data.at(-1) ?? 0;
+
+  const tipoAtivoEhMercado = isAtivoMercado(form.tipoAtivo);
 
   function openNew() {
     setEditing(null);
@@ -157,6 +315,9 @@ export default function InvestimentosPage() {
     setForm({
       nome: investment.nome,
       categoria: investment.categoria,
+      tipoAtivo: investment.tipoAtivo,
+      ticker: investment.ticker || '',
+      quantidade: investment.quantidade !== null ? String(investment.quantidade) : '',
       tipoAporte: investment.tipoAporte,
       valorInicial: String(investment.valorInicial),
       aporteMensal: String(investment.aporteMensal),
@@ -172,9 +333,18 @@ export default function InvestimentosPage() {
       addToast('Dê um nome e uma categoria pro investimento', 'error');
       return;
     }
+    if (tipoAtivoEhMercado && (!form.ticker || !form.quantidade || parseFloat(form.quantidade) <= 0)) {
+      addToast('Informe o ticker e a quantidade pra ação, FII ou criptomoeda', 'error');
+      return;
+    }
+
     const input = {
       nome: form.nome,
       categoria: form.categoria,
+      tipoAtivo: form.tipoAtivo,
+      ...(tipoAtivoEhMercado
+        ? { ticker: form.ticker, quantidade: parseFloat(form.quantidade) || 0 }
+        : {}),
       tipoAporte: form.tipoAporte,
       valorInicial: parseFloat(form.valorInicial) || 0,
       aporteMensal: parseFloat(form.aporteMensal) || 0,
@@ -212,14 +382,16 @@ export default function InvestimentosPage() {
       <div className={styles.header}>
         <div>
           <h1 className={styles.title}>Investimentos</h1>
-          <p className={styles.subtitle}>Acompanhe aportes, taxa de retorno e a projeção futura da carteira</p>
+          <p className={styles.subtitle}>
+            Renda fixa, ações, FIIs, criptomoedas e imóveis -- cotação de mercado atualizada automaticamente.
+          </p>
         </div>
         <Button onClick={openNew}>+ Novo investimento</Button>
       </div>
 
       {aporteMensalTotal > 0 && (
         <p className={styles.summaryLine}>
-          Aportando <MoneyFigure value={aporteMensalTotal} sign="neutral" size="sm" /> por mês no total
+          Aportando <MoneyFigure value={aporteMensalTotal} sign="neutral" size="sm" /> por mês no total (renda fixa / imóveis / outros)
         </p>
       )}
 
@@ -227,7 +399,7 @@ export default function InvestimentosPage() {
         <div className={styles.chartHeader}>
           <div>
             <p className={styles.chartTitle}>Projeção da carteira</p>
-            <p className={styles.chartSubtitle}>Juros compostos a partir da taxa de retorno anual de cada investimento</p>
+            <p className={styles.chartSubtitle}>Juros compostos -- só considera investimentos com taxa de retorno fixa</p>
           </div>
           <div className={styles.tabs} role="tablist" aria-label="Horizonte da projeção">
             {HORIZON_OPTIONS.map((opt) => (
@@ -248,11 +420,11 @@ export default function InvestimentosPage() {
         <QueryState
           isLoading={investmentsQuery.isLoading}
           isError={investmentsQuery.isError}
-          isEmpty={!investmentsQuery.isLoading && !investmentsQuery.isError && investments.length === 0}
+          isEmpty={!investmentsQuery.isLoading && !investmentsQuery.isError && investmentsParaProjecao.length === 0}
           onRetry={investmentsQuery.refetch}
           skeleton={<Skeleton height="260px" />}
-          emptyTitle="Nenhum investimento cadastrado"
-          emptyDescription="Adicione um investimento pra ver a projeção de crescimento da carteira aqui."
+          emptyTitle="Nenhum investimento de renda fixa cadastrado"
+          emptyDescription="Ações, FIIs e criptomoedas não entram nessa projeção (o valor delas segue a cotação de mercado, não uma taxa fixa)."
         >
           <div className={styles.chartWrap}>
             <Line data={chartData} options={chartOptions} />
@@ -268,46 +440,29 @@ export default function InvestimentosPage() {
         </QueryState>
       </Card>
 
-      {investments.length > 0 && (
+      <div className={styles.filterTabs} role="tablist" aria-label="Filtrar por tipo de ativo">
+        {FILTER_OPTIONS.map((opt) => (
+          <button
+            key={opt.value}
+            type="button"
+            role="tab"
+            aria-selected={filtro === opt.value}
+            className={[styles.filterTab, filtro === opt.value && styles.filterTabActive].filter(Boolean).join(' ')}
+            onClick={() => setFiltro(opt.value)}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+
+      {investmentsFiltrados.length > 0 ? (
         <div className={styles.grid}>
-          {investments.map((investment) => (
-            <Card key={investment.id} perforated>
-              <div className={styles.cardTop}>
-                <span className={styles.nome}>{investment.nome}</span>
-                <Badge tone="brand">{investment.categoria}</Badge>
-              </div>
-              <div className={styles.meta}>
-                {investment.tipoAporte === 'mensal' ? 'Aportes mensais' : 'Aporte único'}
-                {' · '}
-                desde {new Date(investment.dataInicio).toLocaleDateString('pt-BR')}
-              </div>
-              <div className={styles.cardBody}>
-                <div className={styles.row}>
-                  <span>Valor inicial</span>
-                  <MoneyFigure value={investment.valorInicial} sign="neutral" size="sm" />
-                </div>
-                {investment.tipoAporte === 'mensal' && (
-                  <div className={styles.row}>
-                    <span>Aporte mensal</span>
-                    <MoneyFigure value={investment.aporteMensal} sign="neutral" size="sm" />
-                  </div>
-                )}
-                <div className={styles.row}>
-                  <span>Retorno esperado</span>
-                  <span className={styles.percent}>{investment.taxaRetornoAnual.toFixed(2)}% a.a.</span>
-                </div>
-              </div>
-              <div className={styles.cardActions}>
-                <Button size="sm" variant="ghost" onClick={() => openEdit(investment)}>
-                  Editar
-                </Button>
-                <Button size="sm" variant="ghost" onClick={() => handleDelete(investment.id)}>
-                  Excluir
-                </Button>
-              </div>
-            </Card>
+          {investmentsFiltrados.map((investment) => (
+            <InvestmentCard key={investment.id} investment={investment} onEdit={openEdit} onDelete={handleDelete} />
           ))}
         </div>
+      ) : (
+        investments.length > 0 && <p className={styles.emptyFilter}>Nenhum investimento desse tipo ainda.</p>
       )}
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editing ? 'Editar investimento' : 'Novo investimento'}>
@@ -320,46 +475,86 @@ export default function InvestimentosPage() {
             required
           />
           <Select
+            label="Tipo de ativo"
+            options={TIPO_ATIVO_OPTIONS}
+            value={form.tipoAtivo}
+            onChange={(e) => setForm({ ...form, tipoAtivo: e.target.value as TipoAtivo })}
+          />
+          <Select
             label="Categoria"
             options={CATEGORY_OPTIONS}
             value={form.categoria}
             onChange={(e) => setForm({ ...form, categoria: e.target.value })}
           />
-          <Select
-            label="Tipo de aporte"
-            options={TIPO_APORTE_OPTIONS}
-            value={form.tipoAporte}
-            onChange={(e) => setForm({ ...form, tipoAporte: e.target.value as TipoAporte })}
-          />
-          <Input
-            label="Valor inicial (R$)"
-            type="number"
-            step="0.01"
-            min="0"
-            placeholder="0,00"
-            value={form.valorInicial}
-            onChange={(e) => setForm({ ...form, valorInicial: e.target.value })}
-          />
-          {form.tipoAporte === 'mensal' && (
-            <Input
-              label="Aporte mensal (R$)"
-              type="number"
-              step="0.01"
-              min="0"
-              placeholder="0,00"
-              value={form.aporteMensal}
-              onChange={(e) => setForm({ ...form, aporteMensal: e.target.value })}
-            />
+
+          {tipoAtivoEhMercado ? (
+            <>
+              {form.tipoAtivo === 'cripto' ? (
+                <Select
+                  label="Moeda"
+                  options={CRYPTO_OPTIONS}
+                  value={form.ticker}
+                  onChange={(e) => setForm({ ...form, ticker: e.target.value })}
+                  placeholder="Selecione a criptomoeda"
+                />
+              ) : (
+                <Input
+                  label="Ticker (B3)"
+                  placeholder="Ex: PETR4, MXRF11"
+                  value={form.ticker}
+                  onChange={(e) => setForm({ ...form, ticker: e.target.value.toUpperCase() })}
+                />
+              )}
+              <Input
+                label="Quantidade"
+                type="number"
+                step="any"
+                min="0"
+                placeholder="0"
+                value={form.quantidade}
+                onChange={(e) => setForm({ ...form, quantidade: e.target.value })}
+              />
+            </>
+          ) : (
+            <>
+              <Select
+                label="Tipo de aporte"
+                options={TIPO_APORTE_OPTIONS}
+                value={form.tipoAporte}
+                onChange={(e) => setForm({ ...form, tipoAporte: e.target.value as TipoAporte })}
+              />
+              <Input
+                label="Valor inicial (R$)"
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="0,00"
+                value={form.valorInicial}
+                onChange={(e) => setForm({ ...form, valorInicial: e.target.value })}
+              />
+              {form.tipoAporte === 'mensal' && (
+                <Input
+                  label="Aporte mensal (R$)"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder="0,00"
+                  value={form.aporteMensal}
+                  onChange={(e) => setForm({ ...form, aporteMensal: e.target.value })}
+                />
+              )}
+              <Input
+                label="Taxa de retorno anual esperada (%)"
+                type="number"
+                step="0.01"
+                placeholder="Ex: 10"
+                value={form.taxaRetornoAnual}
+                onChange={(e) => setForm({ ...form, taxaRetornoAnual: e.target.value })}
+                required
+              />
+            </>
           )}
-          <Input
-            label="Taxa de retorno anual esperada (%)"
-            type="number"
-            step="0.01"
-            placeholder="Ex: 10"
-            value={form.taxaRetornoAnual}
-            onChange={(e) => setForm({ ...form, taxaRetornoAnual: e.target.value })}
-            required
-          />
+
           <Input
             label="Data de início"
             type="date"

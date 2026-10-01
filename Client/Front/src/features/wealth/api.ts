@@ -248,12 +248,22 @@ export async function deleteGoal(id: string) {
 
 // ── Investimentos ───────────────────────────────────────────────────
 export type TipoAporte = 'unico' | 'mensal';
+// 'acao'/'fii'/'cripto' são ativos de MERCADO -- valor vem de
+// quantidade × cotação ao vivo (ver fetchMarketQuote), não de
+// valorInicial/aporteMensal/taxaRetornoAnual digitados à mão.
+export type TipoAtivo = 'renda_fixa' | 'acao' | 'fii' | 'cripto' | 'imovel' | 'outro';
 
 export interface Investment {
   id: string;
   userId: string;
   nome: string;
   categoria: string;
+  tipoAtivo: TipoAtivo;
+  /** Código da ação na B3 (ex.: "PETR4") ou id da moeda no CoinGecko
+   * (ex.: "bitcoin") -- só preenchido pra tipoAtivo de mercado. */
+  ticker: string | null;
+  /** Unidades/cotas/moedas que a pessoa tem -- só pra tipoAtivo de mercado. */
+  quantidade: number | null;
   tipoAporte: TipoAporte;
   valorInicial: number;
   aporteMensal: number;
@@ -268,11 +278,28 @@ export interface Investment {
 export interface InvestmentInput {
   nome: string;
   categoria: string;
+  tipoAtivo: TipoAtivo;
+  ticker?: string;
+  quantidade?: number;
   tipoAporte: TipoAporte;
   valorInicial: number;
   aporteMensal: number;
   taxaRetornoAnual: number;
   dataInicio: string;
+}
+
+export interface MarketQuote {
+  nome: string;
+  preco: number;
+  variacaoPercentual: number;
+  moeda: string;
+  atualizadoEm: string;
+}
+
+export async function fetchMarketQuote(tipoAtivo: 'acao' | 'fii' | 'cripto', ticker: string): Promise<MarketQuote> {
+  const api = new ApiConnection();
+  const data = assertSuccess(await api.get(`/api/market/quote?tipo=${tipoAtivo}&ticker=${encodeURIComponent(ticker)}`));
+  return data.cotacao;
 }
 
 export async function fetchInvestments(userId: string): Promise<Investment[]> {

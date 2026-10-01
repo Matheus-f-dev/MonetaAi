@@ -17,6 +17,7 @@ const TransactionImportController = require('../controllers/TransactionImportCon
 const BudgetController = require('../controllers/BudgetController');
 const GoalController = require('../controllers/GoalController');
 const InvestmentController = require('../controllers/InvestmentController');
+const MarketDataController = require('../controllers/MarketDataController');
 const ReconciliationController = require('../controllers/ReconciliationController');
 const SplitController = require('../controllers/SplitController');
 const AccountController = require('../controllers/AccountController');
@@ -147,6 +148,10 @@ router.post('/investments', InvestmentController.create);
 router.get('/investments/:userId', ensureOwnUser(), InvestmentController.getUserInvestments);
 router.put('/investments/:investmentId', InvestmentController.update);
 router.delete('/investments/:investmentId', InvestmentController.delete);
+
+// Cotação ao vivo (ação/fii via brapi.dev, cripto via CoinGecko) -- pública
+// (não escopada por usuário), só exige token válido como o resto da API.
+router.get('/market/quote', MarketDataController.getQuote);
 
 // Rota de exportação de relatórios (CSV/PDF)
 router.get('/relatorios/:userId/export', ensureOwnUser(), ReportExportController.export);

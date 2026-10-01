@@ -18,6 +18,7 @@ import {
   fetchCards,
   fetchGoalProgress,
   fetchInvestments,
+  fetchMarketQuote,
   fetchReconciliationHistory,
   reconcileAccount,
   transferBetweenAccounts,
@@ -273,6 +274,21 @@ export function useInvestmentsQuery(userId: string | null) {
     queryKey: ['investments', userId],
     queryFn: () => fetchInvestments(userId as string),
     enabled: Boolean(userId)
+  });
+}
+
+// Cotação ao vivo -- staleTime curto (1min) pra "atualizar automaticamente"
+// (pedido do usuário) sem martelar brapi/CoinGecko a cada render; refetch
+// automático quando a aba volta a ficar em foco, pra sempre mostrar um
+// preço recente sem precisar de F5.
+export function useMarketQuoteQuery(tipoAtivo: 'acao' | 'fii' | 'cripto' | null, ticker: string | null) {
+  return useQuery({
+    queryKey: ['market-quote', tipoAtivo, ticker],
+    queryFn: () => fetchMarketQuote(tipoAtivo as 'acao' | 'fii' | 'cripto', ticker as string),
+    enabled: Boolean(tipoAtivo) && Boolean(ticker),
+    staleTime: 60_000,
+    refetchOnWindowFocus: true,
+    retry: 1
   });
 }
 

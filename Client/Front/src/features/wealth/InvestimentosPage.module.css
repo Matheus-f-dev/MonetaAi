@@ -87,6 +87,42 @@
   color: var(--color-ink-muted);
 }
 
+.filterTabs {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.filterTab {
+  border: 1px solid var(--color-line);
+  background: none;
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--color-ink-muted);
+}
+
+.filterTab:hover {
+  border-color: var(--color-line-strong);
+}
+
+.filterTabActive {
+  background: var(--color-brand-soft);
+  border-color: var(--color-brand);
+  color: var(--color-ink);
+}
+
+.emptyFilter {
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+}
+
+.quoteError {
+  color: var(--color-negative);
+  font-size: var(--text-xs);
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));

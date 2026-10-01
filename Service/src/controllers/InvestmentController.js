@@ -1,11 +1,19 @@
 const { db } = require('../config/database');
 
+const TIPOS_ATIVO = new Set(['renda_fixa', 'acao', 'fii', 'cripto', 'imovel', 'outro']);
+// Tipos cuja cotação vem do mercado (MarketDataService), não de
+// valorInicial/aporteMensal/taxaRetornoAnual digitados à mão.
+const TIPOS_MERCADO = new Set(['acao', 'fii', 'cripto']);
+
 function toApiShape(row) {
   return {
     id: row.id,
     userId: row.user_id,
     nome: row.nome,
     categoria: row.categoria,
+    tipoAtivo: row.tipo_ativo || 'renda_fixa',
+    ticker: row.ticker || null,
+    quantidade: row.quantidade !== null ? parseFloat(row.quantidade) : null,
     tipoAporte: row.tipo_aporte,
     valorInicial: parseFloat(row.valor_inicial) || 0,
     aporteMensal: parseFloat(row.aporte_mensal) || 0,
@@ -19,17 +27,33 @@ function toApiShape(row) {
 // cálculo nem checagem contra outra tabela (diferente de Goal, que
 // confere se accountId é mesmo do usuário), então não tem FK pra validar.
 function validarCorpo(body) {
-  const { nome, categoria, tipoAporte } = body;
+  const { nome, categoria, tipoAporte, tipoAtivo, ticker, quantidade } = body;
   if (!nome || !categoria) return 'nome e categoria são obrigatórios';
   if (tipoAporte !== 'unico' && tipoAporte !== 'mensal') return 'tipoAporte precisa ser "unico" ou "mensal"';
+  if (tipoAtivo !== undefined && !TIPOS_ATIVO.has(tipoAtivo)) return 'tipoAtivo inválido';
+
+  if (TIPOS_MERCADO.has(tipoAtivo)) {
+    if (!ticker) return 'ticker é obrigatório pra ação, fundo imobiliário ou criptomoeda';
+    if (!quantidade || parseFloat(quantidade) <= 0) return 'quantidade precisa ser maior que zero';
+  }
   return null;
 }
 
 function paraColunas(body) {
-  const { nome, categoria, tipoAporte, valorInicial, aporteMensal, taxaRetornoAnual, dataInicio } = body;
+  const { nome, categoria, tipoAporte, valorInicial, aporteMensal, taxaRetornoAnual, dataInicio, tipoAtivo, ticker, quantidade } = body;
+  const tipoAtivoFinal = tipoAtivo || 'renda_fixa';
+  const ehMercado = TIPOS_MERCADO.has(tipoAtivoFinal);
+
   return {
     nome,
     categoria,
+    tipo_ativo: tipoAtivoFinal,
+    // Ticker/quantidade só fazem sentido pra ativo de mercado -- os
+    // outros tipos sempre gravam null, mesmo que o cliente mande algo
+    // (evita um ticker velho sobrar de uma edição anterior que trocou o
+    // tipo de volta pra "renda_fixa").
+    ticker: ehMercado ? ticker : null,
+    quantidade: ehMercado ? parseFloat(quantidade) || 0 : null,
     tipo_aporte: tipoAporte,
     valor_inicial: parseFloat(valorInicial) || 0,
     // Aporte mensal só faz sentido pro tipo "mensal" -- "unico" sempre
