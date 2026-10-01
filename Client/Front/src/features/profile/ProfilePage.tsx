@@ -7,6 +7,7 @@ import { FONT_OPTIONS, FONT_SIZE_OPTIONS, useFontPreference } from '../../app-sh
 import { useCurrentUserId, useUpdateProfileMutation, useUserProfileQuery } from '../dashboard/queries';
 import { resolveAvatarUrl } from '../../shared/avatarUrl';
 import { updateStoredUser } from '../../shared/useStoredUser';
+import { AvatarCropModal } from './AvatarCropModal';
 import styles from './ProfilePage.module.css';
 
 const ALLOWED_AVATAR_MIME = new Set(['image/jpeg', 'image/png', 'image/webp']);
@@ -44,6 +45,7 @@ export default function ProfilePage() {
   const [nome, setNome] = useState('');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [cropFile, setCropFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   // Bug real encontrado: com `!nome` na condição (e `nome` na lista de
   // dependências), apagar o campo até ficar vazio disparava o efeito de
@@ -83,9 +85,17 @@ export default function ProfilePage() {
       return;
     }
 
+    // Pedido do usuário: "deixa eu arrumar a foto, e centralizar do jeito
+    // que eu quero" -- a foto bruta não vira avatar direto, primeiro abre
+    // o ajuste (arrastar + zoom); só handleCropConfirm grava avatarFile.
+    setCropFile(file);
+  }
+
+  function handleCropConfirm(croppedFile: File) {
     if (avatarPreview) URL.revokeObjectURL(avatarPreview);
-    setAvatarFile(file);
-    setAvatarPreview(URL.createObjectURL(file));
+    setAvatarFile(croppedFile);
+    setAvatarPreview(URL.createObjectURL(croppedFile));
+    setCropFile(null);
   }
 
   async function handleSaveProfile(e: FormEvent) {
@@ -232,6 +242,8 @@ export default function ProfilePage() {
           Restaurar padrão
         </Button>
       </div>
+
+      <AvatarCropModal open={Boolean(cropFile)} file={cropFile} onCancel={() => setCropFile(null)} onConfirm={handleCropConfirm} />
     </div>
   );
 }
