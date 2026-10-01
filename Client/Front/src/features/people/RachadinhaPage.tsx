@@ -1,5 +1,5 @@
-import { useState, type FormEvent } from 'react';
-import { Badge, Button, Card, Input, MoneyFigure, Select } from '../../design-system';
+import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react';
+import { Badge, Button, Card, Input, Modal, MoneyFigure, Select } from '../../design-system';
 import { useAccounts } from '../../presentation/hooks/useAccounts';
 import { usePeople } from '../../presentation/hooks/usePeople';
 import { useToast } from '../../presentation/hooks/useToast';
@@ -28,7 +28,11 @@ const CATEGORY_OPTIONS = CATEGORIES.map((c) => ({ value: c, label: c }));
 export default function RachadinhaPage() {
   const userId = useCurrentUserId();
   const { addToast } = useToast();
-  const { accounts } = useAccounts(userId);
+  // useAccounts é .js puro -- sem anotação, `accounts` infere como
+  // `never[]` a partir do useState([]) interno, e some .find/.map vira
+  // dor de cabeça de tipo lá na frente (ver uso em "Conta" no modal de
+  // confirmação).
+  const { accounts } = useAccounts(userId) as { accounts: Array<{ id: string; nome: string }> };
   const { people } = usePeople(userId);
   const createMutation = useCreateTransactionMutation();
 
@@ -38,6 +42,8 @@ export default function RachadinhaPage() {
   const [categoria, setCategoria] = useState('');
   const [accountId, setAccountId] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const confirmButtonRef = useRef<HTMLButtonElement>(null);
 
   const {
     participants,
@@ -49,6 +55,8 @@ export default function RachadinhaPage() {
     transferTo,
     generateEqualSplit: generateEqualSplitFor,
     splitEqually: splitEquallyFor,
+    undo,
+    canUndo,
     reset: resetParticipants
   } = useSplitParticipants();
 
@@ -65,7 +73,43 @@ export default function RachadinhaPage() {
     splitEquallyFor(total);
   }
 
-  async function handleSubmit(e: FormEvent) {
+  const validParticipants = participants
+    .map((p) => ({ nome: p.nome.trim(), valor: parseFloat(p.valor) || 0 }))
+    .filter((p) => p.nome && p.valor > 0);
+
+  // Foca o botão "Confirmar" quando o modal abre -- roda depois do Modal
+  // focar o próprio diálogo (efeito do filho comita primeiro), então essa
+  // chamada "ganha" e Enter já confirma sem precisar de Tab antes.
+  useEffect(() => {
+    if (confirmOpen) confirmButtonRef.current?.focus();
+  }, [confirmOpen]);
+
+  // Pedido do usuário: Enter estava submetendo a operação direto (padrão
+  // do HTML -- Enter num input dispara o submit do form). Agora Enter só
+  // avança pro próximo campo (como Tab); só confirma de verdade quando
+  // não sobra mais nenhum campo pra preencher, e mesmo aí passa pelo
+  // modal de confirmação (handleSubmit abaixo), nunca cria a transação
+  // direto.
+  function handleFormKeyDown(e: KeyboardEvent<HTMLFormElement>) {
+    if (e.key !== 'Enter') return;
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'BUTTON' || target.tagName === 'TEXTAREA') return;
+    e.preventDefault();
+
+    const focusables = Array.from(e.currentTarget.querySelectorAll<HTMLInputElement | HTMLSelectElement>('input, select')).filter(
+      (el) => !el.disabled
+    );
+    const index = focusables.indexOf(target as HTMLInputElement | HTMLSelectElement);
+    const next = focusables[index + 1];
+    if (next) {
+      next.focus();
+      if (next instanceof HTMLInputElement) next.select();
+    } else {
+      e.currentTarget.requestSubmit();
+    }
+  }
+
+  function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
 
@@ -87,15 +131,17 @@ export default function RachadinhaPage() {
       return;
     }
 
-    const validParticipants = participants
-      .map((p) => ({ nome: p.nome.trim(), valor: parseFloat(p.valor) || 0 }))
-      .filter((p) => p.nome && p.valor > 0);
-
     if (validParticipants.length === 0) {
       setError('Adicione ao menos uma pessoa com nome e valor pra dividir.');
       return;
     }
 
+    // Só abre a confirmação -- a criação de verdade só acontece se a
+    // pessoa confirmar no modal (ver confirmarRegistro).
+    setConfirmOpen(true);
+  }
+
+  async function confirmarRegistro() {
     // Mesma conversão de data que o resto do app faz (ver TransactionModal)
     // -- o backend espera "DD/MM/AAAA, HH:mm:ss".
     const [year, month, day] = data.split('-');
@@ -113,6 +159,7 @@ export default function RachadinhaPage() {
         split: { participantes: validParticipants.map((p) => ({ ...p, pago: false })) }
       });
       addToast('Despesa dividida registrada com sucesso!', 'success');
+      setConfirmOpen(false);
       setDescricao('');
       setValor('');
       setCategoria('');
@@ -132,7 +179,7 @@ export default function RachadinhaPage() {
         </p>
       </div>
 
-      <form className={styles.form} onSubmit={handleSubmit}>
+      <form className={styles.form} onSubmit={handleSubmit} onKeyDown={handleFormKeyDown}>
         <Card>
           <h2 className={styles.sectionTitle}>A conta</h2>
           <div className={styles.fields}>
@@ -169,7 +216,7 @@ export default function RachadinhaPage() {
               <Select
                 label="Conta (opcional)"
                 placeholder="Conta principal"
-                options={accounts.map((a: { id: string; nome: string }) => ({ value: a.id, label: a.nome }))}
+                options={accounts.map((a) => ({ value: a.id, label: a.nome }))}
                 value={accountId}
                 onChange={(e) => setAccountId(e.target.value)}
               />
@@ -268,6 +315,11 @@ export default function RachadinhaPage() {
             <button type="button" className={styles.linkButton} onClick={splitEqually}>
               Dividir valor igualmente
             </button>
+            {canUndo && (
+              <button type="button" className={styles.linkButton} onClick={undo}>
+                Desfazer
+              </button>
+            )}
           </div>
 
           <div className={styles.summary}>
@@ -294,6 +346,52 @@ export default function RachadinhaPage() {
           </Button>
         </div>
       </form>
+
+      <Modal open={confirmOpen} onClose={() => setConfirmOpen(false)} title="Confirmar despesa dividida">
+        <div className={styles.confirmBody}>
+          <div className={styles.confirmRow}>
+            <span>Descrição</span>
+            <strong>{descricao}</strong>
+          </div>
+          <div className={styles.confirmRow}>
+            <span>Valor total</span>
+            <MoneyFigure value={total} sign="neutral" size="sm" />
+          </div>
+          <div className={styles.confirmRow}>
+            <span>Data</span>
+            <strong>{new Date(`${data}T00:00:00`).toLocaleDateString('pt-BR')}</strong>
+          </div>
+          <div className={styles.confirmRow}>
+            <span>Categoria</span>
+            <strong>{categoria}</strong>
+          </div>
+          {accountId && (
+            <div className={styles.confirmRow}>
+              <span>Conta</span>
+              <strong>{accounts.find((a) => a.id === accountId)?.nome}</strong>
+            </div>
+          )}
+
+          <div className={styles.confirmParticipants}>
+            <span className={styles.confirmParticipantsTitle}>Quem paga</span>
+            {validParticipants.map((p, i) => (
+              <div className={styles.confirmRow} key={i}>
+                <span>{p.nome}</span>
+                <MoneyFigure value={p.valor} sign="neutral" size="sm" />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className={styles.confirmActions}>
+          <Button type="button" variant="secondary" onClick={() => setConfirmOpen(false)}>
+            Voltar e editar
+          </Button>
+          <Button type="button" ref={confirmButtonRef} onClick={confirmarRegistro} disabled={createMutation.isPending}>
+            {createMutation.isPending ? 'Registrando...' : 'Confirmar'}
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 }

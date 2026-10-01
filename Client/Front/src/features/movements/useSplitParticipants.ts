@@ -21,15 +21,28 @@ export function useSplitParticipants(initial: SplitParticipantDraft[] = EMPTY_PA
   const [participants, setParticipants] = useState<SplitParticipantDraft[]>(initial);
   const [headcount, setHeadcount] = useState('2');
 
+  // Histórico só da LISTA de participantes (não do headcount, que é só
+  // um campo de rascunho até alguém clicar "Gerar divisão igual") --
+  // pedido do usuário depois de transferir a parte de uma pessoa pra
+  // outra e não achar como voltar: transferTo remove a linha de origem
+  // de vez (ver abaixo), então sem isso não tinha como desfazer.
+  const [history, setHistory] = useState<SplitParticipantDraft[][]>([]);
+
+  function snapshot() {
+    setHistory((prev) => [...prev, participants]);
+  }
+
   function updateParticipant(index: number, field: 'nome' | 'valor', value: string) {
     setParticipants((prev) => prev.map((p, i) => (i === index ? { ...p, [field]: value } : p)));
   }
 
   function addParticipant() {
+    snapshot();
     setParticipants((prev) => [...prev, { nome: '', valor: '' }]);
   }
 
   function removeParticipant(index: number) {
+    snapshot();
     setParticipants((prev) => prev.filter((_, i) => i !== index));
   }
 
@@ -37,6 +50,7 @@ export function useSplitParticipants(initial: SplitParticipantDraft[] = EMPTY_PA
   // em vez de marcar como "não paga" ou excluir sem mais, a parte dessa
   // pessoa some e vira um acréscimo na parte de quem vai cobrir.
   function transferTo(index: number, targetIndex: number) {
+    snapshot();
     setParticipants((prev) => {
       const amount = parseFloat(prev[index]?.valor) || 0;
       const withTransfer = prev.map((p, i) => {
@@ -53,20 +67,34 @@ export function useSplitParticipants(initial: SplitParticipantDraft[] = EMPTY_PA
   // QUANTIDADE de linhas, não só redivide as que já existem (ver
   // splitEqually abaixo, que faz só a segunda parte).
   function generateEqualSplit(total: number) {
+    snapshot();
     const n = Math.max(1, parseInt(headcount, 10) || 1);
     const share = (total / n).toFixed(2);
     setParticipants((prev) => Array.from({ length: n }, (_, i) => ({ nome: prev[i]?.nome || '', valor: share })));
   }
 
   function splitEqually(total: number) {
+    snapshot();
     const n = participants.length || 1;
     const share = (total / n).toFixed(2);
     setParticipants((prev) => prev.map((p) => ({ ...p, valor: share })));
   }
 
+  // Desfaz a última ação estrutural (transferência, divisão gerada,
+  // adicionar/remover pessoa) -- não cobre edição de nome/valor campo a
+  // campo, pra não precisar empilhar um snapshot a cada tecla digitada.
+  function undo() {
+    setHistory((prev) => {
+      if (prev.length === 0) return prev;
+      setParticipants(prev[prev.length - 1]);
+      return prev.slice(0, -1);
+    });
+  }
+
   function reset(next: SplitParticipantDraft[] = EMPTY_PARTICIPANTS, nextHeadcount?: string) {
     setParticipants(next);
     setHeadcount(nextHeadcount ?? String(Math.max(2, next.length)));
+    setHistory([]);
   }
 
   return {
@@ -79,6 +107,8 @@ export function useSplitParticipants(initial: SplitParticipantDraft[] = EMPTY_PA
     transferTo,
     generateEqualSplit,
     splitEqually,
+    undo,
+    canUndo: history.length > 0,
     reset
   };
 }

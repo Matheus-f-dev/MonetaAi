@@ -109,6 +109,8 @@ export function TransactionModal({
     transferTo,
     generateEqualSplit: generateEqualSplitFor,
     splitEqually: splitEquallyFor,
+    undo,
+    canUndo,
     reset: resetParticipants
   } = useSplitParticipants();
   const isEditing = Boolean(editingTransaction);
@@ -408,6 +410,11 @@ export function TransactionModal({
                   <button type="button" className={styles.linkButton} onClick={splitEqually}>
                     Dividir valor igualmente
                   </button>
+                  {canUndo && (
+                    <button type="button" className={styles.linkButton} onClick={undo}>
+                      Desfazer
+                    </button>
+                  )}
                 </div>
               </div>
             )}
