@@ -130,7 +130,7 @@ export interface ImportPreviewRow {
   jaImportada: boolean;
 }
 
-export async function previewImport(formato: 'ofx' | 'csv-nubank', file: File): Promise<ImportPreviewRow[]> {
+export async function previewImport(formato: 'ofx' | 'csv', file: File): Promise<ImportPreviewRow[]> {
   const token = localStorage.getItem('token');
   const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
   const formData = new FormData();

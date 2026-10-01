@@ -130,7 +130,7 @@ export function useLaunchRecurringMutation(kind: RecurringKind) {
 // ── Importação de extrato ──────────────────────────────────────────
 export function usePreviewImportMutation() {
   return useMutation({
-    mutationFn: ({ formato, file }: { formato: 'ofx' | 'csv-nubank'; file: File }) => previewImport(formato, file)
+    mutationFn: ({ formato, file }: { formato: 'ofx' | 'csv'; file: File }) => previewImport(formato, file)
   });
 }
 

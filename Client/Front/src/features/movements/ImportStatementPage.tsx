@@ -8,7 +8,7 @@ import styles from './ImportStatementPage.module.css';
 
 const CATEGORY_OPTIONS = CATEGORIES.map((c) => ({ value: c, label: c }));
 const FORMAT_OPTIONS = [
-  { value: 'csv-nubank', label: 'CSV (Nubank — conta corrente)' },
+  { value: 'csv', label: 'CSV (qualquer banco)' },
   { value: 'ofx', label: 'OFX' }
 ];
 
@@ -27,7 +27,7 @@ interface EditableRow extends ImportPreviewRow {
 export default function ImportStatementPage() {
   const { addToast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [formato, setFormato] = useState<'ofx' | 'csv-nubank'>('csv-nubank');
+  const [formato, setFormato] = useState<'ofx' | 'csv'>('csv');
   const [rows, setRows] = useState<EditableRow[] | null>(null);
 
   const previewMutation = usePreviewImportMutation();
@@ -106,7 +106,7 @@ export default function ImportStatementPage() {
                     label="Formato"
                     options={FORMAT_OPTIONS}
                     value={formato}
-                    onChange={(e) => setFormato(e.target.value as 'ofx' | 'csv-nubank')}
+                    onChange={(e) => setFormato(e.target.value as 'ofx' | 'csv')}
                   />
                 </div>
                 <Button onClick={() => fileInputRef.current?.click()}>Escolher arquivo</Button>
