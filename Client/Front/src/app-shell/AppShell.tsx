@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
+import { QuickAddTransaction } from './QuickAddTransaction';
 import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
 import { useAppTheme } from './useAppTheme';
@@ -83,6 +84,8 @@ export function AppShell() {
           <Outlet />
         </div>
       </div>
+
+      <QuickAddTransaction />
     </div>
   );
 }
