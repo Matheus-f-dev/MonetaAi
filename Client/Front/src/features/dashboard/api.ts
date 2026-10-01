@@ -71,11 +71,38 @@ export interface UserProfile {
   salario: number;
   perfilCompleto: boolean;
   totpAtivo: boolean;
+  avatarUrl: string | null;
 }
 
 export async function fetchUserProfile(userId: string): Promise<UserProfile> {
   const api = new ApiConnection();
   const data = await api.get(`/api/user/${userId}`);
+  return assertSuccess(data).user;
+}
+
+export interface UpdateProfileInput {
+  nome?: string;
+  avatarFile?: File;
+}
+
+// multipart/form-data -- ApiConnection força Content-Type: application/json
+// em toda chamada (getHeaders), o que quebra o boundary do multipart. Fetch
+// cru igual os hooks antigos (useAccounts.js) já fazem, só que SEM
+// Content-Type: o browser calcula o boundary certo sozinho quando o header
+// não é informado e o body é um FormData.
+export async function updateProfile(userId: string, input: UpdateProfileInput): Promise<UserProfile> {
+  const formData = new FormData();
+  if (input.nome !== undefined) formData.append('nome', input.nome);
+  if (input.avatarFile) formData.append('avatar', input.avatarFile);
+
+  const token = localStorage.getItem('token');
+  const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+  const response = await fetch(`${baseURL}/api/user/${userId}`, {
+    method: 'PUT',
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    body: formData
+  });
+  const data = await response.json();
   return assertSuccess(data).user;
 }
 

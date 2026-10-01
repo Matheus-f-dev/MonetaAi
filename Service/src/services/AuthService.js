@@ -188,6 +188,23 @@ class AuthService {
     return user ? user.toJSON() : null;
   }
 
+  // Edição de perfil (nome/foto) -- cada campo só entra no UPDATE se foi
+  // de fato enviado, pra um PUT só com a foto não apagar o nome (e
+  // vice-versa). User.update já cuida do resto (atualizado_em, etc.).
+  static async updateProfile(uid, { nome, avatarUrl } = {}) {
+    const fields = {};
+    if (nome !== undefined) fields.nome = nome;
+    if (avatarUrl !== undefined) fields.avatar_url = avatarUrl;
+
+    if (Object.keys(fields).length === 0) {
+      const user = await User.findById(uid);
+      return user ? user.toJSON() : null;
+    }
+
+    const user = await User.update(uid, fields);
+    return user.toJSON();
+  }
+
   // Usado pelo Passport na estratégia Google — acha por google_id, senão por
   // e-mail (linka a conta existente), senão cria uma nova sem senha.
   static async findOrCreateGoogleUser({ googleId, email, nome }) {

@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   fetchBalance,
   fetchChartData,
@@ -6,7 +6,9 @@ import {
   fetchProjection,
   fetchTransactions,
   fetchUserProfile,
-  type Transaction
+  updateProfile,
+  type Transaction,
+  type UpdateProfileInput
 } from './api';
 
 export function useCurrentUserId(): string | null {
@@ -47,6 +49,16 @@ export function useUserProfileQuery(userId: string | null) {
     queryKey: ['user-profile', userId],
     queryFn: () => fetchUserProfile(userId as string),
     enabled: Boolean(userId)
+  });
+}
+
+export function useUpdateProfileMutation(userId: string | null) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: UpdateProfileInput) => updateProfile(userId as string, input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-profile', userId] });
+    }
   });
 }
 

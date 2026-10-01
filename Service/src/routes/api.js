@@ -52,6 +52,7 @@ router.use(apiLimiter);
 router.use(authenticateToken);
 
 router.get('/user/:userId', ensureOwnUser(), AuthController.getUserById);
+router.put('/user/:userId', ensureOwnUser(), AuthController.updateProfile);
 router.delete('/user/:userId', ensureOwnUser(), AuthController.deleteAccount);
 
 // Rotas de transações

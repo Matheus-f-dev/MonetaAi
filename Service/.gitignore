@@ -14,5 +14,9 @@ sql/schema.sql
 dist/
 build/
 
+# Fotos de perfil enviadas por upload (AuthController.updateProfile) --
+# conteúdo gerado em runtime, nunca deveria ir pro repo.
+public/uploads/
+
 
 serviceAccountKey.json

@@ -1,9 +1,16 @@
-import { Button, Card, Select } from '../../design-system';
+import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react';
+import { Button, Card, Input, Select } from '../../design-system';
 import { useToast } from '../../presentation/hooks/useToast';
 import { useAppTheme, type ThemePreference } from '../../app-shell/useAppTheme';
 import { DEFAULT_BRAND_COLOR, useBrandColor } from '../../app-shell/useBrandColor';
 import { FONT_OPTIONS, FONT_SIZE_OPTIONS, useFontPreference } from '../../app-shell/useFontPreference';
+import { useCurrentUserId, useUpdateProfileMutation, useUserProfileQuery } from '../dashboard/queries';
+import { resolveAvatarUrl } from '../../shared/avatarUrl';
+import { updateStoredUser } from '../../shared/useStoredUser';
 import styles from './ProfilePage.module.css';
+
+const ALLOWED_AVATAR_MIME = new Set(['image/jpeg', 'image/png', 'image/webp']);
+const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
 
 const THEME_OPTIONS: Array<{ value: ThemePreference; label: string }> = [
   { value: 'light', label: 'Claro' },
@@ -30,6 +37,72 @@ export default function ProfilePage() {
   const { color: brandColor, setColor: setBrandColor, resetColor: resetBrandColor } = useBrandColor();
   const { font, setFont, fontSize, setFontSize, reset: resetFont } = useFontPreference();
 
+  const userId = useCurrentUserId();
+  const profileQuery = useUserProfileQuery(userId);
+  const updateProfileMutation = useUpdateProfileMutation(userId);
+
+  const [nome, setNome] = useState('');
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Prefill só quando o nome ainda não foi tocado nesta sessão da tela --
+  // sem a guarda, a resposta da mutation (que invalida e refaz a query)
+  // reescreveria `nome` por cima do que a pessoa acabou de digitar/salvar.
+  useEffect(() => {
+    if (profileQuery.data && !nome) setNome(profileQuery.data.nome);
+  }, [profileQuery.data, nome]);
+
+  // Preview local é uma blob: URL -- precisa ser liberada explicitamente
+  // (URL.revokeObjectURL) quando troca de arquivo ou desmonta, senão vaza
+  // memória a cada foto escolhida.
+  useEffect(() => {
+    return () => {
+      if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+    };
+  }, [avatarPreview]);
+
+  function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+
+    if (!ALLOWED_AVATAR_MIME.has(file.type)) {
+      addToast('Formato não suportado -- envie JPG, PNG ou WebP.', 'error');
+      return;
+    }
+    if (file.size > MAX_AVATAR_BYTES) {
+      addToast('A imagem precisa ter no máximo 2MB.', 'error');
+      return;
+    }
+
+    if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+    setAvatarFile(file);
+    setAvatarPreview(URL.createObjectURL(file));
+  }
+
+  async function handleSaveProfile(e: FormEvent) {
+    e.preventDefault();
+    if (!nome.trim()) {
+      addToast('O nome não pode ficar em branco.', 'error');
+      return;
+    }
+
+    try {
+      const updated = await updateProfileMutation.mutateAsync({
+        nome: nome.trim(),
+        ...(avatarFile ? { avatarFile } : {})
+      });
+      updateStoredUser({ nome: updated.nome, avatarUrl: updated.avatarUrl });
+      if (avatarPreview) URL.revokeObjectURL(avatarPreview);
+      setAvatarFile(null);
+      setAvatarPreview(null);
+      addToast('Perfil atualizado com sucesso!', 'success');
+    } catch (err) {
+      addToast(err instanceof Error ? err.message : 'Erro ao atualizar perfil', 'error');
+    }
+  }
+
   function handleReset() {
     setTheme('system');
     resetBrandColor();
@@ -37,12 +110,54 @@ export default function ProfilePage() {
     addToast('Preferências restauradas.', 'success');
   }
 
+  const avatarSrc = avatarPreview || resolveAvatarUrl(profileQuery.data?.avatarUrl);
+
   return (
     <div className={styles.page}>
       <div>
         <h1 className={styles.title}>Perfil</h1>
-        <p className={styles.subtitle}>Personalize a aparência da Moneta -- tema, cor de destaque e tipografia.</p>
+        <p className={styles.subtitle}>Seus dados e a aparência da Moneta -- nome, foto, tema, cor de destaque e tipografia.</p>
       </div>
+
+      <Card>
+        <h2 className={styles.sectionTitle}>Seus dados</h2>
+        <p className={styles.sectionHint}>Nome e foto exibidos no topo do app.</p>
+
+        <form className={styles.profileForm} onSubmit={handleSaveProfile}>
+          <div className={styles.avatarRow}>
+            <span className={styles.avatarPreview}>
+              {avatarSrc ? (
+                <img src={avatarSrc} alt="" className={styles.avatarPreviewImg} />
+              ) : (
+                (nome || profileQuery.data?.nome || 'U').charAt(0).toUpperCase()
+              )}
+            </span>
+            <div className={styles.avatarActions}>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                className={styles.hiddenFileInput}
+                onChange={handleFileChange}
+                aria-label="Escolher foto de perfil"
+              />
+              <Button type="button" variant="secondary" size="sm" onClick={() => fileInputRef.current?.click()}>
+                Alterar foto
+              </Button>
+              <p className={styles.sectionHint}>JPG, PNG ou WebP, até 2MB.</p>
+            </div>
+          </div>
+
+          <Input label="Nome" value={nome} onChange={(e) => setNome(e.target.value)} required />
+          <Input label="Email" value={profileQuery.data?.email || ''} disabled hint="O e-mail não pode ser alterado por aqui." />
+
+          <div className={styles.actions}>
+            <Button type="submit" disabled={updateProfileMutation.isPending}>
+              {updateProfileMutation.isPending ? 'Salvando...' : 'Salvar alterações'}
+            </Button>
+          </div>
+        </form>
+      </Card>
 
       <Card>
         <h2 className={styles.sectionTitle}>Tema</h2>
