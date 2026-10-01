@@ -49,8 +49,39 @@ class TransactionRepository {
     return withSplit;
   }
 
-  async update(userId, transactionId, updateData) {
-    await db('transactions').where({ id: transactionId, user_id: userId }).update(updateData);
+  async update(userId, transactionId, updateData, splitParticipantes) {
+    // Checagem de dono antes de mexer em split_participants: o UPDATE de
+    // `transactions` logo abaixo já é escopado por `user_id` (não afeta
+    // nada se a transação for de outro usuário), mas um DELETE/INSERT em
+    // `split_participants` filtrado só por `transaction_id` não teria essa
+    // proteção -- bastaria adivinhar/vazar o id de uma transação alheia
+    // pra apagar a divisão dela. `first('id')` sem mais nada só confirma
+    // que a linha existe E pertence a esse usuário.
+    const owns = await db('transactions').where({ id: transactionId, user_id: userId }).first('id');
+    if (!owns) return null;
+
+    if (Object.keys(updateData).length > 0) {
+      await db('transactions').where({ id: transactionId, user_id: userId }).update(updateData);
+    }
+
+    // undefined (chave "split" nem veio no corpo da requisição) preserva o
+    // que já existia -- só mexe na tabela quando o cliente mandou a lista
+    // explicitamente (mesmo que vazia, pra permitir remover a divisão).
+    if (splitParticipantes !== undefined) {
+      await db('split_participants').where({ transaction_id: transactionId }).del();
+      if (splitParticipantes?.length) {
+        await db('split_participants').insert(
+          splitParticipantes.map((p) => ({
+            transaction_id: transactionId,
+            nome: p.nome,
+            valor: p.valor,
+            pago: Boolean(p.pago),
+            pago_em: p.pago ? db.fn.now() : null
+          }))
+        );
+      }
+    }
+
     return this.findById(userId, transactionId);
   }
 

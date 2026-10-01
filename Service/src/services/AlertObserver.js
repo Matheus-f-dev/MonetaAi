@@ -4,7 +4,16 @@ const { totalGastoNoMes } = require('./CategorySpendingService');
 
 class AlertObserver {
   async update(transaction) {
-    if (transaction.tipo !== 'despesa') return;
+    // Achado testando a Fase 5 (NotificationsBell): a tela de nova
+    // transação sempre manda `tipo` capitalizado ('Despesa'/'Receita',
+    // ver TransactionController.notify() -- é a `transactionData` crua
+    // do body, não a normalizada). Essa comparação exata com 'despesa'
+    // minúsculo nunca batia, então este observer nunca rodava de
+    // verdade em produção -- nenhuma notificação era gravada, nenhum
+    // e-mail de alerta saía. Mesma normalização que o resto do código já
+    // usa pra esse mesmo campo (TransactionController, TransactionsListPage,
+    // useMonthlyProgress).
+    if (transaction.tipo?.toLowerCase() !== 'despesa') return;
 
     try {
       const userId = transaction.userId;

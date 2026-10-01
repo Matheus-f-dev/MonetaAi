@@ -40,24 +40,21 @@ body:has(.mn) .background { display: none; }
    o seu próprio CSS no topo do módulo. Resultado: a rota "/" carrega 34 folhas
    de estilo, incluindo as de telas que o visitante nunca vai ver.
 
-   Duas dessas folhas têm seletor de ELEMENTO sem escopo e vazam para cá:
+   Uma dessas folhas tinha seletor de ELEMENTO sem escopo e vazava pra cá:
 
      src/App.css                             * { font-family: inherit !important }
      src/presentation/styles/pages/
-       ChangePassword.css                    h1     { color: #FFFFFF }
-                                             label  { color: #dceef5; display: block }
-                                             button { width: 100%; padding: 12px;
-                                                      background-color: #00ffc3;
-                                                      border-radius: 8px;
-                                                      font-weight: bold; font-size: 16px }
-                                             button:hover { transform: scale(1.03);
-                                                            background-color: #00e6b2 }
+       ChangePassword.css (corrigido)         h1/label/button/input sem escopo
+                                              -- ChangePassword.jsx passou a
+                                              compartilhar estrutura e classes
+                                              com Login.jsx/Register.jsx, o
+                                              arquivo ficou vazio de propósito.
 
    Sem esta barreira a landing renderiza manchete branca sobre papel branco e
-   todo botão fica verde-menta e de largura total. A correção de raiz é dar
-   escopo a essas regras na própria ChangePassword.css, o que consertaria
-   também as outras telas de autenticação; isso está fora do escopo deste
-   redesenho e está anotado no relatório.
+   todo botão fica verde-menta e de largura total -- o `* { font-family:
+   inherit !important }` de App.css continua valendo pra qualquer página nova
+   que cometer o mesmo erro, então os guards abaixo ficam como defesa, mesmo
+   com a causa original já corrigida.
 
    A técnica: `:where()` não soma especificidade, então `.mn :where(button)`
    pesa (0,1,0). Isso vence o `button` solto (0,0,1) e PERDE para as classes de

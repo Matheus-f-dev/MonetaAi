@@ -6,6 +6,7 @@ import { ValidationContext, EmailValidation, PasswordValidation } from '../../co
 import { useToast } from '../hooks/useToast';
 import { useTerms } from '../hooks/useTerms';
 import TermsModal from '../components/TermsModal';
+import { Mark } from '../landing/ui/Icon';
 
 export default function LoginCard() {
   const [email, setEmail] = useState('');
@@ -26,9 +27,13 @@ export default function LoginCard() {
   useEffect(() => {
     const error = searchParams.get('error');
     if (error) {
-      // Handle error from URL params
+      // Bug real encontrado: esse efeito lia o erro da URL (ex.: vindo do
+      // redirect de /auth/callback quando a troca do código do Google
+      // falha) mas nunca fazia nada com ele -- a pessoa só via a tela de
+      // login de novo, sem pista nenhuma do que deu errado.
+      addToast(error, 'error');
     }
-  }, [searchParams]);
+  }, [searchParams, addToast]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -86,7 +91,7 @@ export default function LoginCard() {
 
       <aside className="auth-visual">
         <div className="auth-brand">
-          <span className="auth-brand-mark">M</span>
+          <Mark size={22} className="auth-brand-mark" />
           <span>Moneta</span>
         </div>
 
@@ -172,7 +177,7 @@ export default function LoginCard() {
           </button>
 
           <p id="mensagem" style={{
-            color: message.includes('sucesso') ? '#1f6e46' : '#d2401f'
+            color: message.includes('sucesso') ? 'var(--auth-pos)' : 'var(--auth-neg)'
           }}>{message}</p>
         </form>
 
@@ -206,7 +211,7 @@ export default function LoginCard() {
           </button>
 
           <p id="mensagem" style={{
-            color: message.includes('sucesso') ? '#1f6e46' : '#d2401f'
+            color: message.includes('sucesso') ? 'var(--auth-pos)' : 'var(--auth-neg)'
           }}>{message}</p>
         </form>
 

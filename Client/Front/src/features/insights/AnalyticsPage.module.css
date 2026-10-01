@@ -1,0 +1,267 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: var(--shell-content-max-w);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: var(--text-xl);
+}
+
+.subtitle {
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+  margin-top: var(--space-1);
+}
+
+.periodField {
+  min-width: 180px;
+}
+
+.tabs {
+  display: flex;
+  gap: var(--space-1);
+  background: var(--color-bg-sunken);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+  overflow-x: auto;
+}
+
+.tab {
+  border: none;
+  background: none;
+  padding: 0.45rem 0.85rem;
+  border-radius: calc(var(--radius-sm) - 2px);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-ink-muted);
+  white-space: nowrap;
+}
+
+.tabActive {
+  background: var(--color-bg-raised);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-sm);
+}
+
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-4);
+}
+
+.kpiLabel {
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+  margin-bottom: var(--space-2);
+}
+
+.kpiValue {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  font-family: var(--font-mono);
+}
+
+.tone-positive {
+  color: var(--color-positive);
+}
+
+.tone-negative {
+  color: var(--color-negative);
+}
+
+.tone-neutral {
+  color: var(--color-ink);
+}
+
+.kpiSublabel {
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+  margin-top: var(--space-2);
+}
+
+.chartGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.chartHeader {
+  margin-bottom: var(--space-4);
+}
+
+.chartTitle {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+.chartSubtitle {
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+  margin-top: 2px;
+}
+
+.chartWrap {
+  height: 260px;
+  position: relative;
+}
+
+.emptyHint {
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+  padding: var(--space-4) 0;
+}
+
+.pieRow {
+  display: flex;
+  gap: var(--space-5);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.pieWrap {
+  width: 180px;
+  height: 180px;
+  flex-shrink: 0;
+}
+
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  flex: 1;
+  min-width: 160px;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+}
+
+.legendDot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.legendLabel {
+  flex: 1;
+  color: var(--color-ink-muted);
+}
+
+.legendPct {
+  font-family: var(--font-mono);
+  font-weight: var(--weight-semibold);
+}
+
+.savingsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.savingsRowHeader {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-1);
+}
+
+.savingsName {
+  font-weight: var(--weight-medium);
+}
+
+.savingsPct {
+  font-family: var(--font-mono);
+  color: var(--color-ink-muted);
+}
+
+.savingsTrack {
+  height: 6px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-sunken);
+  overflow: hidden;
+}
+
+.savingsFill {
+  height: 100%;
+}
+
+.savingsMeta {
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+  margin-top: var(--space-1);
+}
+
+.prediction {
+  background: var(--color-bg-sunken);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.predictionTitle {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--color-ink-muted);
+  margin-bottom: var(--space-2);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.predictionGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-size: var(--text-sm);
+}
+
+.insightsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.insightItem {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-sunken);
+}
+
+.insightTitle {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+}
+
+.insightDesc {
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+  margin-top: 2px;
+}
+
+.trendingList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.trendingRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--text-sm);
+}

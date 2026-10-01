@@ -1,0 +1,161 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: var(--shell-content-max-w);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: var(--text-xl);
+}
+
+.subtitle {
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+  margin-top: var(--space-1);
+}
+
+.searchField {
+  max-width: 360px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.card {
+  background: var(--color-bg-raised);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.cardHeader {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: none;
+  border: none;
+  text-align: left;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: var(--weight-semibold);
+  flex-shrink: 0;
+}
+
+.name {
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+}
+
+.meta {
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+}
+
+.amounts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  align-items: flex-end;
+}
+
+.chevron {
+  color: var(--color-ink-faint);
+  transition: transform var(--duration-fast) var(--ease-standard);
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.items {
+  border-top: 1px solid var(--color-line);
+  display: flex;
+  flex-direction: column;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-line);
+}
+
+.item:last-child {
+  border-bottom: none;
+}
+
+.itemDesc {
+  font-size: var(--text-sm);
+}
+
+.itemDate {
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+}
+
+.paidToggle {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  padding: 0.375rem 0.75rem;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-line-strong);
+  background: var(--color-bg-sunken);
+  color: var(--color-ink-muted);
+  white-space: nowrap;
+}
+
+.paidToggle:hover {
+  border-color: var(--color-brand);
+  color: var(--color-ink);
+}
+
+.paidToggleActive {
+  border-color: var(--color-positive);
+  background: var(--color-positive-soft);
+  color: var(--color-positive);
+}
+
+@media (max-width: 700px) {
+  .cardHeader {
+    grid-template-columns: auto 1fr auto;
+  }
+
+  .amounts {
+    display: none;
+  }
+
+  .item {
+    grid-template-columns: 1fr auto;
+  }
+
+  .paidToggle {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+}

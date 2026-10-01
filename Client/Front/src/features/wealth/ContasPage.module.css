@@ -1,0 +1,140 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: var(--shell-content-max-w);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.headerActions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.title {
+  font-size: var(--text-xl);
+}
+
+.subtitle {
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+  margin-top: var(--space-1);
+}
+
+.resumo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-3);
+}
+
+.resumoLabel {
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+  margin-bottom: var(--space-2);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-4);
+}
+
+.cardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-3);
+}
+
+.cardNome {
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-md);
+}
+
+.cardInst {
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+  margin-top: var(--space-1);
+}
+
+.cardSaldo {
+  margin: var(--space-3) 0;
+}
+
+.cardActions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.reconcileHint {
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+}
+
+.reconcileOk {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-positive-soft);
+  color: var(--color-positive);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+}
+
+.reconcileDiff {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-negative-soft);
+  color: var(--color-negative);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+}
+
+.reconcileHistory {
+  border-top: 1px solid var(--color-line);
+  padding-top: var(--space-3);
+}
+
+.reconcileHistoryTitle {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--color-ink-muted);
+  margin-bottom: var(--space-2);
+}
+
+.reconcileHistoryRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-sm);
+  padding: var(--space-1) 0;
+}
+
+@media (max-width: 700px) {
+  .headerActions {
+    width: 100%;
+  }
+
+  .headerActions > * {
+    flex: 1;
+  }
+}

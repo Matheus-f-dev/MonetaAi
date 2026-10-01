@@ -20,6 +20,7 @@ class User {
     this.perfilCompleto = Boolean(data.perfil_completo);
     this.totpAtivo = Boolean(data.totp_ativo);
     this.tokenVersion = data.token_version;
+    this.avatarUrl = data.avatar_url || null;
     this.criadoEm = data.criado_em;
   }
 
@@ -33,7 +34,8 @@ class User {
       email: this.email,
       salario: this.salario,
       perfilCompleto: this.perfilCompleto,
-      totpAtivo: this.totpAtivo
+      totpAtivo: this.totpAtivo,
+      avatarUrl: this.avatarUrl
     };
   }
 

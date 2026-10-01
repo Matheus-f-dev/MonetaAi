@@ -1,0 +1,169 @@
+/* Base do redesign pós-login.
+   ============================================================
+   ATENÇÃO ao escopo: durante as fases 0-8 o app roda meio novo, meio
+   legado (landing e Login/Register seguem com o CSS antigo, que tem seu
+   próprio reset e suas próprias variáveis em system.css/_variables.css).
+   Um reset global aqui vazaria pra landing -- que está explicitamente
+   fora do escopo do redesign -- e quebraria produção no meio do caminho.
+
+   Por isso tudo que aplica ESTILO (não token) vive sob `.ds-scope`, a
+   classe que o shell novo e a página /design-system colocam na própria
+   raiz. Na Fase 9, quando o CSS legado sair, isso vira reset global de
+   verdade e a classe some. Os tokens (tokens.css) já podem ser globais:
+   são só custom properties com nomes novos (--color-*, --font-*, --space-*),
+   não colidem com as antigas (--bg, --card, --primary...).
+   ============================================================ */
+
+/* Fontes carregadas globalmente em index.html (um pedido só, pra landing
+   E pro painel -- ver o comentário lá): Hanken Grotesk e Zilla Slab são a
+   dupla do painel logado, a mesma dupla que index.html já anuncia desde
+   que a landing nova entrou. Sem @import próprio aqui -- pediria a fonte
+   duas vezes e ainda corria o risco de a segunda vencer com um peso
+   diferente. */
+
+.ds-scope,
+.ds-scope *,
+.ds-scope *::before,
+.ds-scope *::after {
+  box-sizing: border-box;
+}
+
+/* Barra de rolagem no tema do painel -- a nativa (cinza claro, grossa,
+   com track e setas) contrasta forte com o fundo quase preto do tema
+   escuro, mesma classe de "chrome do navegador que não segue o tema" já
+   corrigida no <select> e no botão da Sidebar. Vale pra qualquer área
+   rolável (sidebar, conteúdo, modal, tabela), não só a sidebar -- é a
+   MESMA barra nativa em todo lugar, restilizar só onde apareceu por
+   acaso deixaria o resto inconsistente. Firefox usa as duas propriedades
+   padrão (herdadas, então `.ds-scope` sozinho já alcança tudo dentro);
+   Chromium/Safari usam os pseudo-elementos `::-webkit-scrollbar-*`, que
+   não herdam -- precisam do `.ds-scope *` explícito. */
+.ds-scope {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line-strong) transparent;
+}
+
+.ds-scope::-webkit-scrollbar,
+.ds-scope *::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.ds-scope::-webkit-scrollbar-track,
+.ds-scope *::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ds-scope::-webkit-scrollbar-thumb,
+.ds-scope *::-webkit-scrollbar-thumb {
+  background-color: var(--color-line-strong);
+  border-radius: var(--radius-full);
+  /* Borda transparente + background-clip: o "thumb" fica com um respiro
+     em volta em vez de tocar a borda do trilho -- mesmo truque usado em
+     barras de rolagem finas de outros apps, sem precisar de mais nenhum
+     elemento. */
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.ds-scope::-webkit-scrollbar-thumb:hover,
+.ds-scope *::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-ink-faint);
+}
+
+/* Os !important de font-family abaixo são necessidade, não preferência:
+   App.css:106 declara `* { font-family: inherit !important }` globalmente.
+   Como o `*` também casa com <html>, que não tem de quem herdar, tudo no
+   app resolve pro serif inicial do browser -- inclusive style inline.
+   Sem empatar com !important aqui, nenhuma fonte do design system aparece.
+   A landing bateu no mesmo muro e resolveu igual (ver home.css:53).
+   Some na Fase 9, junto com o App.css legado. */
+.ds-scope {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-body) !important;
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  min-height: 100%;
+}
+
+.ds-scope h1,
+.ds-scope h2,
+.ds-scope h3,
+.ds-scope h4 {
+  font-family: var(--font-display) !important;
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+  margin: 0;
+  color: var(--color-ink);
+}
+
+.ds-scope p {
+  margin: 0;
+}
+
+.ds-scope button,
+.ds-scope input,
+.ds-scope select,
+.ds-scope textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+.ds-scope button {
+  cursor: pointer;
+}
+
+/* :where() zera a especificidade da própria regra (mesma técnica do
+   `:where(.ds-scope) a` logo abaixo) -- sem isso, `.ds-scope button`
+   (0,1,1) venceria QUALQUER botão de uma classe de CSS Module só (0,1,0),
+   apagando o próprio background/border que Button.module.css e outros
+   definem pra cada variant. Com :where() a regra cai pra (0,0,1), perde
+   pra qualquer classe de componente, e só sobra pra reset de verdade:
+   um <button> cru sem nenhuma classe de estilo própria (achado real
+   testando com o app: o "Sair" da Sidebar é um <button>, não um <a> como
+   o resto do menu, e sem isso o navegador aplicava o próprio chrome
+   nativo -- fundo branco/cinza, borda -- por cima do `.item` da Sidebar,
+   que nunca precisou resetar isso porque só via uso em <a>). */
+:where(.ds-scope) button {
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: inherit;
+  appearance: none;
+}
+
+/* :where() zera a especificidade da própria regra (fica só a do `a`
+   sozinho) -- sem isso, "classe + elemento" (0,1,1) vencia qualquer
+   componente estilizado com uma única classe de CSS Module (0,1,0), tipo
+   o .item da Sidebar. Achado real testando o seletor de cor: todo link
+   do menu (não só o ativo) saía na cor de marca em vez do cinza neutro
+   pretendido -- mascarado até aqui porque o verde-marca padrão e o
+   cinza-tinta ficavam parecidos o bastante pra não chamar atenção. */
+:where(.ds-scope) a {
+  color: var(--color-brand);
+}
+
+/* Foco visível em qualquer elemento interativo -- remover o outline no
+   :focus cru sem repor em :focus-visible é a causa mais comum de
+   navegação por teclado ficar cega num app. */
+.ds-scope :focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.ds-scope img,
+.ds-scope svg {
+  display: block;
+  max-width: 100%;
+}
+
+/* Algarismo tabular pra alinhar números em coluna (tabelas, KPIs) sem
+   precisar do componente MoneyFigure inteiro. */
+.ds-scope .tabular-nums {
+  font-variant-numeric: tabular-nums;
+}

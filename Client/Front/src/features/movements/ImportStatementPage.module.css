@@ -1,0 +1,78 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: var(--shell-content-max-w);
+}
+
+.title {
+  font-size: var(--text-xl);
+}
+
+.subtitle {
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+  margin-top: var(--space-1);
+}
+
+.steps {
+  display: flex;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-ink-faint);
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.stepActive {
+  color: var(--color-brand);
+  font-weight: var(--weight-semibold);
+}
+
+.dropzone {
+  border: 2px dashed var(--color-line-strong);
+  border-radius: var(--radius-lg);
+  padding: var(--space-10);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.formatRow {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: center;
+}
+
+.summary {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.rowExcluded {
+  opacity: 0.45;
+}
+
+/* Select nativo (não o componente Select do design system, que sempre
+   renderiza um <label> visível -- indesejado numa célula de tabela).
+   Sem isso o <select> ficava com fundo branco padrão do navegador e texto
+   quase branco herdado da tabela escura (achado testando a Fase 3, texto
+   virtualmente invisível). */
+.categorySelect {
+  background: var(--color-bg-raised);
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-sm);
+  padding: 0.375rem 0.625rem;
+  font-size: var(--text-sm);
+  color: var(--color-ink);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}

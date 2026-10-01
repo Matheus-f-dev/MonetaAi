@@ -1,0 +1,74 @@
+.shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  /* O App.jsx legado renderiza um <div class="background"> fixo com
+     z-index 0. Sem stacking context próprio aqui, esse gradiente cobre
+     o shell inteiro (elemento posicionado pinta acima de conteúdo
+     estático). Sai na Fase 9, junto com o resto do CSS legado. */
+  position: relative;
+  z-index: 1;
+}
+
+.sidebarSlot {
+  display: flex;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+.content {
+  flex: 1;
+  padding: var(--space-6);
+}
+
+.overlay {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .sidebarSlot {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 60;
+    transform: translateX(-100%);
+    transition: transform var(--duration-slow) var(--ease-standard);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .sidebarSlotOpen {
+    transform: translateX(0);
+  }
+
+  .overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 32, 27, 0.5);
+    z-index: 50;
+    animation: fadeIn var(--duration-base) var(--ease-standard);
+  }
+
+  .content {
+    padding: var(--space-4);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebarSlot {
+    transition: none;
+  }
+  .overlay {
+    animation: none;
+  }
+}

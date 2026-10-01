@@ -17,6 +17,15 @@ class SplitController {
 
       const peopleMap = {};
 
+      // setParticipantPaid ainda identifica o participante por posição
+      // dentro dos participantes DAQUELA transação (contrato herdado do
+      // Firestore, ver o comentário lá) -- essa posição não dá pra
+      // recalcular no cliente a partir da resposta agrupada por pessoa,
+      // então computamos aqui: como `rows` já vem ordenado por sp.id
+      // ascendente, um contador por transaction_id reproduz exatamente
+      // o mesmo índice que `orderBy('id','asc')` monta do outro lado.
+      const indexByTransaction = {};
+
       rows.forEach((row) => {
         const key = row.nome.trim().toLowerCase();
         if (!peopleMap[key]) {
@@ -30,9 +39,13 @@ class SplitController {
           peopleMap[key].totalDevido += valor;
         }
 
+        const participantIndex = indexByTransaction[row.transaction_id] ?? 0;
+        indexByTransaction[row.transaction_id] = participantIndex + 1;
+
         peopleMap[key].itens.push({
           transactionId: row.transaction_id,
           participantId: row.participant_id,
+          participantIndex,
           descricao: row.descricao,
           valor,
           pago: Boolean(row.pago),

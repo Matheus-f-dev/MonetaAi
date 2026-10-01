@@ -58,6 +58,23 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Avatares enviados por upload (ver AuthController.updateProfile) --
+// servidos sob /api pra cair na mesma regra de proxy que o nginx da VPS já
+// usa pro resto da API; um /uploads solto na raiz cairia no bucket
+// estático do frontend (nginx serve Client/Front/dist ali) e devolveria
+// 404 em produção. CORP relaxado só aqui: são fotos de perfil, pensadas
+// pra serem carregadas por <img> de qualquer origem que o app rodar (em
+// dev, frontend e backend já são origens diferentes -- localhost:5173 x
+// localhost:3000 -- e o helmet() default bloquearia a imagem).
+app.use(
+  '/api/uploads',
+  (req, res, next) => {
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    next();
+  },
+  express.static(path.join(__dirname, '../public/uploads'))
+);
+
 // Rotas da API (MVC)
 app.use('/api', apiRoutes);
 

@@ -1,0 +1,188 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: var(--text-xl);
+}
+
+.subtitle {
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+  margin-top: var(--space-1);
+}
+
+.sectionTitle {
+  font-size: var(--text-md);
+  margin-bottom: var(--space-1);
+}
+
+.sectionHint {
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+}
+
+/* ---------- Seus dados ---------- */
+.profileForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+.avatarRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.avatarPreview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--color-brand);
+  color: var(--color-bg-raised);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  overflow: hidden;
+}
+
+.avatarPreviewImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarActions {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  align-items: flex-start;
+}
+
+.hiddenFileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---------- Tema ---------- */
+.themeOptions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.themeCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-sunken);
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  transition: border-color var(--duration-fast) var(--ease-standard), color var(--duration-fast) var(--ease-standard);
+}
+
+.themeCard:hover {
+  border-color: var(--color-line-strong);
+}
+
+.themeCardActive {
+  border-color: var(--color-brand);
+  color: var(--color-ink);
+  background: var(--color-brand-soft);
+}
+
+.themeSwatch {
+  width: 100%;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-line);
+}
+
+.swatchlight { background: #fbfaf7; }
+.swatchdark { background: #0a0e0d; }
+.swatchsystem { background: linear-gradient(135deg, #fbfaf7 50%, #0a0e0d 50%); }
+
+/* ---------- Cor de destaque ---------- */
+.colorRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.colorInput {
+  appearance: none;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-line);
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.colorInput::-webkit-color-swatch-wrapper {
+  padding: 3px;
+}
+
+.colorInput::-webkit-color-swatch {
+  border: none;
+  border-radius: calc(var(--radius-md) - 3px);
+}
+
+.colorInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.colorHex {
+  font-family: var(--font-mono);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+}
+
+/* ---------- Tipografia ---------- */
+.typographyGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  margin-top: var(--space-4);
+}
+
+@media (max-width: 560px) {
+  .themeOptions {
+    grid-template-columns: 1fr;
+  }
+  .typographyGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- Ações ---------- */
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}

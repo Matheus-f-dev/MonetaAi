@@ -1,5 +1,41 @@
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 const AuthService = require('../services/AuthService');
 const OAuthExchangeService = require('../services/OAuthExchangeService');
+
+// Disco, não memória (diferente do multer do import de extrato em
+// TransactionImportController) -- o avatar precisa sobreviver além da
+// requisição: fica em Service/public/uploads/avatars e é servido depois
+// por express.static em /api/uploads (ver app.js -- precisa estar sob
+// /api pra já cair na regra de proxy que o nginx da VPS usa pro backend;
+// um /uploads solto na raiz cairia no bucket estático do frontend e
+// devolveria 404 em produção).
+const AVATAR_DIR = path.join(__dirname, '../../public/uploads/avatars');
+fs.mkdirSync(AVATAR_DIR, { recursive: true });
+
+const ALLOWED_AVATAR_MIME = new Set(['image/jpeg', 'image/png', 'image/webp']);
+
+const uploadAvatar = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => cb(null, AVATAR_DIR),
+    filename: (req, file, cb) => {
+      const ext = path.extname(file.originalname).toLowerCase() || '.jpg';
+      // Prefixo com o userId só pra facilitar inspeção manual da pasta --
+      // quem decide de quem é o arquivo é sempre req.params.userId (já
+      // validado contra req.user.uid pelo ensureOwnUser antes da rota
+      // chegar aqui), nunca o nome do arquivo.
+      cb(null, `${req.params.userId}-${Date.now()}${ext}`);
+    }
+  }),
+  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB -- foto de perfil, não precisa de mais
+  fileFilter: (req, file, cb) => {
+    if (!ALLOWED_AVATAR_MIME.has(file.mimetype)) {
+      return cb(new Error('Formato de imagem não suportado -- envie JPG, PNG ou WebP.'));
+    }
+    cb(null, true);
+  }
+}).single('avatar');
 
 class AuthController {
   static async register(req, res) {
@@ -140,6 +176,38 @@ class AuthController {
     }
   }
 
+  // Edição de perfil (nome e/ou foto) -- multipart/form-data, campo opcional
+  // "avatar" + campo opcional "nome". req.params.userId já foi conferido
+  // contra req.user.uid pelo ensureOwnUser antes de chegar aqui.
+  static async updateProfile(req, res) {
+    uploadAvatar(req, res, async (uploadErr) => {
+      if (uploadErr) {
+        return res.status(400).json({ success: false, message: uploadErr.message || 'Erro ao processar a imagem.' });
+      }
+
+      try {
+        const { userId } = req.params;
+        const { nome } = req.body;
+
+        if (nome !== undefined && !nome.trim()) {
+          return res.status(400).json({ success: false, message: 'Nome não pode ficar em branco.' });
+        }
+        if (nome === undefined && !req.file) {
+          return res.status(400).json({ success: false, message: 'Nada pra atualizar.' });
+        }
+
+        const user = await AuthService.updateProfile(userId, {
+          ...(nome !== undefined ? { nome: nome.trim() } : {}),
+          ...(req.file ? { avatarUrl: `/api/uploads/avatars/${req.file.filename}` } : {})
+        });
+
+        res.json({ success: true, message: 'Perfil atualizado com sucesso!', user });
+      } catch (err) {
+        res.status(500).json({ success: false, message: 'Erro interno do servidor.' });
+      }
+    });
+  }
+
   static async esqueciSenha(req, res) {
     // Resposta é SEMPRE a mesma, exista ou não o e-mail — um 404 diferente
     // aqui era um jeito trivial de descobrir quais e-mails têm conta
@@ -225,6 +293,11 @@ class AuthController {
 
     const payload = OAuthExchangeService.consumeCode(code);
     if (!payload) {
+      // Logado -- esse endpoint falhando em silêncio (sem nada no servidor
+      // nem no cliente) foi exatamente o que escondeu o bug de verdade
+      // (Login.jsx ignorando o ?error= da URL) durante o debug do login
+      // com Google.
+      console.error('[auth/exchange] Código ausente, já usado ou expirado.');
       return res.status(400).json({ success: false, message: 'Código de login inválido ou expirado.' });
     }
 

@@ -1,10 +1,15 @@
+/* Mesma identidade "Ledger" de Login/Register (Login.css) -- antes disso
+   era azul genérico (#2c5aa0), sem relação nenhuma com o resto do funil
+   de autenticação. Sem sistema de tokens próprio (um modal, um único
+   consumidor) -- os hex abaixo são literalmente os mesmos valores de
+   --auth-brand/--auth-ink/--auth-line em Login.css. */
 .terms-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(11, 18, 15, 0.72);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -12,31 +17,33 @@
 }
 
 .terms-modal {
-  background: white;
-  border-radius: 12px;
+  background: #FFFFFF;
+  border-radius: 16px;
   width: 90%;
   max-width: 600px;
   max-height: 80vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 4px rgba(11, 18, 15, .05), 0 28px 64px -28px rgba(11, 18, 15, .28);
+  font-family: 'Hanken Grotesk', 'Segoe UI', sans-serif;
 }
 
 .terms-header {
   padding: 24px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #DFDCD3;
   text-align: center;
 }
 
 .terms-header h2 {
   margin: 0 0 8px 0;
-  color: #333;
+  color: #0B120F;
+  font-family: 'Zilla Slab', Georgia, serif;
   font-size: 24px;
 }
 
 .terms-header p {
   margin: 0;
-  color: #666;
+  color: #57605C;
   font-size: 14px;
 }
 
@@ -50,11 +57,11 @@
 .terms-text {
   padding: 20px 0;
   line-height: 1.6;
-  color: #333;
+  color: #0B120F;
 }
 
 .terms-text h3 {
-  color: #2c5aa0;
+  color: #0A5741;
   margin: 20px 0 10px 0;
   font-size: 16px;
 }
@@ -70,17 +77,17 @@
 }
 
 .terms-footer {
-  background: #f8f9fa;
+  background: #F4F2EC;
   padding: 15px;
   border-radius: 8px;
   margin: 20px 0;
   font-weight: 500;
-  border-left: 4px solid #2c5aa0;
+  border-left: 4px solid #0A5741;
 }
 
 .terms-actions {
   padding: 24px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid #DFDCD3;
   display: flex;
   gap: 12px;
   justify-content: flex-end;
@@ -89,34 +96,35 @@
 .terms-btn {
   padding: 12px 24px;
   border: none;
-  border-radius: 8px;
-  font-weight: 500;
+  border-radius: 10px;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
   font-size: 14px;
+  font-family: 'Hanken Grotesk', 'Segoe UI', sans-serif;
 }
 
 .terms-btn.decline {
-  background: #f8f9fa;
-  color: #666;
-  border: 1px solid #ddd;
+  background: #F4F2EC;
+  color: #57605C;
+  border: 1px solid #DFDCD3;
 }
 
 .terms-btn.decline:hover {
-  background: #e9ecef;
+  background: #EDEAE2;
 }
 
 .terms-btn.accept {
-  background: #2c5aa0;
-  color: white;
+  background: #0A5741;
+  color: #fff;
 }
 
 .terms-btn.accept:hover:not(:disabled) {
-  background: #1e3d6f;
+  background: #07422F;
 }
 
 .terms-btn.accept:disabled {
-  background: #ccc;
+  background: #C9C5B9;
   cursor: not-allowed;
 }
 

@@ -1,0 +1,16 @@
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.title {
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+}
+
+.subtitle {
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+}

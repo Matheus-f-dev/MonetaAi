@@ -1,0 +1,176 @@
+.page {
+  min-height: 100vh;
+  padding: var(--space-10) var(--space-6) var(--space-16);
+  /* O App.jsx legado renderiza um <div class="background"> fixo com
+     z-index 0 e gradiente próprio. Elemento posicionado pinta acima de
+     conteúdo estático, então sem este stacking context o gradiente
+     antigo cobre a página inteira. Sai na Fase 9, junto com o CSS
+     legado -- até lá, todo container novo de página precisa disto. */
+  position: relative;
+  z-index: 1;
+}
+
+.inner {
+  max-width: var(--shell-content-max-w);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-12);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.eyebrow {
+  font-family: var(--font-mono) !important;
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-accent);
+  font-weight: var(--weight-semibold);
+}
+
+.pageTitle {
+  font-size: var(--text-xl);
+  margin-top: var(--space-2);
+}
+
+.lede {
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+  max-width: 60ch;
+  margin-top: var(--space-2);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.sectionHead {
+  border-bottom: 1px solid var(--color-line);
+  padding-bottom: var(--space-3);
+}
+
+.sectionTitle {
+  font-size: var(--text-lg);
+}
+
+.sectionNote {
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+  margin-top: var(--space-1);
+}
+
+.swatchGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--space-3);
+}
+
+.swatch {
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.swatchChip {
+  height: 56px;
+}
+
+.swatchMeta {
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg-raised);
+}
+
+.swatchName {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+}
+
+.swatchVar {
+  font-family: var(--font-mono) !important;
+  font-size: 0.68rem;
+  color: var(--color-ink-muted);
+}
+
+.typeRow {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-4);
+  padding: var(--space-3) 0;
+  border-bottom: 1px dashed var(--color-line);
+}
+
+.typeLabel {
+  font-family: var(--font-mono) !important;
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+  min-width: 120px;
+}
+
+/* Amostras da escala tipográfica. Precisam de classe (não style inline)
+   porque o `* { font-family: inherit !important }` do App.css legado
+   sobrepõe até style inline -- ver a nota em global.css. */
+.sampleDisplay {
+  font-family: var(--font-display) !important;
+}
+
+.sampleBody {
+  font-family: var(--font-body) !important;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-4);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.kpiLabel {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-ink-muted);
+  font-weight: var(--weight-semibold);
+}
+
+.scaleList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.scaleItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono) !important;
+  font-size: 0.68rem;
+  color: var(--color-ink-muted);
+}
+
+.scaleBox {
+  background: var(--color-brand-soft);
+  border: 1px solid var(--color-brand);
+  border-radius: var(--radius-sm);
+}

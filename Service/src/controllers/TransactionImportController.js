@@ -17,7 +17,7 @@ function converterDataParaDataHora(dataDDMMYYYY) {
 }
 
 class TransactionImportController {
-  // POST /api/transactions/import/preview?formato=ofx|csv-nubank
+  // POST /api/transactions/import/preview?formato=ofx|csv
   // multipart/form-data, campo "arquivo" -- não grava nada, só devolve a
   // prévia com categoria sugerida (CategoryInference) e um aviso em cada
   // linha cujo external_id já existir pra esse usuário.
@@ -35,7 +35,7 @@ class TransactionImportController {
           return res.status(400).json({ success: false, message: 'Nenhum arquivo enviado (campo "arquivo")' });
         }
         if (!formato) {
-          return res.status(400).json({ success: false, message: 'Parâmetro "formato" é obrigatório (ofx ou csv-nubank)' });
+          return res.status(400).json({ success: false, message: 'Parâmetro "formato" é obrigatório (ofx ou csv)' });
         }
 
         const conteudo = req.file.buffer.toString('utf8');

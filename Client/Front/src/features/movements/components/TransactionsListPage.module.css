@@ -1,0 +1,74 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: var(--shell-content-max-w);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: var(--text-xl);
+}
+
+.subtitle {
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+  margin-top: var(--space-1);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: flex-end;
+}
+
+.tabs {
+  display: flex;
+  gap: var(--space-1);
+  background: var(--color-bg-sunken);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+}
+
+.tab {
+  border: none;
+  background: none;
+  padding: 0.45rem 0.85rem;
+  border-radius: calc(var(--radius-sm) - 2px);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-ink-muted);
+}
+
+.tabActive {
+  background: var(--color-bg-raised);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-sm);
+}
+
+.searchField {
+  min-width: 220px;
+}
+
+.categoryField {
+  min-width: 180px;
+}
+
+.actionsCell {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: flex-end;
+}
+
+.footer {
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+}

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -6,6 +6,16 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 export default function AuthCallback() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  // Bug real encontrado: o código de troca é de USO ÚNICO
+  // (OAuthExchangeService.consumeCode), mas o React.StrictMode (dev) roda
+  // todo useEffect duas vezes de propósito -- a segunda chamada sempre
+  // batia num código já consumido (400) e, dependendo de qual das duas
+  // promises resolvia por último, essa segunda navegação pro /login
+  // "ganhava" e escondia o login que tinha funcionado na primeira
+  // chamada. Essa ref sobrevive ao mount/unmount sintético do
+  // StrictMode (não é resetada em cleanup nenhum), então a segunda
+  // invocação do efeito, pro mesmo código, vira um no-op.
+  const exchangedCodeRef = useRef(null);
 
   useEffect(() => {
     const code = searchParams.get('code');
@@ -20,6 +30,9 @@ export default function AuthCallback() {
       navigate('/login?error=Dados de autenticação inválidos');
       return;
     }
+
+    if (exchangedCodeRef.current === code) return;
+    exchangedCodeRef.current = code;
 
     // O backend não manda mais token/user na URL (achado #12 -- ficava em
     // log de acesso e histórico do navegador). Troca o código de uso único

@@ -2403,7 +2403,7 @@
               "type": "string",
               "enum": [
                 "ofx",
-                "csv-nubank"
+                "csv"
               ]
             }
           }
