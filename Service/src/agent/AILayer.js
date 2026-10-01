@@ -2,20 +2,56 @@
  * AILayer — Camada de IA do agente Moneta AI.
  *
  * Responsabilidades:
- * - Enviar mensagem + prompt para a IA (OpenAI ou simulação local)
+ * - Enviar mensagem + prompt para a IA (Groq, OpenAI ou simulação local)
  * - Garantir que a resposta seja JSON válido
  * - Isolar completamente a lógica de IA do restante do sistema
  *
- * Para usar OpenAI real: defina OPENAI_API_KEY no .env
- * Sem a chave, o sistema usa o interpretador local (simulação inteligente).
+ * Pra usar IA de verdade, defina UMA das duas no .env (nunca as duas --
+ * se existirem as duas, Groq ganha, por ser a mais barata/rápida das
+ * duas pra esse tipo de chamada curta):
+ *   GROQ_API_KEY=gsk_...      (console.groq.com/keys)
+ *   OPENAI_API_KEY=sk-...     (platform.openai.com/api-keys)
+ * Sem nenhuma das duas, o sistema usa o interpretador local (regras por
+ * regex, sem chamada de rede nenhuma -- é o que já rodava antes de
+ * qualquer uma das duas existir, continua funcionando igual).
+ *
+ * A API da Groq é compatível com o formato da OpenAI (mesmo corpo de
+ * request/response, só a URL e o catálogo de modelos mudam) -- por isso
+ * os dois provedores dividem a mesma função de chamada (_chamarIA),
+ * variando só baseURL/model/apiKey.
  */
 
 const { SYSTEM_PROMPT } = require('./agentPrompt');
 
+const PROVIDERS = {
+  groq: {
+    baseURL: 'https://api.groq.com/openai/v1/chat/completions',
+    // Llama 3.3 70B -- bom equilíbrio custo/qualidade pra essa tarefa
+    // (classificar intenção + devolver JSON curto), não o maior modelo
+    // disponível na Groq (não precisa pra esse tamanho de prompt).
+    defaultModel: 'llama-3.3-70b-versatile'
+  },
+  openai: {
+    baseURL: 'https://api.openai.com/v1/chat/completions',
+    defaultModel: 'gpt-4o-mini'
+  }
+};
+
 class AILayer {
   constructor() {
-    this.useOpenAI = !!process.env.OPENAI_API_KEY;
-    this.model = process.env.OPENAI_MODEL || 'gpt-4o-mini';
+    // Groq primeiro: achado real -- documentado acima, não repetir aqui.
+    this.provider = process.env.GROQ_API_KEY ? 'groq' : process.env.OPENAI_API_KEY ? 'openai' : null;
+    this.apiKey = this.provider === 'groq' ? process.env.GROQ_API_KEY : process.env.OPENAI_API_KEY;
+    this.useAI = Boolean(this.provider);
+
+    if (this.useAI) {
+      const config = PROVIDERS[this.provider];
+      this.baseURL = config.baseURL;
+      // GROQ_MODEL/OPENAI_MODEL (conforme o provedor escolhido) continuam
+      // deixando trocar o modelo sem mexer em código -- mesmo nome de
+      // variável que já existia antes pra OPENAI_MODEL.
+      this.model = process.env[`${this.provider.toUpperCase()}_MODEL`] || config.defaultModel;
+    }
   }
 
   /**
@@ -25,14 +61,14 @@ class AILayer {
    * @returns {Promise<{acao: string, dados: object, resposta: string}>}
    */
   async interpretar(mensagem, historico = []) {
-    if (this.useOpenAI) {
-      return this._chamarOpenAI(mensagem, historico);
+    if (this.useAI) {
+      return this._chamarIA(mensagem, historico);
     }
     return this._interpretarLocal(mensagem);
   }
 
-  // --- OpenAI real ---
-  async _chamarOpenAI(mensagem, historico) {
+  // --- IA real (Groq ou OpenAI, mesmo formato de chamada) ---
+  async _chamarIA(mensagem, historico) {
     const axios = require('axios');
 
     const messages = [
@@ -42,9 +78,9 @@ class AILayer {
     ];
 
     const response = await axios.post(
-      'https://api.openai.com/v1/chat/completions',
+      this.baseURL,
       { model: this.model, messages, temperature: 0.2, max_tokens: 500 },
-      { headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, 'Content-Type': 'application/json' } }
+      { headers: { Authorization: `Bearer ${this.apiKey}`, 'Content-Type': 'application/json' } }
     );
 
     const content = response.data.choices[0].message.content.trim();
