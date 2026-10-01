@@ -1,10 +1,11 @@
-import { useState, type FocusEvent, type MouseEvent, type ReactElement } from 'react';
+import { useEffect, useState, type FocusEvent, type MouseEvent, type ReactElement } from 'react';
 import { createPortal } from 'react-dom';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { NAV_GROUPS } from './navConfig';
 import {
   AutomationIcon,
   CollapseIcon,
+  DisclosureIcon,
   InsightsIcon,
   LogoutIcon,
   MovementIcon,
@@ -41,7 +42,39 @@ interface TooltipState {
   left: number;
 }
 
+function groupContaining(pathname: string): string | undefined {
+  return NAV_GROUPS.find((g) => g.items.some((item) => item.path === pathname))?.label;
+}
+
 export function Sidebar({ onLogout, onNavigate, collapsed = false, onToggleCollapse }: SidebarProps) {
+  const location = useLocation();
+
+  // Pedido do usuário: a lista só cresce a cada fase (7 grupos, mais de 20
+  // itens no total) -- cada grupo vira um dropdown, só o grupo da rota
+  // ativa começa aberto. Estado local (não persiste entre sessões de
+  // propósito -- é sobre reduzir o que aparece numa carga de página, não
+  // sobre lembrar preferência; abrir tudo de novo a cada F5 é esperado).
+  // Não se aplica ao trilho colapsado (só ícone): lá não tem rótulo nem
+  // espaço pra um chevron, os itens do grupo já aparecem direto.
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(() => {
+    const active = groupContaining(location.pathname);
+    return active ? { [active]: true } : {};
+  });
+
+  // Navegar pra uma rota de um grupo ainda fechado abre ele sozinho (sem
+  // fechar os outros que a pessoa já tinha aberto na mão) -- senão a rota
+  // ativa ficaria escondida atrás de um dropdown fechado.
+  useEffect(() => {
+    const active = groupContaining(location.pathname);
+    if (active) {
+      setExpandedGroups((prev) => (prev[active] ? prev : { ...prev, [active]: true }));
+    }
+  }, [location.pathname]);
+
+  function toggleGroup(label: string) {
+    setExpandedGroups((prev) => ({ ...prev, [label]: !prev[label] }));
+  }
+
   // Tooltip próprio pros itens colapsados (trilho só de ícones) -- não o
   // `title` nativo do navegador, que aparecia como uma caixa branca crua,
   // fora do tema, exatamente o "jogo de cor" que não combina que motivou o
@@ -85,29 +118,52 @@ export function Sidebar({ onLogout, onNavigate, collapsed = false, onToggleColla
       <div className={styles.groups}>
         {NAV_GROUPS.map((group) => {
           const GroupIcon = GROUP_ICON[group.label];
+          const groupId = `nav-group-${group.label.replace(/\s+/g, '-')}`;
+          const expanded = collapsed || Boolean(expandedGroups[group.label]);
           return (
             <div className={styles.group} key={group.label}>
-              <span className={styles.groupLabel}>{group.label}</span>
-              {group.items.map((item) => (
-                <NavLink
-                  key={item.path}
-                  to={item.path}
-                  onClick={onNavigate}
-                  aria-label={item.label}
-                  className={({ isActive }) => [styles.item, isActive && styles.itemActive].filter(Boolean).join(' ')}
-                  onMouseEnter={(e) => showTooltip(e, item.label)}
-                  onMouseLeave={hideTooltip}
-                  onFocus={(e) => showTooltip(e, item.label)}
-                  onBlur={hideTooltip}
+              {collapsed ? (
+                <span className={styles.groupLabel}>{group.label}</span>
+              ) : (
+                <button
+                  type="button"
+                  className={styles.groupToggle}
+                  onClick={() => toggleGroup(group.label)}
+                  aria-expanded={expanded}
+                  aria-controls={groupId}
                 >
-                  {GroupIcon && (
-                    <span className={styles.itemIcon} aria-hidden="true">
-                      <GroupIcon />
-                    </span>
-                  )}
-                  <span className={styles.itemLabel}>{item.label}</span>
-                </NavLink>
-              ))}
+                  <span className={styles.groupLabel}>{group.label}</span>
+                  <DisclosureIcon className={[styles.groupChevron, expanded && styles.groupChevronOpen].filter(Boolean).join(' ')} />
+                </button>
+              )}
+
+              <div
+                id={groupId}
+                className={[styles.groupItems, expanded && styles.groupItemsOpen].filter(Boolean).join(' ')}
+              >
+                <div className={styles.groupItemsInner}>
+                  {group.items.map((item) => (
+                    <NavLink
+                      key={item.path}
+                      to={item.path}
+                      onClick={onNavigate}
+                      aria-label={item.label}
+                      className={({ isActive }) => [styles.item, isActive && styles.itemActive].filter(Boolean).join(' ')}
+                      onMouseEnter={(e) => showTooltip(e, item.label)}
+                      onMouseLeave={hideTooltip}
+                      onFocus={(e) => showTooltip(e, item.label)}
+                      onBlur={hideTooltip}
+                    >
+                      {GroupIcon && (
+                        <span className={styles.itemIcon} aria-hidden="true">
+                          <GroupIcon />
+                        </span>
+                      )}
+                      <span className={styles.itemLabel}>{item.label}</span>
+                    </NavLink>
+                  ))}
+                </div>
+              </div>
             </div>
           );
         })}

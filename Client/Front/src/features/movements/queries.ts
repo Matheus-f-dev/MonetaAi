@@ -31,7 +31,10 @@ export function useTransactionsQuery(userId: string | null) {
 // Toda mutação de transação invalida não só a própria lista, mas tudo que
 // o dashboard (Fase 2) calcula em cima dela -- sem isso, criar um gasto
 // aqui deixaria o dashboard mostrando saldo/gráfico desatualizados até
-// o staleTime de 30s expirar sozinho.
+// o staleTime de 30s expirar sozinho. 'people' entrou junto quando a
+// Rachadinha ganhou página própria -- achado testando ao vivo: criar uma
+// despesa dividida aqui não refletia em /pessoas até navegar pra outro
+// lugar e voltar (o staleTime escondia o problema até alguém reparar).
 function useInvalidateTransactionData() {
   const queryClient = useQueryClient();
   const userId = useCurrentUserId();
@@ -40,6 +43,7 @@ function useInvalidateTransactionData() {
     queryClient.invalidateQueries({ queryKey: ['balance', userId] });
     queryClient.invalidateQueries({ queryKey: ['chart-data', userId] });
     queryClient.invalidateQueries({ queryKey: ['projection', userId] });
+    queryClient.invalidateQueries({ queryKey: ['people', userId] });
   };
 }
 

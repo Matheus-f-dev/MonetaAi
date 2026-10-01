@@ -4,6 +4,7 @@ import { ValidationContext, AmountValidation } from '../../../core/services/Vali
 import { TransactionFactory } from '../../../core/services/TransactionFactory';
 import { CATEGORIES } from '../../../shared/categories';
 import type { TransactionPayload } from '../api';
+import { useSplitParticipants } from '../useSplitParticipants';
 import styles from './TransactionModal.module.css';
 
 export interface TransactionModalAccount {
@@ -59,11 +60,6 @@ const emptyForm = {
   accountId: ''
 };
 
-const EMPTY_PARTICIPANTS = [
-  { nome: '', valor: '' },
-  { nome: '', valor: '' }
-];
-
 const CATEGORY_OPTIONS = CATEGORIES.map((c) => ({ value: c, label: c }));
 
 /**
@@ -103,8 +99,18 @@ export function TransactionModal({
   const [formData, setFormData] = useState(emptyForm);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [splitEnabled, setSplitEnabled] = useState(false);
-  const [participants, setParticipants] = useState(EMPTY_PARTICIPANTS);
-  const [headcount, setHeadcount] = useState('2');
+  const {
+    participants,
+    headcount,
+    setHeadcount,
+    updateParticipant,
+    addParticipant,
+    removeParticipant,
+    transferTo,
+    generateEqualSplit: generateEqualSplitFor,
+    splitEqually: splitEquallyFor,
+    reset: resetParticipants
+  } = useSplitParticipants();
   const isEditing = Boolean(editingTransaction);
 
   useEffect(() => {
@@ -125,66 +131,25 @@ export function TransactionModal({
       const existing = editingTransaction.split?.participantes;
       if (existing?.length) {
         setSplitEnabled(true);
-        setParticipants(existing.map((p) => ({ nome: p.nome, valor: String(p.valor) })));
-        setHeadcount(String(existing.length));
+        resetParticipants(existing.map((p) => ({ nome: p.nome, valor: String(p.valor) })));
       } else {
         setSplitEnabled(false);
-        setParticipants(EMPTY_PARTICIPANTS);
-        setHeadcount('2');
+        resetParticipants();
       }
     } else {
       setFormData({ ...emptyForm, tipo: defaultTipo });
       setSplitEnabled(false);
-      setParticipants(EMPTY_PARTICIPANTS);
-      setHeadcount('2');
+      resetParticipants();
     }
     setValidationError(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, editingTransaction, defaultTipo]);
 
-  function updateParticipant(index: number, field: 'nome' | 'valor', value: string) {
-    setParticipants((prev) => prev.map((p, i) => (i === index ? { ...p, [field]: value } : p)));
-  }
-
-  function addParticipant() {
-    setParticipants((prev) => [...prev, { nome: '', valor: '' }]);
-  }
-
-  function removeParticipant(index: number) {
-    setParticipants((prev) => prev.filter((_, i) => i !== index));
-  }
-
-  // "Transferir pra outra pessoa" -- o caso especial que o usuário pediu:
-  // em vez de marcar como "não paga" ou excluir sem mais, a parte dessa
-  // pessoa some daqui e vira um acréscimo na parte de quem vai cobrir.
-  function transferTo(index: number, targetIndex: number) {
-    setParticipants((prev) => {
-      const amount = parseFloat(prev[index]?.valor) || 0;
-      const withTransfer = prev.map((p, i) => {
-        if (i !== targetIndex) return p;
-        const currentValue = parseFloat(p.valor) || 0;
-        return { ...p, valor: (currentValue + amount).toFixed(2) };
-      });
-      return withTransfer.filter((_, i) => i !== index);
-    });
-  }
-
-  // Rachadinha -- gera N linhas (preservando nome de quem já estava
-  // digitado, quando dá) com o valor total dividido igualmente. Mesma
-  // conta de "Dividir valor igualmente" (abaixo), só que decide também a
-  // QUANTIDADE de linhas, não só redivide as que já existem.
-  function generateEqualSplit() {
-    const n = Math.max(1, parseInt(headcount, 10) || 1);
-    const total = parseFloat(formData.valor) || 0;
-    const share = (total / n).toFixed(2);
-    setParticipants((prev) => Array.from({ length: n }, (_, i) => ({ nome: prev[i]?.nome || '', valor: share })));
-  }
-
-  function splitEqually() {
-    const total = parseFloat(formData.valor) || 0;
-    const n = participants.length || 1;
-    const share = (total / n).toFixed(2);
-    setParticipants((prev) => prev.map((p) => ({ ...p, valor: share })));
-  }
+  // Os dois precisam do valor total digitado no formulário -- o hook
+  // compartilhado não sabe dele (não tem campo "valor" nenhum, só a lista
+  // de participantes), então a conta entra aqui na hora de chamar.
+  const generateEqualSplit = () => generateEqualSplitFor(parseFloat(formData.valor) || 0);
+  const splitEqually = () => splitEquallyFor(parseFloat(formData.valor) || 0);
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();

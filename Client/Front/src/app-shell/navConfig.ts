@@ -40,7 +40,10 @@ export const NAV_GROUPS: NavGroup[] = [
   },
   {
     label: 'Pessoas',
-    items: [{ label: 'Pessoas', path: '/pessoas' }]
+    items: [
+      { label: 'Pessoas', path: '/pessoas' },
+      { label: 'Rachadinha', path: '/rachadinha' }
+    ]
   },
   {
     label: 'Insights',

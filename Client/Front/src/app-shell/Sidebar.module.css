@@ -84,7 +84,6 @@
 .group {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
 }
 
 .groupLabel {
@@ -93,9 +92,64 @@
   color: var(--color-ink-faint);
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  padding: 0 var(--space-2);
-  margin-bottom: var(--space-1);
   white-space: nowrap;
+}
+
+/* Cabeçalho do grupo virou dropdown (pedido do usuário -- a lista só
+   cresce a cada fase). Mesma pegada visual de .item (largura toda,
+   hover sutil), só que com o rótulo à esquerda e o chevron à direita em
+   vez de ícone+texto. Só existe no modo expandido -- no trilho colapsado
+   (Sidebar.tsx) o rótulo volta a ser um <span> simples, sem botão nem
+   chevron (não tem espaço nem sentido pra "fechar" um grupo que já
+   mostra só os ícones). */
+.groupToggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  color: var(--color-ink-faint);
+}
+
+.groupToggle:hover {
+  background: var(--color-bg-sunken);
+}
+
+.groupChevron {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  color: var(--color-ink-faint);
+  transition: transform var(--duration-fast) var(--ease-standard);
+}
+
+.groupChevronOpen {
+  transform: rotate(180deg);
+}
+
+/* grid-template-rows 0fr -> 1fr -- colapsa/expande com altura real de
+   conteúdo sem precisar medir nada em JS (truque de CSS puro: o
+   elemento com o conteúdo vira a única linha do grid, e a transição é
+   na fração da linha, não numa altura fixa que erraria pra listas de
+   tamanho diferente por grupo). */
+.groupItems {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--duration-base) var(--ease-standard);
+}
+
+.groupItemsOpen {
+  grid-template-rows: 1fr;
+}
+
+.groupItemsInner {
+  overflow: hidden;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-top: var(--space-1);
 }
 
 .item {

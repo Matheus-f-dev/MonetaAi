@@ -144,3 +144,15 @@ export function CollapseIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+// Disclosure (grupo da sidebar expandido/recolhido, Fase 0 -> dropdown) --
+// mesmo path do chevron do Select (design-system/components/Select.tsx),
+// pra usar o mesmo vocabulário visual de "isso abre/fecha" em todo o app:
+// aponta pra baixo parado, gira 180deg quando o grupo está aberto.
+export function DisclosureIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  );
+}
