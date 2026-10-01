@@ -20,6 +20,7 @@ const IncomesPage = lazy(() => import('./features/movements/IncomesPage'));
 const FixedExpensesPage = lazy(() => import('./features/movements/FixedExpensesPage'));
 const FixedIncomesPage = lazy(() => import('./features/movements/FixedIncomesPage'));
 const ImportStatementPage = lazy(() => import('./features/movements/ImportStatementPage'));
+const CalendarioPage = lazy(() => import('./features/calendar/CalendarioPage'));
 const ContasPage = lazy(() => import('./features/wealth/ContasPage'));
 const CartoesPage = lazy(() => import('./features/wealth/CartoesPage'));
 const OrcamentoPage = lazy(() => import('./features/wealth/OrcamentoPage'));
@@ -31,6 +32,7 @@ const AlertsPage = lazy(() => import('./features/alerts/AlertsPage'));
 const AnalyticsPage = lazy(() => import('./features/insights/AnalyticsPage'));
 const ReportsPage = lazy(() => import('./features/insights/ReportsPage'));
 const ImpactoFinanceiroPage = lazy(() => import('./features/insights/ImpactoFinanceiroPage'));
+const SaudeFinanceiraPage = lazy(() => import('./features/insights/SaudeFinanceiraPage'));
 const AgentPage = lazy(() => import('./features/agent/AgentPage'));
 const ProfilePage = lazy(() => import('./features/profile/ProfilePage'));
 
@@ -85,6 +87,7 @@ function App() {
               <Route path="/gastos-fixos" element={<FixedExpensesPage />} />
               <Route path="/receita-recorrente" element={<FixedIncomesPage />} />
               <Route path="/importar-extrato" element={<ImportStatementPage />} />
+              <Route path="/calendario" element={<CalendarioPage />} />
               <Route path="/contas" element={<ContasPage />} />
               <Route path="/cartoes" element={<CartoesPage />} />
               <Route path="/orcamento" element={<OrcamentoPage />} />
@@ -96,6 +99,7 @@ function App() {
               <Route path="/analytics" element={<AnalyticsPage />} />
               <Route path="/reports" element={<ReportsPage />} />
               <Route path="/impacto-financeiro" element={<ImpactoFinanceiroPage />} />
+              <Route path="/saude-financeira" element={<SaudeFinanceiraPage />} />
               <Route path="/agent" element={<AgentPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               {import.meta.env.DEV && <Route path="/design-system" element={<DesignSystemPage />} />}

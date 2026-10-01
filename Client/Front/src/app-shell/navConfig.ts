@@ -26,7 +26,8 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: 'Receitas', path: '/incomes' },
       { label: 'Gastos fixos', path: '/gastos-fixos' },
       { label: 'Receita recorrente', path: '/receita-recorrente' },
-      { label: 'Importar extrato', path: '/importar-extrato' }
+      { label: 'Importar extrato', path: '/importar-extrato' },
+      { label: 'Calendário', path: '/calendario' }
     ]
   },
   {
@@ -51,7 +52,8 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { label: 'Análises', path: '/analytics' },
       { label: 'Relatórios', path: '/reports' },
-      { label: 'Impacto financeiro', path: '/impacto-financeiro' }
+      { label: 'Impacto financeiro', path: '/impacto-financeiro' },
+      { label: 'Saúde financeira', path: '/saude-financeira' }
     ]
   },
   {

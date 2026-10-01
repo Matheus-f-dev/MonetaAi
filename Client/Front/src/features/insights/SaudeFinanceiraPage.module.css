@@ -1,0 +1,139 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: var(--text-xl);
+}
+
+.subtitle {
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+  margin-top: var(--space-1);
+}
+
+.scoreRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+}
+
+/* Anel de progresso só em CSS (conic-gradient) -- sem SVG, sem canvas:
+   a cor e o percentual entram via custom properties (--score-color/
+   --score-percent) setadas inline pelo componente, porque dependem do
+   score calculado em runtime. */
+.scoreRing {
+  --score-percent: 0%;
+  --score-color: var(--color-brand);
+  position: relative;
+  width: 112px;
+  height: 112px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: conic-gradient(var(--score-color) var(--score-percent), var(--color-bg-sunken) 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scoreRing::before {
+  content: '';
+  position: absolute;
+  inset: 10px;
+  border-radius: 50%;
+  background: var(--color-bg-raised);
+}
+
+.scoreNumber {
+  position: relative;
+  font-family: var(--font-mono);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-ink);
+}
+
+.scoreHint {
+  margin-top: var(--space-2);
+  color: var(--color-ink-muted);
+  font-size: var(--text-sm);
+  max-width: 42ch;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-4);
+}
+
+.breakdownHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: var(--space-2);
+}
+
+.breakdownLabel {
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+}
+
+.breakdownWeight {
+  font-size: var(--text-xs);
+  color: var(--color-ink-faint);
+}
+
+.track {
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-sunken);
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--color-brand);
+  transition: width var(--duration-slow) var(--ease-standard);
+}
+
+.breakdownDetail {
+  margin-top: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-ink-muted);
+}
+
+.sectionTitle {
+  font-size: var(--text-md);
+  margin-bottom: var(--space-3);
+}
+
+.tipsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-left: var(--space-5);
+}
+
+.tipItem {
+  font-size: var(--text-sm);
+  color: var(--color-ink-muted);
+  list-style: disc;
+}
+
+@media (max-width: 480px) {
+  .scoreRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
