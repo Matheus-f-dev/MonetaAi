@@ -45,13 +45,20 @@ export default function ProfilePage() {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // Bug real encontrado: com `!nome` na condição (e `nome` na lista de
+  // dependências), apagar o campo até ficar vazio disparava o efeito de
+  // novo e reescrevia por cima do que a pessoa tava digitando -- dava pra
+  // editar, nunca dava pra LIMPAR. Uma ref (não re-renderiza, não entra
+  // em dependência) garante que o prefill rode só uma vez, na primeira
+  // vez que os dados chegam, e nunca mais depois disso.
+  const hasPrefilledNomeRef = useRef(false);
 
-  // Prefill só quando o nome ainda não foi tocado nesta sessão da tela --
-  // sem a guarda, a resposta da mutation (que invalida e refaz a query)
-  // reescreveria `nome` por cima do que a pessoa acabou de digitar/salvar.
   useEffect(() => {
-    if (profileQuery.data && !nome) setNome(profileQuery.data.nome);
-  }, [profileQuery.data, nome]);
+    if (profileQuery.data && !hasPrefilledNomeRef.current) {
+      setNome(profileQuery.data.nome);
+      hasPrefilledNomeRef.current = true;
+    }
+  }, [profileQuery.data]);
 
   // Preview local é uma blob: URL -- precisa ser liberada explicitamente
   // (URL.revokeObjectURL) quando troca de arquivo ou desmonta, senão vaza
