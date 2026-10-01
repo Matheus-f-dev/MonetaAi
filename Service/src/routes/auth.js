@@ -44,11 +44,16 @@ router.get('/google/callback',
       // pro trade-off assumido (código em memória, não sobrevive a múltiplas
       // instâncias do Node).
       //
-      // Continua indo pro /auth/callback (rota pública, não exige sessão
+      // Continua indo pro /login/callback (rota pública, não exige sessão
       // ainda), não direto pro /system -- é o AuthCallback.jsx que sabe
-      // completar a troca antes de navegar pro dashboard.
+      // completar a troca antes de navegar pro dashboard. NÃO é
+      // /auth/callback -- em produção o nginx manda qualquer /auth/* pro
+      // backend (onde vivem /auth/google e /auth/google/callback de
+      // verdade), e essa rota é do FRONTEND; compartilhar o prefixo
+      // /auth/ fazia o nginx engolir a rota do frontend e devolver o 404
+      // do Express em vez de servir o SPA.
       const exchangeCode = OAuthExchangeService.issueCode({ token, user: userData });
-      res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth/callback?code=${exchangeCode}`);
+      res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/login/callback?code=${exchangeCode}`);
     } catch (error) {
       console.error('Erro no callback do Google:', error);
       res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/login?error=auth_failed`);

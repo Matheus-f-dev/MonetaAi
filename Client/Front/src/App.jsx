@@ -64,7 +64,13 @@ function App() {
           <Route path="/login" element={<LoginCard />} />
           <Route path="/cadastro" element={<Cadastro />} />
           <Route path="/esqueci-senha" element={<RedefinirSenha />} />
-          <Route path="/auth/callback" element={<AuthCallback />} />
+          {/* Bug real achado em produção: nginx manda tudo que começa com
+              /auth/ pro backend (é lá que vivem /auth/google e
+              /auth/google/callback de verdade) -- /auth/callback aqui no
+              frontend colidia com esse prefixo e caía no 404 do Express
+              em vez de chegar nesta rota. /login/callback não compartilha
+              prefixo com nenhuma rota do backend. */}
+          <Route path="/login/callback" element={<AuthCallback />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
 

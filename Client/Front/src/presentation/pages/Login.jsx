@@ -28,7 +28,7 @@ export default function LoginCard() {
     const error = searchParams.get('error');
     if (error) {
       // Bug real encontrado: esse efeito lia o erro da URL (ex.: vindo do
-      // redirect de /auth/callback quando a troca do código do Google
+      // redirect de /login/callback quando a troca do código do Google
       // falha) mas nunca fazia nada com ele -- a pessoa só via a tela de
       // login de novo, sem pista nenhuma do que deu errado.
       addToast(error, 'error');
