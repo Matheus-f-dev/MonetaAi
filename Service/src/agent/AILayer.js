@@ -2,28 +2,42 @@
  * AILayer — Camada de IA do agente Moneta AI.
  *
  * Responsabilidades:
- * - Enviar mensagem + prompt para a IA (Groq, OpenAI ou simulação local)
+ * - Enviar mensagem + prompt para a IA (xAI/Grok, Groq, OpenAI ou
+ *   simulação local)
  * - Garantir que a resposta seja JSON válido
  * - Isolar completamente a lógica de IA do restante do sistema
  *
- * Pra usar IA de verdade, defina UMA das duas no .env (nunca as duas --
- * se existirem as duas, Groq ganha, por ser a mais barata/rápida das
- * duas pra esse tipo de chamada curta):
- *   GROQ_API_KEY=gsk_...      (console.groq.com/keys)
+ * Pra usar IA de verdade, defina UMA das três no .env (nunca mais de
+ * uma -- se existir mais de uma, a ordem abaixo decide qual ganha):
+ *   XAI_API_KEY=xai-...       (console.x.ai -- Grok, da xAI/Elon Musk)
+ *   GROQ_API_KEY=gsk_...      (console.groq.com/keys -- Groq, hospeda
+ *                              Llama/Mixtral com inferência rápida --
+ *                              nome parecido com "Grok" mas é outra
+ *                              empresa, outro produto, cuidado ao copiar
+ *                              a chave certa pra variável certa)
  *   OPENAI_API_KEY=sk-...     (platform.openai.com/api-keys)
- * Sem nenhuma das duas, o sistema usa o interpretador local (regras por
+ * Sem nenhuma das três, o sistema usa o interpretador local (regras por
  * regex, sem chamada de rede nenhuma -- é o que já rodava antes de
- * qualquer uma das duas existir, continua funcionando igual).
+ * qualquer uma delas existir, continua funcionando igual).
  *
- * A API da Groq é compatível com o formato da OpenAI (mesmo corpo de
+ * As três APIs são compatíveis com o formato da OpenAI (mesmo corpo de
  * request/response, só a URL e o catálogo de modelos mudam) -- por isso
- * os dois provedores dividem a mesma função de chamada (_chamarIA),
- * variando só baseURL/model/apiKey.
+ * os três provedores dividem a mesma função de chamada (_chamarIA),
+ * variando só baseURL/model/apiKey. Se a chamada falhar por qualquer
+ * motivo (chave inválida, provedor fora do ar, limite de uso) o agente
+ * cai pro interpretador local em vez de devolver erro pro usuário --
+ * achado real: antes disso, uma chave errada travava a conversa inteira
+ * com "Ocorreu um erro interno", em vez de simplesmente responder com
+ * menos inteligência.
  */
 
 const { SYSTEM_PROMPT } = require('./agentPrompt');
 
 const PROVIDERS = {
+  xai: {
+    baseURL: 'https://api.x.ai/v1/chat/completions',
+    defaultModel: 'grok-4-fast'
+  },
   groq: {
     baseURL: 'https://api.groq.com/openai/v1/chat/completions',
     // Llama 3.3 70B -- bom equilíbrio custo/qualidade pra essa tarefa
@@ -39,17 +53,21 @@ const PROVIDERS = {
 
 class AILayer {
   constructor() {
-    // Groq primeiro: achado real -- documentado acima, não repetir aqui.
-    this.provider = process.env.GROQ_API_KEY ? 'groq' : process.env.OPENAI_API_KEY ? 'openai' : null;
-    this.apiKey = this.provider === 'groq' ? process.env.GROQ_API_KEY : process.env.OPENAI_API_KEY;
+    this.provider = process.env.XAI_API_KEY
+      ? 'xai'
+      : process.env.GROQ_API_KEY
+        ? 'groq'
+        : process.env.OPENAI_API_KEY
+          ? 'openai'
+          : null;
+    this.apiKey = this.provider ? process.env[`${this.provider.toUpperCase()}_API_KEY`] : null;
     this.useAI = Boolean(this.provider);
 
     if (this.useAI) {
       const config = PROVIDERS[this.provider];
       this.baseURL = config.baseURL;
-      // GROQ_MODEL/OPENAI_MODEL (conforme o provedor escolhido) continuam
-      // deixando trocar o modelo sem mexer em código -- mesmo nome de
-      // variável que já existia antes pra OPENAI_MODEL.
+      // XAI_MODEL/GROQ_MODEL/OPENAI_MODEL (conforme o provedor escolhido)
+      // deixam trocar o modelo sem mexer em código.
       this.model = process.env[`${this.provider.toUpperCase()}_MODEL`] || config.defaultModel;
     }
   }
@@ -62,12 +80,24 @@ class AILayer {
    */
   async interpretar(mensagem, historico = []) {
     if (this.useAI) {
-      return this._chamarIA(mensagem, historico);
+      try {
+        return await this._chamarIA(mensagem, historico);
+      } catch (error) {
+        // Loga o motivo de verdade (status HTTP, corpo do erro) pra dar
+        // pra diagnosticar (chave errada vs. provedor fora do ar vs.
+        // limite de uso) sem expor isso na resposta pro usuário -- ele só
+        // recebe a resposta do interpretador local, como se a IA nunca
+        // tivesse sido configurada.
+        console.error(
+          `[AILayer] Chamada pra ${this.provider} falhou (${error.response?.status || error.message}) -- caindo pro interpretador local.`
+        );
+        return this._interpretarLocal(mensagem);
+      }
     }
     return this._interpretarLocal(mensagem);
   }
 
-  // --- IA real (Groq ou OpenAI, mesmo formato de chamada) ---
+  // --- IA real (xAI, Groq ou OpenAI, mesmo formato de chamada) ---
   async _chamarIA(mensagem, historico) {
     const axios = require('axios');
 
