@@ -35,7 +35,8 @@ export const NAV_GROUPS: NavGroup[] = [
       { label: 'Contas', path: '/contas' },
       { label: 'Cartões', path: '/cartoes' },
       { label: 'Orçamento', path: '/orcamento' },
-      { label: 'Metas', path: '/metas' }
+      { label: 'Metas', path: '/metas' },
+      { label: 'Investimentos', path: '/investimentos' }
     ]
   },
   {

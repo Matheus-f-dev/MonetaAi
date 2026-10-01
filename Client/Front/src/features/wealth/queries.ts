@@ -5,16 +5,19 @@ import {
   createBudget,
   createCard,
   createGoal,
+  createInvestment,
   deleteAccount,
   deleteBudget,
   deleteCard,
   deleteGoal,
+  deleteInvestment,
   fetchAccountResumo,
   fetchAccounts,
   fetchBudgetStatus,
   fetchCardInvoice,
   fetchCards,
   fetchGoalProgress,
+  fetchInvestments,
   fetchReconciliationHistory,
   reconcileAccount,
   transferBetweenAccounts,
@@ -22,10 +25,12 @@ import {
   updateBudget,
   updateCard,
   updateGoal,
+  updateInvestment,
   type AccountInput,
   type BudgetInput,
   type CardInput,
   type GoalInput,
+  type InvestmentInput,
   type TransferInput
 } from './api';
 
@@ -258,6 +263,45 @@ export function useDeleteGoalMutation() {
   const invalidate = useInvalidateGoals();
   return useMutation({
     mutationFn: (id: string) => deleteGoal(id),
+    onSuccess: invalidate
+  });
+}
+
+// ── Investimentos ───────────────────────────────────────────────────
+export function useInvestmentsQuery(userId: string | null) {
+  return useQuery({
+    queryKey: ['investments', userId],
+    queryFn: () => fetchInvestments(userId as string),
+    enabled: Boolean(userId)
+  });
+}
+
+function useInvalidateInvestments() {
+  const queryClient = useQueryClient();
+  const userId = useCurrentUserId();
+  return () => queryClient.invalidateQueries({ queryKey: ['investments', userId] });
+}
+
+export function useCreateInvestmentMutation() {
+  const invalidate = useInvalidateInvestments();
+  return useMutation({
+    mutationFn: (input: InvestmentInput) => createInvestment(input),
+    onSuccess: invalidate
+  });
+}
+
+export function useUpdateInvestmentMutation() {
+  const invalidate = useInvalidateInvestments();
+  return useMutation({
+    mutationFn: ({ id, input }: { id: string; input: InvestmentInput }) => updateInvestment(id, input),
+    onSuccess: invalidate
+  });
+}
+
+export function useDeleteInvestmentMutation() {
+  const invalidate = useInvalidateInvestments();
+  return useMutation({
+    mutationFn: (id: string) => deleteInvestment(id),
     onSuccess: invalidate
   });
 }

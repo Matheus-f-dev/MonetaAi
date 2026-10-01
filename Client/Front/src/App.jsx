@@ -24,6 +24,7 @@ const ContasPage = lazy(() => import('./features/wealth/ContasPage'));
 const CartoesPage = lazy(() => import('./features/wealth/CartoesPage'));
 const OrcamentoPage = lazy(() => import('./features/wealth/OrcamentoPage'));
 const MetasPage = lazy(() => import('./features/wealth/MetasPage'));
+const InvestimentosPage = lazy(() => import('./features/wealth/InvestimentosPage'));
 const PessoasPage = lazy(() => import('./features/people/PessoasPage'));
 const RachadinhaPage = lazy(() => import('./features/people/RachadinhaPage'));
 const AlertsPage = lazy(() => import('./features/alerts/AlertsPage'));
@@ -88,6 +89,7 @@ function App() {
               <Route path="/cartoes" element={<CartoesPage />} />
               <Route path="/orcamento" element={<OrcamentoPage />} />
               <Route path="/metas" element={<MetasPage />} />
+              <Route path="/investimentos" element={<InvestimentosPage />} />
               <Route path="/pessoas" element={<PessoasPage />} />
               <Route path="/rachadinha" element={<RachadinhaPage />} />
               <Route path="/alerts" element={<AlertsPage />} />

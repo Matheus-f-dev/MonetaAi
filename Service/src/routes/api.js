@@ -16,6 +16,7 @@ const ReportExportController = require('../controllers/ReportExportController');
 const TransactionImportController = require('../controllers/TransactionImportController');
 const BudgetController = require('../controllers/BudgetController');
 const GoalController = require('../controllers/GoalController');
+const InvestmentController = require('../controllers/InvestmentController');
 const ReconciliationController = require('../controllers/ReconciliationController');
 const SplitController = require('../controllers/SplitController');
 const AccountController = require('../controllers/AccountController');
@@ -137,6 +138,14 @@ router.get('/goals/:userId', ensureOwnUser(), GoalController.getUserGoals);
 router.get('/goals/:userId/progress', ensureOwnUser(), GoalController.getProgress);
 router.put('/goals/:goalId', GoalController.update);
 router.delete('/goals/:goalId', GoalController.delete);
+
+// Investimentos -- CRUD simples, mesma forma de goals (sem cálculo nenhum
+// do lado do servidor; a projeção é juros compostos puro, calculado no
+// frontend a partir dos campos salvos aqui).
+router.post('/investments', InvestmentController.create);
+router.get('/investments/:userId', ensureOwnUser(), InvestmentController.getUserInvestments);
+router.put('/investments/:investmentId', InvestmentController.update);
+router.delete('/investments/:investmentId', InvestmentController.delete);
 
 // Rota de exportação de relatórios (CSV/PDF)
 router.get('/relatorios/:userId/export', ensureOwnUser(), ReportExportController.export);

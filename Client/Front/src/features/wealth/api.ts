@@ -245,3 +245,53 @@ export async function deleteGoal(id: string) {
   const api = new ApiConnection();
   return assertSuccess(await api.delete(`/api/goals/${id}`));
 }
+
+// ── Investimentos ───────────────────────────────────────────────────
+export type TipoAporte = 'unico' | 'mensal';
+
+export interface Investment {
+  id: string;
+  userId: string;
+  nome: string;
+  categoria: string;
+  tipoAporte: TipoAporte;
+  valorInicial: number;
+  aporteMensal: number;
+  /** % ao ano (ex.: 8.5 = 8,5% ao ano) -- a projeção converte pra taxa
+   * mensal equivalente na hora de desenhar o gráfico (ver
+   * InvestimentosPage -> projetar()). */
+  taxaRetornoAnual: number;
+  dataInicio: string;
+  ativo: boolean;
+}
+
+export interface InvestmentInput {
+  nome: string;
+  categoria: string;
+  tipoAporte: TipoAporte;
+  valorInicial: number;
+  aporteMensal: number;
+  taxaRetornoAnual: number;
+  dataInicio: string;
+}
+
+export async function fetchInvestments(userId: string): Promise<Investment[]> {
+  const api = new ApiConnection();
+  const data = assertSuccess(await api.get(`/api/investments/${userId}`));
+  return data.investments ?? [];
+}
+
+export async function createInvestment(input: InvestmentInput) {
+  const api = new ApiConnection();
+  return assertSuccess(await api.post('/api/investments', input));
+}
+
+export async function updateInvestment(id: string, input: InvestmentInput) {
+  const api = new ApiConnection();
+  return assertSuccess(await api.put(`/api/investments/${id}`, input));
+}
+
+export async function deleteInvestment(id: string) {
+  const api = new ApiConnection();
+  return assertSuccess(await api.delete(`/api/investments/${id}`));
+}
