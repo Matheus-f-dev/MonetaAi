@@ -7,7 +7,20 @@ const router = express.Router();
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 router.get('/google/callback',
-  passport.authenticate('google', { failureRedirect: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/login` }),
+  // Callback customizado (não o atalho `{failureRedirect}`) só pra logar o
+  // motivo real de uma falha -- com o atalho, passport engole qualquer erro
+  // (secret errado, consent screen mal configurada, etc.) e redireciona em
+  // silêncio, sem rastro nenhum no servidor pra debugar.
+  (req, res, next) => {
+    passport.authenticate('google', (err, user) => {
+      if (err || !user) {
+        console.error('[auth/google/callback] Falha na troca com o Google:', err?.message || err || 'sem usuário retornado');
+        return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/login?error=google_auth_failed`);
+      }
+      req.user = user;
+      next();
+    })(req, res, next);
+  },
   async (req, res) => {
     try {
       req.session.userId = req.user.id;

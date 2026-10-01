@@ -293,6 +293,11 @@ class AuthController {
 
     const payload = OAuthExchangeService.consumeCode(code);
     if (!payload) {
+      // Logado -- esse endpoint falhando em silêncio (sem nada no servidor
+      // nem no cliente) foi exatamente o que escondeu o bug de verdade
+      // (Login.jsx ignorando o ?error= da URL) durante o debug do login
+      // com Google.
+      console.error('[auth/exchange] Código ausente, já usado ou expirado.');
       return res.status(400).json({ success: false, message: 'Código de login inválido ou expirado.' });
     }
 
