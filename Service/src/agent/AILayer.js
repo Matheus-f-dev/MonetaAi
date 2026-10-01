@@ -20,6 +20,15 @@
  * regex, sem chamada de rede nenhuma -- é o que já rodava antes de
  * qualquer uma delas existir, continua funcionando igual).
  *
+ * AI_AGENT_DISABLED=true força o interpretador local mesmo com uma
+ * chave presente no .env -- pensado pro caso de já ter a chave (ex.:
+ * conta criada, aguardando crédito/plano ativar do lado do provedor)
+ * mas não querer que o sistema tente chamar a API nesse meio-tempo
+ * (cada tentativa falhada é uma chamada de rede + o log de erro em
+ * _chamarIA a mais, sem necessidade). Tirar essa variável (ou pôr
+ * `false`) volta a tentar a chave normalmente, sem precisar mexer em
+ * mais nada.
+ *
  * As três APIs são compatíveis com o formato da OpenAI (mesmo corpo de
  * request/response, só a URL e o catálogo de modelos mudam) -- por isso
  * os três provedores dividem a mesma função de chamada (_chamarIA),
@@ -61,7 +70,7 @@ class AILayer {
           ? 'openai'
           : null;
     this.apiKey = this.provider ? process.env[`${this.provider.toUpperCase()}_API_KEY`] : null;
-    this.useAI = Boolean(this.provider);
+    this.useAI = Boolean(this.provider) && process.env.AI_AGENT_DISABLED !== 'true';
 
     if (this.useAI) {
       const config = PROVIDERS[this.provider];
