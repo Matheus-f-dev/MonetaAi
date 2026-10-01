@@ -1,6 +1,6 @@
 import { useEffect, useState, type FocusEvent, type MouseEvent, type ReactElement } from 'react';
 import { createPortal } from 'react-dom';
-import { NavLink, useLocation } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { NAV_GROUPS } from './navConfig';
 import {
   AutomationIcon,
@@ -98,10 +98,10 @@ export function Sidebar({ onLogout, onNavigate, collapsed = false, onToggleColla
   return (
     <nav className={[styles.sidebar, collapsed && styles.sidebarCollapsed].filter(Boolean).join(' ')} aria-label="Navegação principal">
       <div className={styles.brandRow}>
-        <div className={styles.brand}>
+        <Link to="/system" className={styles.brand} onClick={onNavigate} aria-label="Ir para o painel">
           <span className={styles.brandMark} aria-hidden="true">M</span>
           <span className={styles.brandText}>Moneta</span>
-        </div>
+        </Link>
         {onToggleCollapse && (
           <button
             type="button"
