@@ -8,7 +8,12 @@ const AuditLogService = require('./AuditLogService');
 const CryptoService = require('./CryptoService');
 
 const SALT_ROUNDS = 10;
-const TOKEN_EXPIRY = '24h';
+// Sessão longa + renovação deslizante (ver refreshSession abaixo e o
+// useSessionRefresh no frontend): quem abre o sistema de vez em quando não
+// precisa digitar a senha toda vez. A segurança não depende mais do prazo
+// curto -- trocar a senha ou excluir a conta incrementa token_version e
+// invalida na hora qualquer token emitido antes (middleware/auth.js).
+const TOKEN_EXPIRY = '30d';
 const TOTP_TEMP_TOKEN_EXPIRY = '5m';
 
 function requireJwtSecret() {
@@ -181,6 +186,16 @@ class AuthService {
     }
 
     await User.update(userId, { totp_ativo: false, totp_secret: null });
+  }
+
+  // Troca um token ainda válido por um novo, com o prazo cheio de novo
+  // (sessão deslizante). authenticateToken já conferiu assinatura,
+  // expiração e token_version antes de chegar aqui -- só emite de novo se
+  // o usuário ainda existe.
+  static async refreshSession(uid) {
+    const user = await User.findById(uid);
+    if (!user) return null;
+    return issueToken(user);
   }
 
   static async getUserById(uid) {

@@ -4,6 +4,7 @@ import { QuickAddTransaction } from './QuickAddTransaction';
 import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
 import { useAppTheme } from './useAppTheme';
+import { useSessionRefresh } from './useSessionRefresh';
 import styles from './AppShell.module.css';
 
 /**
@@ -32,6 +33,7 @@ export function AppShell() {
   // em localStorage, é preferência por dispositivo, não por conta).
   const [collapsed, setCollapsed] = useState(readCollapsed);
   const { preference, toggle } = useAppTheme();
+  useSessionRefresh();
 
   function toggleCollapsed() {
     setCollapsed((prev) => {

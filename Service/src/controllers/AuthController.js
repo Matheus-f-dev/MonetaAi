@@ -176,6 +176,21 @@ class AuthController {
     }
   }
 
+  // POST /api/auth/refresh -- renovação deslizante da sessão. Já passou
+  // por authenticateToken (assinatura, expiração, token_version), então
+  // aqui só emite um token novo com o prazo cheio.
+  static async refreshSession(req, res) {
+    try {
+      const token = await AuthService.refreshSession(req.user.uid);
+      if (!token) {
+        return res.status(404).json({ success: false, message: 'Usuário não encontrado.' });
+      }
+      res.json({ success: true, token });
+    } catch (err) {
+      res.status(500).json({ success: false, message: 'Erro interno do servidor.' });
+    }
+  }
+
   // Edição de perfil (nome e/ou foto) -- multipart/form-data, campo opcional
   // "avatar" + campo opcional "nome". req.params.userId já foi conferido
   // contra req.user.uid pelo ensureOwnUser antes de chegar aqui.

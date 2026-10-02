@@ -52,6 +52,10 @@ router.get('/test', (req, res) => res.json({ message: 'API funcionando' }));
 router.use(apiLimiter);
 router.use(authenticateToken);
 
+// Renovação deslizante da sessão -- atrás do authenticateToken (precisa de
+// um token ainda válido pra trocar por um novo).
+router.post('/auth/refresh', AuthController.refreshSession);
+
 router.get('/user/:userId', ensureOwnUser(), AuthController.getUserById);
 router.put('/user/:userId', ensureOwnUser(), AuthController.updateProfile);
 router.delete('/user/:userId', ensureOwnUser(), AuthController.deleteAccount);
