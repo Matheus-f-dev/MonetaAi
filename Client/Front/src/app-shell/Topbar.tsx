@@ -1,9 +1,11 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MenuIcon, MoonIcon, SunIcon } from './icons';
 import { NotificationsBell } from './NotificationsBell';
 import type { ThemePreference } from './useAppTheme';
+import { useCurrentUserId, useUserProfileQuery } from '../features/dashboard/queries';
 import { resolveAvatarUrl } from '../shared/avatarUrl';
-import { useStoredUser } from '../shared/useStoredUser';
+import { updateStoredUser, useStoredUser } from '../shared/useStoredUser';
 import styles from './Topbar.module.css';
 
 export interface TopbarProps {
@@ -22,6 +24,23 @@ export function Topbar({ onOpenMenu, themePreference, onToggleTheme }: TopbarPro
   // (ver shared/useStoredUser.ts: ouve o CustomEvent que o Perfil dispara
   // depois de salvar).
   const storedUser = useStoredUser();
+
+  // O localStorage['user'] é um retrato do momento do login -- se ele nasceu
+  // incompleto (o login com Google não mandava avatarUrl) ou ficou velho
+  // (nome/foto editados em outro dispositivo), a foto salva no servidor
+  // nunca aparecia aqui. O servidor é a fonte de verdade: quando o perfil
+  // chega, alinha o que estiver diferente. Só escreve se mudou, pra não
+  // disparar o evento de atualização em loop.
+  const profileQuery = useUserProfileQuery(useCurrentUserId());
+  const serverNome = profileQuery.data?.nome;
+  const serverAvatar = profileQuery.data?.avatarUrl ?? null;
+  useEffect(() => {
+    if (serverNome === undefined) return;
+    if (storedUser.nome !== serverNome || (storedUser.avatarUrl ?? null) !== serverAvatar) {
+      updateStoredUser({ nome: serverNome, avatarUrl: serverAvatar });
+    }
+  }, [serverNome, serverAvatar, storedUser.nome, storedUser.avatarUrl]);
+
   const userName = storedUser.nome || storedUser.displayName || 'Usuário';
   const avatarSrc = resolveAvatarUrl(storedUser.avatarUrl);
 

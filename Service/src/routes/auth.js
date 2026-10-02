@@ -31,10 +31,15 @@ router.get('/google/callback',
       // previsível em produção.
       const token = AuthService.issueTokenForUser(req.user);
 
+      // Mesmo formato do login por e-mail/senha (User.toJSON) -- este
+      // objeto era montado na mão só com uid/email/nome e esquecia o
+      // avatarUrl, então quem entrava pelo Google nunca via a própria foto
+      // no topo (ela estava salva, só não chegava no navegador).
       const userData = {
         uid: String(req.user.id),
         email: req.user.email,
-        nome: req.user.nome
+        nome: req.user.nome,
+        avatarUrl: req.user.avatarUrl || null
       };
 
       // Achado #12: token de sessão não vai mais na URL (fica em log de
