@@ -83,11 +83,11 @@ function applyFont(font: string) {
   root.setProperty('--font-body', `'${font}', 'Hanken Grotesk', 'Segoe UI', sans-serif`, 'important');
 }
 
-// `data-font-scale` no <html> -- tokens.css redeclara --text-* só dentro
-// de `.ds-scope` sob esse atributo (ver o bloco lá), nunca em :root: uma
-// escala de texto vazando pra landing/auth (que têm a própria escala,
-// --t-*/--auth-font-*, sem relação com esta) seria uma regressão fora do
-// escopo deste redesign.
+// `data-font-scale` no <html> -- tokens.css redeclara --text-* sob esse
+// atributo (ver o bloco lá). Em :root, não em `.ds-scope`, de propósito:
+// Modal e o tooltip da sidebar renderizam via portal no <body>, fora do
+// `.ds-scope`. Não vaza pra landing/auth -- elas têm a própria escala
+// (--t-*/--auth-font-*) e nenhum arquivo delas lê --text-*.
 function applyFontSize(size: FontSize) {
   if (size === 'medium') {
     document.documentElement.removeAttribute('data-font-scale');

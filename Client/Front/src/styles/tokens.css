@@ -200,28 +200,39 @@
 
 /* ---------- Tamanho da fonte (Perfil > Tipografia) ----------
    Redeclara só --text-* (nunca --space-*, senão o layout inteiro
-   "respira" só porque o texto cresceu) e só dentro de `.ds-scope` -- o
-   `data-font-scale` fica no <html> (useFontPreference.ts), mas a
-   redeclaração em si tem que estar embaixo de `.ds-scope` pra não vazar
-   pra landing/auth, que têm a própria escala de tipografia (--t-*/
-   --auth-font-*) sem relação nenhuma com esta. Sem bloco "medium": os
-   valores base do :root acima já são o médio/padrão. */
-:root[data-font-scale='small'] .ds-scope {
-  --text-xs: 0.6875rem;
-  --text-sm: 0.8125rem;
-  --text-base: 0.9375rem;
-  --text-md: 1.0625rem;
-  --text-lg: 1.25rem;
-  --text-xl: 1.625rem;
-  --text-2xl: 2.0625rem;
+   "respira" só porque o texto cresceu). Pequeno = 0.875x e Grande = 1.2x
+   do padrão -- antes era ±1px (16px -> 17px no corpo), diferença que
+   ninguém percebia, e a pessoa concluía que a opção "não funcionava".
+
+   Fica em `:root`, não em `.ds-scope`: Modal e o tooltip da sidebar
+   renderizam via portal no <body>, FORA do `.ds-scope`, então uma
+   redeclaração presa nele deixava todo modal no tamanho padrão. Não
+   vaza pra landing/auth -- elas têm a própria escala de tipografia
+   (variáveis --t-NOME e --auth-font-NOME) e nenhum arquivo delas lê
+   --text-NOME. Sem bloco "medium": os valores base do :root acima já
+   são o padrão.
+
+   ATENÇÃO ao editar este comentário: nunca escrever asterisco seguido
+   de barra dentro dele (nem em exemplo de wildcard) -- isso FECHA o
+   comentário no meio, o resto vira lixo que invalida o seletor da regra
+   "small" logo abaixo, e o navegador descarta a regra em silêncio. Foi
+   exatamente isso que fazia o tamanho Pequeno não funcionar. */
+:root[data-font-scale='small'] {
+  --text-xs: 0.65625rem;
+  --text-sm: 0.765625rem;
+  --text-base: 0.875rem;
+  --text-md: 0.984375rem;
+  --text-lg: 1.203125rem;
+  --text-xl: 1.53125rem;
+  --text-2xl: 1.96875rem;
 }
 
-:root[data-font-scale='large'] .ds-scope {
-  --text-xs: 0.8125rem;
-  --text-sm: 0.9375rem;
-  --text-base: 1.0625rem;
-  --text-md: 1.1875rem;
-  --text-lg: 1.4375rem;
-  --text-xl: 1.875rem;
-  --text-2xl: 2.4375rem;
+:root[data-font-scale='large'] {
+  --text-xs: 0.9rem;
+  --text-sm: 1.05rem;
+  --text-base: 1.2rem;
+  --text-md: 1.35rem;
+  --text-lg: 1.65rem;
+  --text-xl: 2.1rem;
+  --text-2xl: 2.7rem;
 }
