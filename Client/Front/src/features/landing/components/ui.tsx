@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode, SVGProps } from 'react';
 import { Link } from 'react-router-dom';
+import { DEMO_TAG } from '../data/content';
 import s from '../Landing.module.css';
 
 export const ROUTES = {
@@ -141,6 +142,21 @@ export function Meter({ value, tone = 'mint', className }: { value: number; tone
           transition: 'width 1.2s cubic-bezier(0.16, 1, 0.3, 1)',
         }}
       />
+    </span>
+  );
+}
+
+/**
+ * Selo de demonstração: todo módulo com dados fictícios usa este, sempre com
+ * a mesma cara (borda tracejada), para nunca se confundir com o produto real.
+ */
+export function DemoTag({ text = DEMO_TAG, className }: { text?: string; className?: string }) {
+  return (
+    <span className={`${s.demoTag} ${className ?? ''}`}>
+      <svg width={12} height={12} viewBox="0 0 12 12" fill="none" aria-hidden="true">
+        <path d="M4.5 1.5h3M5 1.5v3L2 9.5a1 1 0 0 0 .9 1.5h6.2a1 1 0 0 0 .9-1.5L7 4.5v-3" stroke="currentColor" strokeWidth="1.1" strokeLinejoin="round" />
+      </svg>
+      {text}
     </span>
   );
 }

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
-import { Meter } from '../components/ui';
+import { DemoTag, Meter } from '../components/ui';
 import { Glyph } from '../components/glyphs';
 import { GOALS } from '../data/content';
 import { BUDGETS, GOAL } from '../data/demo';
@@ -97,6 +97,7 @@ export function Goals() {
           </header>
 
           <div className={g.counter} aria-hidden="true">
+            <DemoTag className={g.tag} />
             <span className={g.counterLabel}>Meta · {GOAL.name}</span>
             <span ref={counterRef} className={`${g.counterValue} ${s.num}`}>
               {brl0(reduced ? GOAL.saved : 0)}

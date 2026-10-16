@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import { SectionHead } from '../components/ui';
+import { DemoTag, SectionHead } from '../components/ui';
 import { Glyph } from '../components/glyphs';
 import { CONTROL } from '../data/content';
 import { BUDGETS, CALENDAR, RECURRING, SPLIT, UPCOMING } from '../data/demo';
@@ -38,9 +38,10 @@ export function Control() {
           </p>
         </div>
 
+        <DemoTag className={c.tag} />
         <div className={c.bento}>
           {/* Alerta */}
-          <article className={`${c.card} ${c.alert}`} data-reveal>
+          <article data-glow className={`${c.card} ${c.alert}`} data-reveal>
             <div className={c.cardHead}>
               <Glyph name="bell" width={18} height={18} />
               <h3>Alertas por categoria</h3>
@@ -68,7 +69,7 @@ export function Control() {
           </article>
 
           {/* Calendário */}
-          <article className={`${c.card} ${c.calendar}`} data-reveal style={{ '--d': '100ms' } as CSSProperties}>
+          <article data-glow className={`${c.card} ${c.calendar}`} data-reveal style={{ '--d': '100ms' } as CSSProperties}>
             <div className={c.cardHead}>
               <Glyph name="calendar" width={18} height={18} />
               <h3>Calendário de contas</h3>
@@ -116,7 +117,7 @@ export function Control() {
           </article>
 
           {/* Recorrentes */}
-          <article className={`${c.card} ${c.recurring}`} data-reveal style={{ '--d': '80ms' } as CSSProperties}>
+          <article data-glow className={`${c.card} ${c.recurring}`} data-reveal style={{ '--d': '80ms' } as CSSProperties}>
             <div className={c.cardHead}>
               <Glyph name="repeat" width={18} height={18} />
               <h3>Gastos e receitas fixos</h3>
@@ -138,7 +139,7 @@ export function Control() {
           </article>
 
           {/* Rachadinha */}
-          <article className={`${c.card} ${c.split}`} data-reveal style={{ '--d': '160ms' } as CSSProperties}>
+          <article data-glow className={`${c.card} ${c.split}`} data-reveal style={{ '--d': '160ms' } as CSSProperties}>
             <div className={c.cardHead}>
               <Glyph name="people" width={18} height={18} />
               <h3>Rachadinha</h3>
@@ -162,7 +163,7 @@ export function Control() {
           </article>
 
           {/* Relatórios e importação */}
-          <article className={`${c.card} ${c.files}`} data-reveal style={{ '--d': '240ms' } as CSSProperties}>
+          <article data-glow className={`${c.card} ${c.files}`} data-reveal style={{ '--d': '240ms' } as CSSProperties}>
             <div className={c.cardHead}>
               <Glyph name="chart" width={18} height={18} />
               <h3>Relatórios e extratos</h3>

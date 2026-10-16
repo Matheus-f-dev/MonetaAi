@@ -136,7 +136,8 @@ export const IMPACT = {
   monthsToSave: 3,
 } as const;
 
-export const HEALTH = { score: 78, band: 'Em dia' } as const; // 60-79 = "Em dia"
+// Saúde financeira: não é número fixo -- sai da função do app
+// (features/insights/financialHealth.ts) via data/sandbox.ts.
 
 // Rachadinha: 128 / 4 = 32 por pessoa; 3 amigos devem, 2 já pagaram.
 export const SPLIT = {

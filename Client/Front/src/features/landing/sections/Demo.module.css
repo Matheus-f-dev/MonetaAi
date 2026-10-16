@@ -1,0 +1,22 @@
+.demo {
+  padding: calc(var(--section-y) * 0.6) 0 var(--section-y);
+}
+
+/* Uma faixa de superfície um pouco mais clara marca a área "mexível" da
+   página, sem borda dura: some nas pontas. */
+.demo::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.018) 22%, rgba(255, 255, 255, 0.018) 78%, transparent);
+  pointer-events: none;
+}
+
+.head {
+  max-width: 720px;
+}
+
+.body {
+  margin-top: clamp(40px, 5vw, 64px);
+}

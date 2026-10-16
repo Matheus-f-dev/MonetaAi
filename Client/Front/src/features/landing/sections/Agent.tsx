@@ -1,4 +1,4 @@
-import { AgentDemo } from '../components/AgentDemo';
+import { AgentPipeline } from '../components/AgentPipeline';
 import { SectionHead } from '../components/ui';
 import { AGENT } from '../data/content';
 import s from '../Landing.module.css';
@@ -18,9 +18,8 @@ export function Agent() {
           className={g.head}
         />
         <div className={g.demo} data-reveal="scale">
-          <AgentDemo />
+          <AgentPipeline />
         </div>
-        <p className={g.footnote}>{AGENT.footnote}</p>
       </div>
     </section>
   );

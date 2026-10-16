@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, type CSSProperties } from 'react';
 import { AreaChart, Ring } from './charts';
 import { Glyph } from './glyphs';
 import { BrandMark, Meter } from './ui';
@@ -59,7 +59,7 @@ export function DashboardMock({ className }: { className?: string }) {
           </div>
         </div>
 
-        <div className={d.kpis} data-callout="saldo">
+        <div className={d.kpis} data-callout="saldo" data-reveal style={{ '--d': '150ms' } as CSSProperties}>
           <div className={`${d.card} ${d.kpiMain}`}>
             <span className={d.cardLabel}>Saldo disponível</span>
             <strong className={d.kpiValue}>{brl(BALANCE_BEFORE)}</strong>
@@ -82,7 +82,7 @@ export function DashboardMock({ className }: { className?: string }) {
           </div>
         </div>
 
-        <div className={d.row2}>
+        <div className={d.row2} data-reveal style={{ '--d': '300ms' } as CSSProperties}>
           <div className={`${d.card} ${d.evolution}`} data-callout="evolucao">
             <div className={d.cardHead}>
               <span className={d.cardTitle}>Evolução do saldo</span>
@@ -119,7 +119,7 @@ export function DashboardMock({ className }: { className?: string }) {
           </div>
         </div>
 
-        <div className={d.row3}>
+        <div className={d.row3} data-reveal style={{ '--d': '450ms' } as CSSProperties}>
           <div className={d.card} data-callout="contas">
             <div className={d.cardHead}>
               <span className={d.cardTitle}>Próximas contas</span>
@@ -173,7 +173,7 @@ export function DashboardMock({ className }: { className?: string }) {
           </div>
         </div>
 
-        <div className={`${d.card} ${d.recent}`}>
+        <div className={`${d.card} ${d.recent}`} data-reveal style={{ '--d': '600ms' } as CSSProperties}>
           <div className={d.cardHead}>
             <span className={d.cardTitle}>Movimentações recentes</span>
           </div>

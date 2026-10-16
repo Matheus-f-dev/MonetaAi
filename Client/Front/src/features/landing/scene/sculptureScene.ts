@@ -1,23 +1,29 @@
 // ============================================================================
-// A escultura da Moneta: um anel de "resina escura" com seção elíptica que
-// torce ao longo do percurso, linhas de fluxo que correm pela superfície e
-// partículas que saem dispersas e se organizam em órbita. É a ideia do
-// produto em forma: dinheiro solto virando um sistema. Os dois aros finos ao
-// redor repetem os anéis concêntricos do logo.
+// A peça da Moneta: um anel de "resina escura" com seção elíptica que torce ao
+// longo do percurso, linhas de fluxo correndo pela superfície e partículas em
+// órbita. É a ideia do produto em forma -- dinheiro solto virando um sistema --
+// e é UMA peça só para a página inteira: vive num canvas fixo atrás do
+// conteúdo e "atraca" no ponto focal de cada capítulo (ver OrbitStage.tsx).
 //
-// Imperativo de propósito (three puro, sem React Three Fiber): é uma cena
-// só, com três objetos, e assim o chunk fica menor e o ciclo de vida
-// (pausar fora da tela, descartar no unmount) fica explícito.
+// Quem dirige a peça entrega uma Pose em coordenadas de tela (px); a cena
+// amortece o caminho até ela, então a troca de capítulo vira um voo, e dentro
+// do capítulo a peça acompanha o conteúdo rolando.
 //
-// Este módulo é carregado sob demanda por BrandSculpture.tsx, depois do
-// primeiro paint -- three nunca entra no bundle inicial.
+//   dissolve  0..1  o anel se desfaz em fragmentos com borda luminosa
+//   scatter   0..1  as partículas saem da órbita e se espalham
+//   energy    0..1  os sinais correm mais rápido e mais claros ("processando")
+//   opacity   0..1  presença na tela; em 0 o laço de render para de vez
+//
+// Imperativo de propósito (three puro, sem React Three Fiber): é uma cena com
+// três objetos, e assim o chunk fica menor e o ciclo de vida (pausar, descartar)
+// fica explícito. Carregado sob demanda -- three nunca entra no bundle inicial.
 // ============================================================================
 
 import {
   AdditiveBlending,
-  DoubleSide,
   BufferAttribute,
   BufferGeometry,
+  DoubleSide,
   Group,
   LineLoop,
   Mesh,
@@ -30,24 +36,37 @@ import {
   WebGLRenderer,
 } from 'three';
 
-export type SculptureVariant = 'hero' | 'closing';
 export type SculptureQuality = 'high' | 'low';
 
+export interface Pose {
+  /** Centro da peça, em px da viewport. */
+  x: number;
+  y: number;
+  /** Raio externo do anel, em px. */
+  radius: number;
+  rx: number;
+  ry: number;
+  rz: number;
+  dissolve: number;
+  scatter: number;
+  energy: number;
+  opacity: number;
+}
+
 export interface SculptureHandle {
-  /** Ponteiro normalizado, -1..1 em cada eixo, relativo ao centro do palco. */
+  /** Novo alvo. `flight` = troca de capítulo (caminho mais lento e curvo). */
+  setTarget(pose: Pose, opts?: { flight?: boolean; snap?: boolean }): void;
+  /** Ponteiro normalizado, -1..1. */
   setPointer(x: number, y: number): void;
-  /** Quanto o palco já saiu da tela por rolagem, 0..1. */
-  setScroll(p: number): void;
-  /** Liga/desliga o laço de render (fora da tela ou aba oculta = desligado). */
+  /** Liga/desliga o laço (aba oculta = desligado). */
   setActive(on: boolean): void;
   dispose(): void;
 }
 
 interface Options {
   canvas: HTMLCanvasElement;
-  variant: SculptureVariant;
   quality: SculptureQuality;
-  /** Sem animação contínua: desenha um quadro final e para. */
+  /** Movimento reduzido: sem animação contínua, sem voo; desenha sob demanda. */
   still: boolean;
   onFirstFrame: () => void;
   onContextLost: () => void;
@@ -57,6 +76,11 @@ interface Options {
 // conversão de cor do three, então o hex vai direto pro shader.
 const MINT = new Vector3(0x74 / 255, 0xe8 / 255, 0xae / 255);
 const GLOW = new Vector3(0xb8 / 255, 0xff / 255, 0xd5 / 255);
+
+/** Raio externo do anel em unidades de mundo (centro 1,34 + tubo ~0,46). */
+const RING_OUTER = 1.8;
+const FOV = 30;
+const CAM_Z = 7.2;
 
 // Percurso do anel, compartilhado pelo anel e pelas partículas. Um laço
 // levemente selado (sela em z) para não ser um toro plano de catálogo.
@@ -120,8 +144,10 @@ const ringVertex = /* glsl */ `
 `;
 
 const ringFragment = /* glsl */ `
-  uniform float uTime;
+  uniform float uFlow;
   uniform float uReveal;
+  uniform float uDissolve;
+  uniform float uEnergy;
   uniform vec3 uMint;
   uniform vec3 uGlow;
   varying vec3 vNormal;
@@ -129,8 +155,37 @@ const ringFragment = /* glsl */ `
   varying vec2 vUv;
 
   float hash(float n) { return fract(sin(n * 127.1) * 43758.5453); }
+  float hash2(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+
+  // Ruído de valor periódico em x (fecha a volta do anel sem costura).
+  float vnoise(vec2 p, float period) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    vec2 w = f * f * (3.0 - 2.0 * f);
+    float x0 = mod(i.x, period);
+    float x1 = mod(i.x + 1.0, period);
+    float a = hash2(vec2(x0, i.y));
+    float b = hash2(vec2(x1, i.y));
+    float c = hash2(vec2(x0, i.y + 1.0));
+    float d = hash2(vec2(x1, i.y + 1.0));
+    return mix(mix(a, b, w.x), mix(c, d, w.x), w.y);
+  }
 
   void main() {
+    // Dissolução em blocos: a superfície é uma grade de placas (como
+    // lançamentos), e cada placa cai quando o limiar passa por ela. O limiar
+    // mistura acaso por placa com um ruído largo, para a peça se desfazer
+    // em regiões e não como estática.
+    vec2 grid = vec2(96.0, 12.0);
+    vec2 cell = floor(vUv * grid);
+    cell.x = mod(cell.x, grid.x);
+    float t = hash2(cell) * 0.55 + vnoise(vUv * vec2(10.0, 2.0), 10.0) * 0.45;
+    if (t < uDissolve) discard;
+    vec2 f = fract(vUv * grid);
+    float border = 1.0 - smoothstep(0.0, 0.12, min(min(f.x, 1.0 - f.x), min(f.y, 1.0 - f.y)));
+    float near = 1.0 - smoothstep(0.0, 0.14, t - uDissolve);
+    float edge = step(0.002, uDissolve) * (near * 0.9 + border * near * 0.6);
+
     vec3 N = normalize(vNormal);
     vec3 V = normalize(-vViewPos);
     float ndv = clamp(dot(N, V), 0.0, 1.0);
@@ -155,7 +210,7 @@ const ringFragment = /* glsl */ `
     col += uMint * floorBounce * 0.05;
     col += vec3(1.0) * spec1 * 0.75;
     col += uMint * spec2 * 0.55;
-    col += mix(vec3(0.015, 0.07, 0.045), uMint, 0.5) * fres * 0.85;
+    col += mix(vec3(0.015, 0.07, 0.045), uMint, 0.5) * fres * (0.85 + uEnergy * 0.35);
 
     // Linhas de fluxo: 14 fios correndo ao longo do anel, desenhados da
     // esquerda pra direita durante a entrada (uReveal).
@@ -166,16 +221,18 @@ const ringFragment = /* glsl */ `
     float line = 1.0 - smoothstep(w * 0.6, w * 1.8, d);
     float drawn = 1.0 - smoothstep(uReveal - 0.12, uReveal, vUv.x);
     float facing = 0.35 + 0.65 * smoothstep(0.0, 0.6, ndv);
-    col += uMint * line * 0.10 * drawn * facing;
+    col += uMint * line * (0.10 + uEnergy * 0.08) * drawn * facing;
 
-    // Pulsos: um sinal por fio, cada um no seu ritmo.
+    // Sinais: um por fio, cada um no seu ritmo. uFlow é um relógio próprio,
+    // que acelera com uEnergy sem dar saltos.
     float speed = 0.035 + hash(id) * 0.05;
-    float x = fract(vUv.x * 2.0 - uTime * speed - hash(id + 7.0));
+    float x = fract(vUv.x * 2.0 - uFlow * speed - hash(id + 7.0));
     float head = smoothstep(0.0, 0.025, x) * (1.0 - smoothstep(0.025, 0.16, x));
     float halo = (1.0 - smoothstep(w * 0.6, w * 6.0, d)) * head;
     float alive = smoothstep(0.6, 1.0, uReveal);
-    col += uGlow * (line * head * 1.25 + halo * 0.18) * alive * facing;
+    col += uGlow * (line * head * (1.25 + uEnergy * 1.2) + halo * (0.18 + uEnergy * 0.25)) * alive * facing;
 
+    col += uGlow * edge * 0.85;
     gl_FragColor = vec4(col, 1.0);
   }
 `;
@@ -183,9 +240,11 @@ const ringFragment = /* glsl */ `
 const particleVertex = /* glsl */ `
   ${RING_GLSL}
   uniform float uReveal;
+  uniform float uScatter;
   uniform float uPixelRatio;
+  uniform float uSizeScale;
   attribute vec4 aOrbit;   // u inicial, raio relativo, fase angular, velocidade
-  attribute vec3 aScatter; // posição dispersa antes de se organizar
+  attribute vec3 aScatter; // posição dispersa
   attribute float aSize;
   varying float vAlpha;
 
@@ -193,17 +252,21 @@ const particleVertex = /* glsl */ `
     float u = fract(aOrbit.x + uTime * aOrbit.w);
     vec3 c; vec3 n; vec3 b;
     ringFrame(u, c, n, b);
-    float ang = aOrbit.z + uTime * 0.3 * aOrbit.w * 10.0;
+    float ang = aOrbit.z + uTime * 3.0 * aOrbit.w;
     float rad = tubeRadius(u) * aOrbit.y;
     vec3 orbit = c + n * cos(ang) * rad + b * sin(ang) * rad * 0.7;
 
+    // Organização: entra em órbita com a revelação, sai dela com o scatter.
     float k = smoothstep(0.0, 1.0, clamp(uReveal * 1.15 - aSize * 0.05, 0.0, 1.0));
-    vec3 p = mix(aScatter, orbit, k);
+    float s = smoothstep(0.0, 1.0, clamp(uScatter * 1.3 - aSize * 0.08, 0.0, 1.0));
+    k *= 1.0 - s;
+    vec3 drift = aScatter + vec3(sin(uTime * 0.3 + aOrbit.z), cos(uTime * 0.25 + aOrbit.z), 0.0) * 0.12;
+    vec3 p = mix(drift, orbit, k);
 
     vec4 mv = modelViewMatrix * vec4(p, 1.0);
     gl_Position = projectionMatrix * mv;
-    gl_PointSize = aSize * uPixelRatio * (5.5 / -mv.z);
-    vAlpha = (0.35 + 0.65 * k) * (0.55 + 0.45 * sin(uTime * 1.3 + aOrbit.z * 3.0));
+    gl_PointSize = aSize * uPixelRatio * uSizeScale * (5.5 / -mv.z);
+    vAlpha = (0.35 + 0.65 * max(k, s * 0.8)) * (0.55 + 0.45 * sin(uTime * 1.3 + aOrbit.z * 3.0));
   }
 `;
 
@@ -227,20 +290,23 @@ const orbitVertex = /* glsl */ `
 `;
 
 const orbitFragment = /* glsl */ `
-  uniform float uTime;
+  uniform float uFlow;
   uniform float uReveal;
+  uniform float uDissolve;
   uniform float uOffset;
   uniform vec3 uMint;
   varying float vT;
   void main() {
-    float x = fract(vT - uTime * 0.02 + uOffset);
+    float x = fract(vT - uFlow * 0.02 + uOffset);
     float pulse = smoothstep(0.0, 0.02, x) * (1.0 - smoothstep(0.02, 0.3, x));
-    float a = (0.10 + pulse * 0.55) * smoothstep(0.2, 1.0, uReveal);
+    float a = (0.10 + pulse * 0.55) * smoothstep(0.2, 1.0, uReveal) * (1.0 - uDissolve);
     gl_FragColor = vec4(uMint * a, a);
   }
 `;
 
-function makeOrbit(radius: number, segments: number, offset: number, uniforms: Record<string, { value: unknown }>) {
+type Uniforms = Record<string, { value: unknown }>;
+
+function makeOrbit(radius: number, segments: number, offset: number, uniforms: Uniforms) {
   const positions = new Float32Array(segments * 3);
   const t = new Float32Array(segments);
   for (let i = 0; i < segments; i++) {
@@ -264,8 +330,10 @@ function makeOrbit(radius: number, segments: number, offset: number, uniforms: R
   return new LineLoop(geo, mat);
 }
 
+const POSE_KEYS: Array<keyof Pose> = ['x', 'y', 'radius', 'rx', 'ry', 'rz', 'dissolve', 'scatter', 'energy', 'opacity'];
+
 export function createSculpture(opts: Options): SculptureHandle {
-  const { canvas, variant, quality, still, onFirstFrame, onContextLost } = opts;
+  const { canvas, quality, still, onFirstFrame, onContextLost } = opts;
   const high = quality === 'high';
 
   const renderer = new WebGLRenderer({
@@ -274,17 +342,22 @@ export function createSculpture(opts: Options): SculptureHandle {
     alpha: true,
     powerPreference: high ? 'high-performance' : 'low-power',
   });
-  const pixelRatio = Math.min(window.devicePixelRatio || 1, high ? 1.75 : 1.25);
+  // Canvas de tela cheia: densidade mais contida que numa peça recortada.
+  const pixelRatio = Math.min(window.devicePixelRatio || 1, high ? 1.5 : 1.25);
   renderer.setPixelRatio(pixelRatio);
   renderer.setClearColor(0x000000, 0);
 
   const scene = new Scene();
-  const camera = new PerspectiveCamera(30, 1, 0.1, 60);
-  camera.position.set(0, 0, 7.2);
+  const camera = new PerspectiveCamera(FOV, 1, 0.1, 60);
+  camera.position.set(0, 0, CAM_Z);
 
   const shared = {
     uTime: { value: 0 },
+    uFlow: { value: 0 },
     uReveal: { value: still ? 1.15 : 0 },
+    uDissolve: { value: 0 },
+    uScatter: { value: 0 },
+    uEnergy: { value: 0 },
     uMint: { value: MINT },
     uGlow: { value: GLOW },
   };
@@ -303,7 +376,7 @@ export function createSculpture(opts: Options): SculptureHandle {
   ring.frustumCulled = false;
 
   // Partículas.
-  const count = high ? 720 : 260;
+  const count = high ? 720 : 280;
   const orbitAttr = new Float32Array(count * 4);
   const scatterAttr = new Float32Array(count * 3);
   const sizeAttr = new Float32Array(count);
@@ -312,12 +385,12 @@ export function createSculpture(opts: Options): SculptureHandle {
     orbitAttr[i * 4 + 1] = 1.25 + Math.pow(Math.random(), 1.6) * 1.9;
     orbitAttr[i * 4 + 2] = Math.random() * Math.PI * 2;
     orbitAttr[i * 4 + 3] = 0.004 + Math.random() * 0.012;
-    const r = 2.6 + Math.random() * 3.2;
+    // Disperso: uma nuvem achatada e larga, como papéis espalhados na mesa.
+    const r = 1.6 + Math.random() * 4.2;
     const th = Math.random() * Math.PI * 2;
-    const ph = Math.acos(2 * Math.random() - 1);
-    scatterAttr[i * 3] = r * Math.sin(ph) * Math.cos(th);
-    scatterAttr[i * 3 + 1] = r * Math.sin(ph) * Math.sin(th);
-    scatterAttr[i * 3 + 2] = r * Math.cos(ph) * 0.6;
+    scatterAttr[i * 3] = Math.cos(th) * r * 1.35;
+    scatterAttr[i * 3 + 1] = Math.sin(th) * r * 0.85;
+    scatterAttr[i * 3 + 2] = (Math.random() - 0.5) * 1.4;
     sizeAttr[i] = 0.6 + Math.random() * 2.2;
   }
   const pGeo = new BufferGeometry();
@@ -327,10 +400,11 @@ export function createSculpture(opts: Options): SculptureHandle {
   pGeo.setAttribute('aOrbit', new BufferAttribute(orbitAttr, 4));
   pGeo.setAttribute('aScatter', new BufferAttribute(scatterAttr, 3));
   pGeo.setAttribute('aSize', new BufferAttribute(sizeAttr, 1));
+  const sizeScale = { value: 1 };
   const pMat = new ShaderMaterial({
     vertexShader: particleVertex,
     fragmentShader: particleFragment,
-    uniforms: { ...shared, uPixelRatio: { value: pixelRatio } },
+    uniforms: { ...shared, uPixelRatio: { value: pixelRatio }, uSizeScale: sizeScale },
     transparent: true,
     depthWrite: false,
     blending: AdditiveBlending,
@@ -353,83 +427,117 @@ export function createSculpture(opts: Options): SculptureHandle {
   rig.add(sculpture, halo);
   scene.add(rig);
 
-  // Pose base de cada variante: no hero, três quartos; no fechamento, de
-  // frente, como um portal.
-  const base =
-    variant === 'hero'
-      ? { rx: -0.52, ry: 0.42, rz: 0.2, scale: 1 }
-      : { rx: -0.18, ry: 0.0, rz: 0.0, scale: 0.92 };
-
   // --- estado ----------------------------------------------------------------
+  let current: Pose | null = null;
+  let target: Pose | null = null;
+  let flightUntil = 0;
   const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
-  let scroll = 0;
   let active = false;
   let raf = 0;
   let last = performance.now();
   let time = still ? 12 : 0;
+  let flow = still ? 12 : 0;
   let revealStart = -1;
   let firstFrame = false;
   let disposed = false;
+  let vw = 1;
+  let vh = 1;
 
   function resize() {
-    const w = canvas.clientWidth;
-    const h = canvas.clientHeight;
-    if (!w || !h) return;
-    renderer.setSize(w, h, false);
-    const aspect = w / h;
-    camera.aspect = aspect;
-    // Em tela retrato, afasta a câmera pra peça inteira caber.
-    camera.position.z = aspect < 1 ? 7.2 / Math.pow(aspect, 0.55) : 7.2;
+    vw = canvas.clientWidth || window.innerWidth;
+    vh = canvas.clientHeight || window.innerHeight;
+    renderer.setSize(vw, vh, false);
+    camera.aspect = vw / vh;
     camera.updateProjectionMatrix();
   }
 
-  function frame(now: number) {
+  /** Unidades de mundo por px no plano z = 0. */
+  function worldPerPx() {
+    return (2 * Math.tan(((FOV / 2) * Math.PI) / 180) * CAM_Z) / vh;
+  }
+
+  function settled() {
+    if (!current || !target) return true;
+    return POSE_KEYS.every((k) => Math.abs((current as Pose)[k] - (target as Pose)[k]) < (k === 'x' || k === 'y' || k === 'radius' ? 0.3 : 0.002));
+  }
+
+  function draw(now: number) {
     const dt = Math.min((now - last) / 1000, 0.05);
     last = now;
+    if (!current || !target) return;
+
+    // Amortecimento exponencial: rápido dentro do capítulo (a peça acompanha
+    // o conteúdo), mais lento na troca de capítulo (voo).
+    const flying = now < flightUntil;
+    const aPos = still ? 1 : 1 - Math.exp(-(flying ? 3.2 : 14) * dt);
+    const aShape = still ? 1 : 1 - Math.exp(-(flying ? 2.6 : 6) * dt);
+    for (const k of POSE_KEYS) {
+      const a = k === 'x' || k === 'y' ? aPos : aShape;
+      current[k] += (target[k] - current[k]) * a;
+    }
+
     if (!still) {
       time += dt;
-      if (revealStart < 0) revealStart = now;
-      const r = Math.min((now - revealStart) / 2400, 1);
-      shared.uReveal.value = 1.15 * (1 - Math.pow(1 - r, 3));
+      flow += dt * (1 + current.energy * 2.6);
+      if (current.opacity > 0.05) {
+        if (revealStart < 0) revealStart = now;
+        const r = Math.min((now - revealStart) / 2400, 1);
+        shared.uReveal.value = 1.15 * (1 - Math.pow(1 - r, 3));
+      }
     }
     shared.uTime.value = time;
+    shared.uFlow.value = flow;
+    shared.uDissolve.value = current.dissolve;
+    shared.uScatter.value = current.scatter;
+    shared.uEnergy.value = current.energy;
 
     pointer.x += (pointer.tx - pointer.x) * 0.045;
     pointer.y += (pointer.ty - pointer.y) * 0.045;
 
-    const s = scroll;
-    rig.rotation.x = base.rx + pointer.y * 0.16 + s * 0.45;
-    rig.rotation.y = base.ry + pointer.x * 0.22;
-    rig.rotation.z = base.rz - s * 0.25;
+    const wpp = worldPerPx();
+    const scale = (current.radius * wpp) / RING_OUTER;
+    rig.position.set((current.x - vw / 2) * wpp, -(current.y - vh / 2) * wpp, 0);
+    rig.scale.setScalar(Math.max(scale, 0.0001));
+    rig.rotation.set(current.rx + pointer.y * 0.14, current.ry + pointer.x * 0.2, current.rz);
     sculpture.rotation.z = still ? 0.4 : time * 0.045;
     halo.rotation.z = still ? 0 : -time * 0.02;
-    const scale = base.scale * (1 - s * 0.1);
-    rig.scale.setScalar(scale);
-    rig.position.y = s * 0.55;
+    sizeScale.value = Math.min(Math.max(scale, 0.55), 1.5);
 
-    renderer.render(scene, camera);
-    if (!firstFrame) {
+    canvas.style.opacity = current.opacity.toFixed(3);
+    if (current.opacity > 0.003) renderer.render(scene, camera);
+
+    if (!firstFrame && current.opacity > 0.003) {
       firstFrame = true;
       onFirstFrame();
     }
   }
 
   function loop(now: number) {
+    raf = 0;
     if (!active || disposed) return;
-    frame(now);
-    raf = requestAnimationFrame(loop);
+    draw(now);
+    // Invisível e parado: o laço dorme até o próximo alvo visível.
+    const idle = current !== null && target !== null && target.opacity === 0 && current.opacity < 0.004 && settled();
+    if (!idle) raf = requestAnimationFrame(loop);
   }
 
-  function renderStill() {
-    resize();
-    frame(performance.now());
+  function wake() {
+    if (disposed) return;
+    if (still) {
+      draw(performance.now());
+      return;
+    }
+    if (active && !raf) {
+      last = performance.now();
+      raf = requestAnimationFrame(loop);
+    }
   }
 
-  const ro = new ResizeObserver(() => {
+  const onResize = () => {
     resize();
-    if (!active) frame(performance.now());
-  });
-  ro.observe(canvas);
+    wake();
+  };
+  window.addEventListener('resize', onResize);
 
   const lost = (e: Event) => {
     e.preventDefault();
@@ -440,32 +548,33 @@ export function createSculpture(opts: Options): SculptureHandle {
   canvas.addEventListener('webglcontextlost', lost);
 
   resize();
-  if (still) renderStill();
 
   return {
+    setTarget(pose, o = {}) {
+      if (!current || o.snap || still) current = { ...pose };
+      if (o.flight && !still) flightUntil = performance.now() + 1100;
+      target = { ...pose };
+      wake();
+    },
     setPointer(x, y) {
       pointer.tx = x;
       pointer.ty = y;
-    },
-    setScroll(p) {
-      scroll = p;
-      if (still && !disposed) frame(performance.now());
+      if (current && current.opacity > 0.01) wake();
     },
     setActive(on) {
-      if (still || disposed || on === active) return;
+      if (disposed || on === active) return;
       active = on;
-      if (on) {
-        last = performance.now();
-        raf = requestAnimationFrame(loop);
-      } else {
+      if (on) wake();
+      else {
         cancelAnimationFrame(raf);
+        raf = 0;
       }
     },
     dispose() {
       disposed = true;
       active = false;
       cancelAnimationFrame(raf);
-      ro.disconnect();
+      window.removeEventListener('resize', onResize);
       canvas.removeEventListener('webglcontextlost', lost);
       ringGeo.dispose();
       ringMat.dispose();

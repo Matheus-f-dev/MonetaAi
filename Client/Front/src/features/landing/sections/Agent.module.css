@@ -1,13 +1,13 @@
 .agent {
-  padding: calc(var(--section-y) * 0.6) 0 var(--section-y);
+  padding: calc(var(--section-y) * 0.8) 0 calc(var(--section-y) * 0.6);
 }
 
 .backdrop {
   position: absolute;
   inset: 10% 0 0 0;
   background:
-    radial-gradient(40% 50% at 15% 40%, rgba(116, 232, 174, 0.07), transparent 70%),
-    radial-gradient(30% 40% at 85% 70%, rgba(184, 255, 213, 0.04), transparent 70%);
+    radial-gradient(40% 50% at 50% 55%, rgba(116, 232, 174, 0.07), transparent 70%),
+    radial-gradient(30% 40% at 85% 80%, rgba(184, 255, 213, 0.035), transparent 70%);
   pointer-events: none;
 }
 
@@ -20,13 +20,5 @@
 }
 
 .demo {
-  margin-top: clamp(48px, 6vw, 80px);
-}
-
-.footnote {
-  max-width: 70ch;
-  margin-top: 22px !important;
-  font-size: 12.5px;
-  line-height: 1.6;
-  color: var(--text-3);
+  margin-top: clamp(44px, 5vw, 72px);
 }

@@ -16,14 +16,19 @@
   justify-self: end;
 }
 
+.tag {
+  margin-top: clamp(40px, 5vw, 72px);
+}
+
 .bento {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 16px;
-  margin-top: clamp(48px, 6vw, 80px);
+  margin-top: 18px;
 }
 
 .card {
+  position: relative;
   padding: 22px;
   border-radius: var(--r-lg);
   background: var(--surface);

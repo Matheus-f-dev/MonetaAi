@@ -1,6 +1,7 @@
 import { useRef, type CSSProperties } from 'react';
 import { PROBLEM } from '../data/content';
-import { useReducedMotion, useScrollProgress } from '../motion/hooks';
+import { measureProgress, useReducedMotion, useScrollProgress } from '../motion/hooks';
+import { useOrbitDock } from '../scene/OrbitStage';
 import { ease, range } from '../lib/format';
 import { BrandMark } from '../components/ui';
 import { FragmentGlyph } from '../components/glyphs';
@@ -22,12 +23,33 @@ const SCATTER = [
   { sx: 12, sy: 46, sr: 8, ss: 0.82, o: 0.34, im: -1 },
 ];
 
-const toVars = (prog: number) => ({ '--e': ease(range(prog, 0.06, 0.8)) });
+const organized = (prog: number) => ease(range(prog, 0.06, 0.8));
+const toVars = (prog: number) => ({ '--e': organized(prog) });
 
 export function Problem() {
   const ref = useRef<HTMLElement>(null);
+  const fieldRef = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
   useScrollProgress(ref, { mode: 'sticky', enabled: !reduced, vars: toVars });
+
+  // A peça chega aqui desfeita em fragmentos, como o dinheiro espalhado, e se
+  // recompõe atrás do extrato no mesmo ritmo em que os itens entram na fila.
+  useOrbitDock('problema', fieldRef, (r, view) => {
+    const e = reduced || !ref.current ? 1 : organized(measureProgress(ref.current, 'sticky'));
+    const narrow = view.w < 760;
+    return {
+      x: r.left + r.width / 2,
+      y: r.top + r.height / 2,
+      radius: narrow ? r.width * 0.48 : Math.min(r.width * 0.62, r.height * 0.44),
+      opacity: narrow ? 0.75 : 1,
+      rx: -0.28 + (1 - e) * 0.3,
+      ry: 0.3,
+      rz: 0.12,
+      dissolve: 1 - e,
+      scatter: 1 - e,
+      energy: e * 0.2,
+    };
+  });
 
   return (
     <section
@@ -62,7 +84,7 @@ export function Problem() {
             </p>
           </div>
 
-          <div className={p.field} aria-hidden="true">
+          <div ref={fieldRef} className={p.field} aria-hidden="true">
             <div className={p.ledger}>
               <div className={p.ledgerHead}>
                 <span>{PROBLEM.ledgerTitle}</span>

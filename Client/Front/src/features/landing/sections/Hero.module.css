@@ -3,11 +3,10 @@
   --my: 0;
   --hp: 0;
   position: relative;
-  min-height: 100svh;
-  min-height: max(100svh, 680px);
+  min-height: max(100svh, 700px);
   display: flex;
   align-items: center;
-  padding: 120px 0 120px;
+  padding: 120px 0 140px;
   overflow: clip;
 }
 
@@ -26,12 +25,12 @@
 }
 .glowA {
   right: -12vw;
-  top: 6vh;
+  top: 2vh;
   width: 70vw;
   height: 70vw;
   max-width: 1100px;
   max-height: 1100px;
-  background: radial-gradient(closest-side, rgba(116, 232, 174, 0.16), rgba(116, 232, 174, 0.05) 45%, transparent 72%);
+  background: radial-gradient(closest-side, rgba(116, 232, 174, 0.15), rgba(116, 232, 174, 0.045) 45%, transparent 72%);
   animation: glowIn 2.2s var(--ease-out) both;
 }
 .glowB {
@@ -47,8 +46,10 @@
   left: 0;
   right: 0;
   bottom: 0;
-  height: 40%;
-  background: linear-gradient(180deg, transparent, var(--bg) 92%);
+  height: 24%;
+  background: linear-gradient(180deg, transparent, var(--bg) 88%);
+  z-index: 2;
+  pointer-events: none;
 }
 
 @keyframes glowIn {
@@ -58,60 +59,197 @@
   }
 }
 
-/* ---- escultura e cartões flutuantes ------------------------------------ */
-.stage {
+/* ---- composição visual (peça + painel + cartões) ------------------------ */
+.visual {
   position: absolute;
   z-index: 1;
-  right: max(-6vw, calc((100vw - 1500px) / 2));
-  top: 50%;
-  width: min(64vw, 1000px);
-  aspect-ratio: 1;
-  transform: translate3d(calc(var(--mx) * -10px), calc(-50% + var(--my) * -8px + var(--hp) * 90px), 0);
+  top: 0;
+  bottom: 0;
+  right: max(-5vw, calc((100vw - 1500px) / 2));
+  width: min(62vw, 980px);
   pointer-events: none;
 }
 
-.sculpture {
+.anchor {
   position: absolute;
-  inset: 0;
+  top: 4%;
+  right: 0;
+  width: 100%;
+  aspect-ratio: 1;
+  transform: translate3d(calc(var(--mx) * -8px), calc(var(--my) * -6px), 0);
   animation: stageIn 2s var(--ease-out) 0.15s both;
 }
 
 @keyframes stageIn {
   from {
     opacity: 0;
-    transform: scale(0.92);
+    transform: scale(0.94);
   }
 }
 
+/* Painel em perspectiva: a peça nasce por trás dele. */
+.slabWrap {
+  position: absolute;
+  right: 3%;
+  bottom: -9%;
+  width: 86%;
+  perspective: 1800px;
+  transform: translate3d(calc(var(--mx) * 10px), calc(var(--my) * 6px - var(--hp) * 60px), 0);
+}
+.slab {
+  transform-origin: 50% 100%;
+  transform: rotateX(26deg) rotateY(-10deg) rotateZ(2.5deg);
+  padding: 18px 20px 22px;
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(18, 21, 20, 0.97), rgba(9, 10, 10, 0.98));
+  border: 1px solid var(--line-2);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.07) inset,
+    0 -30px 80px -40px rgba(116, 232, 174, 0.35),
+    0 60px 120px -40px rgba(0, 0, 0, 1);
+  animation: slabIn 1.4s var(--ease-out) 0.9s both;
+}
+@keyframes slabIn {
+  from {
+    opacity: 0;
+    transform: rotateX(34deg) rotateY(-10deg) rotateZ(2.5deg) translate3d(0, 80px, 0);
+  }
+}
+.slabTop {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 14px;
+}
+.slabTitle {
+  font-size: 13px;
+  font-weight: 600;
+}
+.slabChip {
+  margin-left: auto;
+  padding: 3px 10px;
+  border-radius: 99px;
+  border: 1px solid var(--line);
+  font-size: 11px;
+  color: var(--text-3);
+}
+.slabKpis {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1fr;
+  gap: 10px;
+}
+.slabKpis > div {
+  padding: 11px 13px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.025);
+  min-width: 0;
+}
+.slabKpis span {
+  display: block;
+  font-size: 10.5px;
+  color: var(--text-3);
+}
+.slabKpis strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+.slabKpiMain {
+  border-color: var(--line-mint) !important;
+  background: radial-gradient(120% 140% at 0% 0%, rgba(116, 232, 174, 0.14), transparent 60%) !important;
+}
+.slabKpiMain strong {
+  font-size: 18px !important;
+}
+.slabBody {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+.slabChart,
+.slabCats {
+  padding: 11px 13px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.02);
+}
+.slabLabel {
+  display: block;
+  font-size: 10.5px;
+  color: var(--text-3);
+  margin-bottom: 6px;
+}
+.slabChart svg {
+  display: block;
+  width: 100%;
+  height: 70px;
+}
+.sparkArea {
+  fill: rgba(116, 232, 174, 0.12);
+}
+.sparkLine {
+  fill: none;
+  stroke: var(--mint);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.slabCats {
+  display: grid;
+  align-content: center;
+  gap: 10px;
+}
+.slabCats li {
+  display: grid;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--text-2);
+}
+.slabTrack {
+  display: block;
+  height: 5px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+.slabTrack span {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, rgba(116, 232, 174, 0.4), var(--mint));
+}
+
+/* ---- cartões que saltam do painel ---------------------------------------- */
 .floats {
   position: absolute;
   inset: 0;
 }
-
 .float {
   position: absolute;
   transform: translate3d(
     calc(var(--mx) * var(--z) * 18px),
-    calc(var(--my) * var(--z) * 14px - var(--hp) * var(--z) * 120px),
+    calc(var(--my) * var(--z) * 14px - var(--hp) * var(--z) * 110px),
     0
   );
   will-change: transform;
 }
-
 .floatIn {
-  padding: 16px 18px;
+  padding: 14px 16px;
   border-radius: 18px;
-  background: linear-gradient(180deg, rgba(22, 26, 24, 0.82), rgba(12, 14, 13, 0.78));
+  background: linear-gradient(180deg, rgba(24, 28, 26, 0.86), rgba(12, 14, 13, 0.82));
   border: 1px solid var(--line-2);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.06) inset,
-    0 24px 60px -24px rgba(0, 0, 0, 0.9),
-    0 0 0 1px rgba(116, 232, 174, 0.04);
+    0 24px 60px -24px rgba(0, 0, 0, 0.9);
   animation: floatIn 1.2s var(--ease-out) var(--fd, 1s) both;
 }
-
 @keyframes floatIn {
   from {
     opacity: 0;
@@ -119,46 +257,25 @@
     filter: blur(8px);
   }
 }
-
-.floatBalance {
-  left: 46%;
-  top: 9%;
-  min-width: 210px;
-}
 .floatChat {
-  left: 12%;
-  bottom: 14%;
-  width: 270px;
+  left: 2%;
+  bottom: 31%;
+  width: 262px;
 }
 .floatBudget {
-  right: 8%;
-  bottom: 28%;
-  width: 220px;
+  right: 7%;
+  top: 22%;
+  width: 214px;
 }
-
 .floatLabel {
   display: block;
+  margin-top: 10px;
   font-family: var(--f-mono) !important;
   font-size: 10.5px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-3);
 }
-.floatValue {
-  display: block;
-  margin: 6px 0 8px;
-  font-size: 1.55rem;
-  font-weight: 600;
-  letter-spacing: -0.025em;
-}
-.floatDelta {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--mint);
-}
-
 .bubbleUser,
 .bubbleAgent {
   font-size: 13.5px;
@@ -192,7 +309,6 @@
   background: var(--mint);
   box-shadow: 0 0 10px var(--mint);
 }
-
 .budgetRow {
   display: flex;
   justify-content: space-between;
@@ -203,20 +319,15 @@
 .budgetRow span:last-child {
   color: var(--mint);
 }
-.floatBudget .floatLabel {
-  margin-top: 10px;
-}
 
 /* ---- texto ------------------------------------------------------------- */
 .content {
   position: relative;
-  z-index: 2;
+  z-index: 4;
 }
-
 .eyebrow {
   animation: rise 0.9s var(--ease-out) 0.1s both;
 }
-
 .title {
   margin-top: 28px !important;
   font-family: var(--f-display) !important;
@@ -227,7 +338,6 @@
   letter-spacing: -0.048em;
   max-width: 9.5em;
 }
-
 .titleLine {
   display: block;
   overflow: hidden;
@@ -243,19 +353,16 @@
   font-size: 1.04em;
   padding-right: 0.06em;
 }
-
 @keyframes lineUp {
   from {
     transform: translate3d(0, 105%, 0);
   }
 }
-
 .lead {
   margin-top: 30px !important;
   max-width: 33ch;
   animation: rise 1s var(--ease-out) 0.68s both;
 }
-
 .ctas {
   display: flex;
   flex-wrap: wrap;
@@ -263,14 +370,12 @@
   margin-top: 38px;
   animation: rise 1s var(--ease-out) 0.86s both;
 }
-
 .note {
   margin-top: 18px !important;
   font-size: var(--t-small);
   color: var(--text-3);
   animation: rise 1s var(--ease-out) 1s both;
 }
-
 @keyframes rise {
   from {
     opacity: 0;
@@ -278,13 +383,13 @@
   }
 }
 
-/* ---- indicação de rolagem ---------------------------------------------- */
+/* ---- indicação de continuidade ------------------------------------------- */
 .scrollCue {
   position: absolute;
-  z-index: 2;
+  z-index: 5;
   left: 0;
   right: 0;
-  bottom: 36px;
+  bottom: 30px;
   width: max-content;
   margin-inline: auto;
   display: flex;
@@ -330,22 +435,16 @@
 
 /* ---- responsivo -------------------------------------------------------- */
 @media (max-width: 1100px) {
-  .stage {
-    width: 78vw;
-    right: -22vw;
-    opacity: 0.85;
-  }
-  .floatBalance {
-    left: 30%;
-    top: 8%;
+  .visual {
+    width: 74vw;
+    right: -20vw;
   }
   .floatChat {
     display: none;
   }
-  /* Parte do palco fica fora da tela à direita; o cartão vem pra dentro. */
   .floatBudget {
-    right: 34%;
-    bottom: 16%;
+    right: 30%;
+    top: 20%;
   }
 }
 
@@ -353,21 +452,54 @@
   .hero {
     flex-direction: column;
     align-items: stretch;
-    padding: 104px 0 96px;
+    padding: 104px 0 40px;
     min-height: auto;
-  }
-  .stage {
-    position: relative;
-    order: 2;
-    right: auto;
-    top: auto;
-    width: 118vw;
-    margin: -6vw 0 0 -9vw;
-    opacity: 1;
-    transform: translate3d(0, calc(var(--hp) * 60px), 0);
   }
   .content {
     order: 1;
+  }
+  .visual {
+    position: relative;
+    order: 2;
+    top: auto;
+    bottom: auto;
+    right: auto;
+    width: 112vw;
+    height: 128vw;
+    margin: 4vw 0 0 -6vw;
+  }
+  .anchor {
+    top: 0;
+    width: 100%;
+  }
+  .slabWrap {
+    right: 9%;
+    bottom: 2%;
+    width: 84%;
+  }
+  .slab {
+    padding: 12px 13px 14px;
+    border-radius: 16px;
+  }
+  .slabBody {
+    grid-template-columns: 1fr;
+  }
+  .slabCats {
+    display: none;
+  }
+  .slabKpis > div:last-child {
+    display: none;
+  }
+  .slabKpis {
+    grid-template-columns: 1.3fr 1fr;
+  }
+  .floatBudget {
+    right: 10%;
+    top: 14%;
+    width: 176px;
+  }
+  .floatBudget .floatIn {
+    padding: 12px 14px;
   }
   .title {
     margin-top: 22px !important;
@@ -381,26 +513,10 @@
   .ctas > * {
     flex: 1 1 100%;
   }
-  .floatBalance {
-    left: 12vw;
-    top: 12%;
-    min-width: 0;
-  }
-  .floatBalance .floatIn {
-    padding: 12px 14px;
-  }
-  .floatValue {
-    font-size: 1.2rem;
-  }
-  .floatBudget {
-    right: 12vw;
-    bottom: 14%;
-    width: 180px;
-  }
-  .floatBudget .floatIn {
-    padding: 12px 14px;
-  }
   .scrollCue {
+    display: none;
+  }
+  .horizon {
     display: none;
   }
 }
@@ -408,7 +524,8 @@
 @media (prefers-reduced-motion: reduce) {
   .glowA,
   .glowB,
-  .sculpture,
+  .anchor,
+  .slab,
   .floatIn,
   .eyebrow,
   .titleLine > span,
@@ -419,17 +536,9 @@
   .scrollLine span {
     animation: none !important;
   }
-  .stage,
+  .anchor,
+  .slabWrap,
   .float {
-    transform: none;
-  }
-  .stage {
-    transform: translateY(-50%);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) and (max-width: 760px) {
-  .stage {
     transform: none;
   }
 }

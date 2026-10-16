@@ -7,8 +7,12 @@
 //  2. Nenhuma métrica de usuário, depoimento, logo de parceiro ou
 //     certificação. Segurança: só o que está verificável no código.
 //  3. A plataforma é gratuita. Não há plano pago, checkout nem preço.
-//  4. Todo número de demonstração vem de data/demo.ts e fecha com ele.
+//  4. Todo número de demonstração vem de data/demo.ts e fecha com ele, e
+//     todo módulo demonstrativo leva o selo DEMO_TAG.
 //  5. Sem travessão em string visível.
+//
+// NARRATIVA: Registrar -> Organizar -> Compreender -> Planejar -> Decidir
+// melhor. Cada capítulo do meio da página é um desses verbos (ver METHOD).
 //
 // PENDENTE (não renderizado de propósito):
 //  - 2FA: o login já aceita o código, mas ainda não há tela para o usuário
@@ -20,22 +24,40 @@
 export const NAV = [
   { href: '#plataforma', label: 'Plataforma' },
   { href: '#agente', label: 'Agente de IA' },
+  { href: '#demo', label: 'Experimente' },
   { href: '#recursos', label: 'Recursos' },
-  { href: '#analises', label: 'Análises' },
   { href: '#seguranca', label: 'Segurança' },
 ] as const;
+
+/** Selo de todo módulo com dados de demonstração. */
+export const DEMO_TAG = 'Demonstração · dados fictícios';
 
 /** Trilho lateral: o fio que atravessa a página (só em telas largas). */
 export const RAIL = [
   { id: 'problema', label: 'O problema' },
   { id: 'plataforma', label: 'Plataforma' },
-  { id: 'agente', label: 'Agente' },
-  { id: 'recursos', label: 'Conectado' },
-  { id: 'analises', label: 'Análises' },
-  { id: 'metas', label: 'Metas' },
-  { id: 'controle', label: 'Controle' },
+  { id: 'agente', label: 'Registrar' },
+  { id: 'demo', label: 'Experimente' },
+  { id: 'recursos', label: 'Organizar' },
+  { id: 'analises', label: 'Compreender' },
+  { id: 'metas', label: 'Planejar' },
+  { id: 'controle', label: 'Decidir' },
   { id: 'seguranca', label: 'Confiança' },
 ] as const;
+
+/** A espinha da narrativa: cinco movimentos, cada um com o seu capítulo. */
+export const METHOD = {
+  eyebrow: 'Como a Moneta trabalha',
+  title: 'Do caos à decisão,',
+  accent: 'em cinco movimentos.',
+  steps: [
+    { n: '01', verb: 'Registrar', href: '#agente', body: 'Conversando com o agente, à mão ou importando o extrato do banco.' },
+    { n: '02', verb: 'Organizar', href: '#recursos', body: 'Contas, cartões, gastos fixos e categorias, cada um no seu lugar.' },
+    { n: '03', verb: 'Compreender', href: '#analises', body: 'Tendência, saúde financeira e previsão de saldo a partir do seu histórico.' },
+    { n: '04', verb: 'Planejar', href: '#metas', body: 'Metas ligadas a contas e orçamento por categoria.' },
+    { n: '05', verb: 'Decidir melhor', href: '#controle', body: 'Alertas, calendário e relatórios antes da surpresa chegar.' },
+  ],
+} as const;
 
 export const HERO = {
   eyebrow: 'Gestão financeira com IA · Grátis',
@@ -49,9 +71,9 @@ export const HERO = {
 
 export const PROBLEM = {
   eyebrow: 'O problema',
-  title: 'Seu dinheiro está em todo lugar.',
-  accent: 'Menos num lugar só.',
-  lead: 'A fatura num app, o Pix em outro, a planilha parada em março e a meta guardada só na cabeça. Quando nada conversa, fica difícil decidir.',
+  title: 'O dinheiro não precisa',
+  accent: 'ser complicado.',
+  lead: 'A fatura num app, o Pix em outro, um extrato baixado e nunca aberto, a meta guardada só na cabeça. Quando nada conversa, fica difícil decidir.',
   resolved: 'Na Moneta, tudo vira um lugar só.',
   ledgerTitle: 'Outubro · organizado',
   fragments: [
@@ -69,8 +91,8 @@ export const PROBLEM = {
 
 export const PLATFORM = {
   eyebrow: 'A plataforma',
-  title: 'Um lugar só para',
-  accent: 'a sua vida financeira.',
+  title: 'Sua vida financeira,',
+  accent: 'em um só lugar.',
   lead: 'Saldo, receitas, despesas, contas a pagar, orçamento e metas na mesma tela. Você abre e já entende como está o mês.',
   callouts: [
     { id: 'saldo', text: 'Saldo de todas as contas, somado' },
@@ -78,55 +100,75 @@ export const PLATFORM = {
     { id: 'contas', text: 'O que vence nos próximos dias' },
     { id: 'orcamento', text: 'Orçamento consumido, em tempo real' },
   ],
-  caption: 'Painel com dados ilustrativos.',
 };
 
 export const AGENT = {
-  eyebrow: 'Agente de IA',
-  title: 'Você conversa.',
-  accent: 'A Moneta executa.',
-  lead: 'O agente vive dentro da plataforma. Você escreve do jeito que fala, ele registra, consulta e sugere, e cada resposta já aparece no seu painel.',
-  footnote:
-    'Conversa ilustrativa, no formato do agente real. Ele registra gastos e receitas, lista movimentações, gera relatórios do período e sugere onde economizar.',
+  eyebrow: '01 · Registrar',
+  title: 'Sua inteligência',
+  accent: 'financeira.',
+  lead: 'O agente de IA vive dentro da Moneta. Você escreve do jeito que fala; ele entende o que aconteceu, registra no lugar certo e o painel responde na mesma hora.',
   steps: [
-    { id: 'gasto', label: 'Registrar um gasto' },
-    { id: 'consulta', label: 'Consultar o mês' },
-    { id: 'dica', label: 'Pedir uma dica' },
+    { id: 'escreve', label: 'Você escreve' },
+    { id: 'entende', label: 'A IA entende' },
+    { id: 'registra', label: 'A Moneta registra' },
+    { id: 'responde', label: 'O painel responde' },
   ],
+  footnote:
+    'É o fluxo do agente real: a mensagem vira uma ação estruturada (registrar gasto ou receita, listar gastos, gerar relatório, sugerir economia) que é executada nos seus dados.',
+};
+
+export const DEMO = {
+  eyebrow: 'Demonstração interativa',
+  title: 'Experimente agora.',
+  accent: 'Sem criar conta.',
+  lead: 'Escolha uma ação ou escreva do seu jeito. Tudo roda no seu navegador, com dados fictícios: nada é enviado, nada é salvo.',
+  badge: 'Dados fictícios · roda só no seu navegador',
+  groups: [
+    {
+      label: 'Registrar despesa',
+      actions: ['Gastei 45 no Uber', 'Paguei 126,30 no mercado', 'Gastei 38 no cinema'],
+    },
+    { label: 'Registrar receita', actions: ['Recebi 850 de freelance'] },
+    { label: 'Consultar', actions: ['Quanto gastei esse mês?', 'Me dá um relatório', 'Como posso economizar?'] },
+  ],
+  placeholder: 'Ex.: gastei 30 na farmácia',
+  reset: 'Reiniciar demonstração',
+  footnote:
+    'Esta demonstração interpreta as mensagens com as mesmas regras do interpretador local do agente da Moneta (palavras-chave e valor). No produto, as mensagens também podem ser interpretadas por um modelo de IA.',
 };
 
 export const CONNECTED = {
-  eyebrow: 'Tudo conectado',
-  title: 'Cada peça conversa',
-  accent: 'com as outras.',
-  lead: 'A compra no cartão entra na fatura, conta para o orçamento da categoria, aparece no calendário e muda o saldo. Você não reconcilia nada na mão.',
+  eyebrow: '02 · Organizar',
+  title: 'Tudo conectado.',
+  accent: 'Cada peça no seu lugar.',
+  lead: 'Quatro perguntas que a Moneta responde sem você montar planilha: onde o dinheiro está, como ele entra, o que se repete e para onde ele vai.',
 };
 
 export const INSIGHTS = {
-  eyebrow: 'Análises',
-  title: 'Enxergue além',
-  accent: 'do saldo.',
+  eyebrow: '03 · Compreender',
+  title: 'Entenda o que acontece',
+  accent: 'com seu dinheiro.',
   lead: 'A Moneta compara o mês com o seu próprio histórico, mostra para onde o saldo caminha e quanto uma compra pesa antes de você decidir.',
   projectionNote: 'Cenários calculados a partir do seu histórico. Não são garantia de resultado.',
 };
 
 export const GOALS = {
-  eyebrow: 'Metas e orçamento',
-  title: 'Seus objetivos',
-  accent: 'ganham forma.',
+  eyebrow: '04 · Planejar',
+  title: 'Planeje seu',
+  accent: 'próximo passo.',
   lead: 'Crie uma meta, vincule a uma conta e veja o progresso andar a cada depósito. O orçamento por categoria fecha o plano: você sabe quanto pode gastar sem tirar da meta.',
 };
 
 export const CONTROL = {
-  eyebrow: 'Controle',
-  title: 'Mais controle.',
-  accent: 'Menos surpresa.',
+  eyebrow: '05 · Decidir melhor',
+  title: 'Mais controle,',
+  accent: 'menos surpresas.',
   lead: 'Alertas por categoria, contas recorrentes lançadas com um clique e um calendário com tudo o que vence. O mês para de pegar você desprevenido.',
 };
 
 export const TRUST = {
   eyebrow: 'Confiança',
-  title: 'Seus dados,',
+  title: 'Sua vida financeira,',
   accent: 'do seu jeito.',
   lead: 'O que a Moneta faz hoje para proteger a sua conta e deixar o painel com a sua cara. Sem sigla de marketing.',
   items: [

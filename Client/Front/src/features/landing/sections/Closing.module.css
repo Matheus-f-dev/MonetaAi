@@ -27,7 +27,6 @@
   width: min(1100px, 120vw);
   aspect-ratio: 1;
   translate: -50% -50%;
-  opacity: 0.75;
   pointer-events: none;
 }
 .sculpture {
@@ -35,13 +34,19 @@
   inset: 0;
 }
 
-/* Véu central: garante contraste do texto sobre a peça. */
-.sculptureWrap::after {
+/* Véu de leitura: um elipse escuro do tamanho do bloco de texto, acima da
+   peça (que vive no canvas fixo, por baixo de todo o conteúdo). */
+.content::before {
   content: '';
   position: absolute;
-  inset: 22%;
-  border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(5, 5, 5, 0.85), rgba(5, 5, 5, 0.4) 60%, transparent);
+  z-index: -1;
+  left: 50%;
+  top: 50%;
+  width: min(1100px, 130%);
+  height: 150%;
+  translate: -50% -50%;
+  background: radial-gradient(closest-side, rgba(5, 5, 5, 0.94), rgba(5, 5, 5, 0.78) 55%, rgba(5, 5, 5, 0) 100%);
+  pointer-events: none;
 }
 
 .content {

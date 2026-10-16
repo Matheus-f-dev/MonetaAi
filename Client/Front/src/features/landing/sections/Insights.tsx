@@ -1,5 +1,5 @@
 import { useRef, type CSSProperties } from 'react';
-import { SectionHead } from '../components/ui';
+import { DemoTag, SectionHead } from '../components/ui';
 import { ColumnChart, Gauge, ScenarioChart } from '../components/charts';
 import { Glyph } from '../components/glyphs';
 import { INSIGHTS } from '../data/content';
@@ -9,15 +9,19 @@ import {
   EXPENSE_AVG,
   EXPENSE_HISTORY,
   EXPENSES_AFTER,
-  HEALTH,
   IMPACT,
   PROJECTION,
   TRANSPORT_AFTER,
 } from '../data/demo';
+import { health, initialState, send } from '../data/sandbox';
 import { brl, brl0, pct } from '../lib/format';
 import { useCountUp, useInView, useReducedMotion } from '../motion/hooks';
 import s from '../Landing.module.css';
 import i from './Insights.module.css';
+
+// O mês desta seção é o mesmo da demonstração depois do Uber registrado, e a
+// nota de saúde sai da mesma função que o app usa (financialHealth.ts).
+const HEALTH = health(send(initialState(), 'Gastei 45 no Uber'));
 
 export function Insights() {
   const gridRef = useRef<HTMLDivElement>(null);
@@ -39,9 +43,10 @@ export function Insights() {
           className={i.head}
         />
 
+        <DemoTag className={i.tag} />
         <div ref={gridRef} className={i.grid}>
           {/* Evolução: o número em destaque e as colunas contra a média. */}
-          <article className={`${i.card} ${i.evolution}`} data-reveal style={{ '--d': '0ms' } as CSSProperties}>
+          <article data-glow className={`${i.card} ${i.evolution}`} data-reveal style={{ '--d': '0ms' } as CSSProperties}>
             <header className={i.cardHead}>
               <h3 className={i.cardTitle}>Evolução dos gastos</h3>
               <span className={i.tag}>6 meses</span>
@@ -65,7 +70,7 @@ export function Insights() {
           </article>
 
           {/* Distribuição por categoria. */}
-          <article className={`${i.card} ${i.split}`} data-reveal style={{ '--d': '120ms' } as CSSProperties}>
+          <article data-glow className={`${i.card} ${i.split}`} data-reveal style={{ '--d': '120ms' } as CSSProperties}>
             <header className={i.cardHead}>
               <h3 className={i.cardTitle}>Para onde o dinheiro vai</h3>
               <span className={i.tag}>outubro</span>
@@ -98,7 +103,7 @@ export function Insights() {
           </article>
 
           {/* Projeção em cenários. */}
-          <article className={`${i.card} ${i.projection}`} data-reveal style={{ '--d': '60ms' } as CSSProperties}>
+          <article data-glow className={`${i.card} ${i.projection}`} data-reveal style={{ '--d': '60ms' } as CSSProperties}>
             <header className={i.cardHead}>
               <h3 className={i.cardTitle}>Previsão de saldo</h3>
               <span className={i.tag}>próximos 6 meses</span>
@@ -113,7 +118,7 @@ export function Insights() {
           </article>
 
           {/* Impacto de uma compra. */}
-          <article className={`${i.card} ${i.impact}`} data-reveal style={{ '--d': '180ms' } as CSSProperties}>
+          <article data-glow className={`${i.card} ${i.impact}`} data-reveal style={{ '--d': '180ms' } as CSSProperties}>
             <header className={i.cardHead}>
               <h3 className={i.cardTitle}>Impacto de uma compra</h3>
             </header>
@@ -134,30 +139,25 @@ export function Insights() {
           </article>
 
           {/* Saúde financeira. */}
-          <article className={`${i.card} ${i.health}`} data-reveal style={{ '--d': '240ms' } as CSSProperties}>
+          <article data-glow className={`${i.card} ${i.health}`} data-reveal style={{ '--d': '240ms' } as CSSProperties}>
             <header className={i.cardHead}>
               <h3 className={i.cardTitle}>Saúde financeira</h3>
             </header>
             <div className={i.healthBody}>
-              <Gauge value={HEALTH.score} drawn={drawn} label={HEALTH.band} />
+              <Gauge value={HEALTH.score} drawn={drawn} label={HEALTH.bandLabel} />
               <ul className={i.factors}>
-                <li>
-                  <span>Receita x despesa</span>
-                  <em>50%</em>
-                </li>
-                <li>
-                  <span>Orçamentos</span>
-                  <em>25%</em>
-                </li>
-                <li>
-                  <span>Metas</span>
-                  <em>25%</em>
-                </li>
+                {HEALTH.breakdown.map((b) => (
+                  <li key={b.label}>
+                    <span>
+                      {b.label} <em>peso {b.weightPercent}%</em>
+                    </span>
+                    <b>{b.score}</b>
+                  </li>
+                ))}
               </ul>
             </div>
           </article>
         </div>
-        <p className={i.caption}>Análises com dados ilustrativos.</p>
       </div>
     </section>
   );

@@ -55,6 +55,9 @@
   align-items: flex-end;
   text-align: right;
 }
+.tag {
+  margin-bottom: 14px;
+}
 .counterLabel {
   font-family: var(--f-mono) !important;
   font-size: 11px;

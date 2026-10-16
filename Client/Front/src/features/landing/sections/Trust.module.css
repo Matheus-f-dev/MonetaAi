@@ -61,6 +61,9 @@
     0 60px 120px -60px rgba(0, 0, 0, 1),
     0 0 120px -40px rgba(116, 232, 174, 0.25);
 }
+.tag {
+  margin-bottom: 18px;
+}
 .prefsHead {
   display: flex;
   align-items: center;

@@ -1,0 +1,142 @@
+.method {
+  padding: calc(var(--section-y) * 0.5) 0 calc(var(--section-y) * 0.4);
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px 40px;
+}
+
+.title {
+  font-size: clamp(1.9rem, 3.4vw, 3rem);
+  margin-top: 14px !important;
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin-top: clamp(32px, 4vw, 56px);
+  border-top: 1px solid var(--line);
+}
+
+.steps li {
+  position: relative;
+}
+
+.step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+  padding: 26px 22px 30px 0;
+  margin-right: 22px;
+  border-top: 1px solid transparent;
+  margin-top: -1px;
+  transition: border-color 0.4s var(--ease-out);
+}
+
+/* A linha de cima acende do primeiro ao último verbo ao passar o mouse:
+   a sequência é a ideia. */
+.step::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -1px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--mint), var(--mint-glow));
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform 0.6s var(--ease-out);
+}
+.step:hover::before,
+.step:focus-visible::before {
+  transform: scaleX(1);
+}
+
+.n {
+  font-family: var(--f-mono) !important;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--mint);
+}
+
+.verb {
+  font-family: var(--f-display) !important;
+  font-size: clamp(1.45rem, 2.2vw, 2rem);
+  font-weight: 560;
+  font-variation-settings: 'opsz' 96;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+  color: var(--text);
+  transition: color 0.4s var(--ease-out);
+}
+.step:hover .verb {
+  color: var(--mint-glow);
+}
+
+.body {
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--text-2);
+  max-width: 24ch;
+}
+
+.arrow {
+  margin-top: auto;
+  padding-top: 6px;
+  color: var(--text-3);
+  transition:
+    color 0.4s var(--ease-out),
+    transform 0.4s var(--ease-out);
+}
+.step:hover .arrow {
+  color: var(--mint);
+  transform: translateX(4px);
+}
+
+@media (max-width: 1080px) {
+  .steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .step {
+    padding-right: 16px;
+  }
+}
+
+@media (max-width: 620px) {
+  .steps {
+    grid-template-columns: 1fr;
+  }
+  .step {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr) 20px;
+    grid-template-areas:
+      'n verb arrow'
+      '. body .';
+    align-items: baseline;
+    gap: 6px 12px;
+    margin-right: 0;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .n {
+    grid-area: n;
+  }
+  .verb {
+    grid-area: verb;
+  }
+  .body {
+    grid-area: body;
+    max-width: none;
+  }
+  .arrow {
+    grid-area: arrow;
+    margin: 0;
+    padding: 0;
+  }
+}

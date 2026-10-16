@@ -27,9 +27,11 @@ MonetaAi/
 │   │   │   ├── alerts/            # Fase 5 -- Alertas
 │   │   │   └── insights/          # Fase 6 -- Análises, Relatórios, Impacto Financeiro
 │   │   │   └── landing/           # Landing pública (rota /) -- seções, copy e dados
-│   │   │                           de demonstração (data/), motion por rolagem
-│   │   │                           (motion/) e a escultura 3D da marca (scene/,
-│   │   │                           three.js carregado sob demanda)
+│   │   │                           de demonstração (data/; a demo interativa roda
+│   │   │                           em data/sandbox.ts, só no navegador), motion por
+│   │   │                           rolagem (motion/) e a peça 3D da marca (scene/:
+│   │   │                           uma só, num canvas fixo, que atraca em cada
+│   │   │                           capítulo; three.js carregado sob demanda)
 │   │   ├── presentation/         # Views Layer (páginas ainda não redesenhadas --
 │   │   │   │                       Agente de IA e Perfil, Fases 7-8 -- e os hooks/
 │   │   │   │                       validadores que as features acima reaproveitam)

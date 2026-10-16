@@ -6,11 +6,15 @@
   max-width: 720px;
 }
 
+.tag {
+  margin-top: clamp(40px, 5vw, 72px);
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 16px;
-  margin-top: clamp(48px, 6vw, 88px);
+  margin-top: 18px;
 }
 
 .card {
@@ -227,17 +231,18 @@
   padding-bottom: 0;
 }
 .factors em {
+  margin-left: 6px;
   font-style: normal;
   font-family: var(--f-mono) !important;
-  font-size: 11.5px;
+  font-size: 10.5px;
   color: var(--text-3);
+}
+.factors b {
+  color: var(--text);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
-.caption {
-  margin-top: 16px !important;
-  font-size: 12px;
-  color: var(--text-3);
-}
 
 /* ---- responsivo -------------------------------------------------------- */
 @media (max-width: 1080px) {

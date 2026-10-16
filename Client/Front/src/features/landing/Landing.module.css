@@ -150,6 +150,12 @@
 }
 
 /* ---- primitivas de layout ---------------------------------------------- */
+/* O conteúdo fica num plano acima do canvas fixo da peça 3D (z-index 0). */
+.main {
+  position: relative;
+  z-index: 1;
+}
+
 .wrap {
   width: 100%;
   max-width: calc(var(--maxw) + var(--gutter) * 2);
@@ -319,6 +325,48 @@
   height: 40px;
   padding: 0 18px;
   font-size: 0.9rem;
+}
+
+/* ---- selo de demonstração ----------------------------------------------- */
+.demoTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 11px 5px 9px;
+  border-radius: 999px;
+  border: 1px dashed rgba(184, 255, 213, 0.38);
+  background: rgba(116, 232, 174, 0.05);
+  font-family: var(--f-mono) !important;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mint-glow);
+  white-space: nowrap;
+}
+
+/* ---- luz que segue o cursor (só com ponteiro fino) -----------------------
+   O LandingPage escreve --gx/--gy no cartão sob o ponteiro. */
+/* (o cartão precisa ser posicionado; não forçamos position aqui para não
+   desmontar cartões absolutos) */
+.root [data-glow] {
+  isolation: isolate;
+}
+.root [data-glow]::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(280px circle at var(--gx, 50%) var(--gy, 0%), rgba(116, 232, 174, 0.09), transparent 65%);
+  opacity: 0;
+  transition: opacity 0.45s var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .root [data-glow]:hover::after {
+    opacity: 1;
+  }
 }
 
 /* ---- superfície de produto (cartões de interface) ----------------------- */

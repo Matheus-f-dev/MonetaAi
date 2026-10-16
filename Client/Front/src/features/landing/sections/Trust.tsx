@@ -1,5 +1,5 @@
 import { useState, type CSSProperties } from 'react';
-import { SectionHead } from '../components/ui';
+import { DemoTag, SectionHead } from '../components/ui';
 import { Glyph } from '../components/glyphs';
 import { TRUST } from '../data/content';
 import { BALANCE_BEFORE } from '../data/demo';
@@ -50,7 +50,8 @@ export function Trust() {
         </div>
 
         <div className={t.side} data-reveal="scale">
-          <div className={t.prefs}>
+          <div className={t.prefs} data-glow>
+            <DemoTag text="Prévia interativa" className={t.tag} />
             <div className={t.prefsHead}>
               <span className={t.avatar} style={{ '--a': accent.color } as CSSProperties}>
                 B
