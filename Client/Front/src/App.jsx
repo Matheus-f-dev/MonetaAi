@@ -7,13 +7,17 @@ import { ProtectedRoute } from './presentation/components/ProtectedRoute';
 import { ToastContainer } from './presentation/components/system/ToastContainer';
 // Lazy: mantém a landing fora do bundle de quem só vai fazer login e usar o painel.
 const LandingPage = lazy(() => import('./presentation/pages/Home'));
-import LoginCard from './presentation/pages/Login';
-import Cadastro from './presentation/pages/Register';
-import RedefinirSenha from './presentation/pages/ChangePassword';
-import AuthCallback from './presentation/pages/AuthCallback';
-import PrivacyPolicy from './presentation/pages/legal/PrivacyPolicy';
-import TermsOfService from './presentation/pages/legal/TermsOfService';
-import { AppShell } from './app-shell/AppShell';
+// Também sob demanda: telas de autenticação, páginas legais e o shell do
+// painel. Antes entravam no bundle inicial de todo visitante -- inclusive
+// de quem só abre a landing, que nunca as vê (e ainda carregava as folhas
+// de estilo legadas delas).
+const LoginCard = lazy(() => import('./presentation/pages/Login'));
+const Cadastro = lazy(() => import('./presentation/pages/Register'));
+const RedefinirSenha = lazy(() => import('./presentation/pages/ChangePassword'));
+const AuthCallback = lazy(() => import('./presentation/pages/AuthCallback'));
+const PrivacyPolicy = lazy(() => import('./presentation/pages/legal/PrivacyPolicy'));
+const TermsOfService = lazy(() => import('./presentation/pages/legal/TermsOfService'));
+const AppShell = lazy(() => import('./app-shell/AppShell').then((m) => ({ default: m.AppShell })));
 const DashboardPage = lazy(() => import('./features/dashboard/DashboardPage'));
 const ExpensesPage = lazy(() => import('./features/movements/ExpensesPage'));
 const IncomesPage = lazy(() => import('./features/movements/IncomesPage'));

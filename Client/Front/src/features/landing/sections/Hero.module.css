@@ -1,0 +1,435 @@
+.hero {
+  --mx: 0;
+  --my: 0;
+  --hp: 0;
+  position: relative;
+  min-height: 100svh;
+  min-height: max(100svh, 680px);
+  display: flex;
+  align-items: center;
+  padding: 120px 0 120px;
+  overflow: clip;
+}
+
+/* ---- fundo ------------------------------------------------------------- */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.glowA,
+.glowB {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(20px);
+}
+.glowA {
+  right: -12vw;
+  top: 6vh;
+  width: 70vw;
+  height: 70vw;
+  max-width: 1100px;
+  max-height: 1100px;
+  background: radial-gradient(closest-side, rgba(116, 232, 174, 0.16), rgba(116, 232, 174, 0.05) 45%, transparent 72%);
+  animation: glowIn 2.2s var(--ease-out) both;
+}
+.glowB {
+  left: -20vw;
+  bottom: -30vh;
+  width: 60vw;
+  height: 60vw;
+  background: radial-gradient(closest-side, rgba(184, 255, 213, 0.05), transparent 70%);
+  animation: glowIn 2.6s var(--ease-out) 0.2s both;
+}
+.horizon {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 40%;
+  background: linear-gradient(180deg, transparent, var(--bg) 92%);
+}
+
+@keyframes glowIn {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+}
+
+/* ---- escultura e cartões flutuantes ------------------------------------ */
+.stage {
+  position: absolute;
+  z-index: 1;
+  right: max(-6vw, calc((100vw - 1500px) / 2));
+  top: 50%;
+  width: min(64vw, 1000px);
+  aspect-ratio: 1;
+  transform: translate3d(calc(var(--mx) * -10px), calc(-50% + var(--my) * -8px + var(--hp) * 90px), 0);
+  pointer-events: none;
+}
+
+.sculpture {
+  position: absolute;
+  inset: 0;
+  animation: stageIn 2s var(--ease-out) 0.15s both;
+}
+
+@keyframes stageIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+}
+
+.floats {
+  position: absolute;
+  inset: 0;
+}
+
+.float {
+  position: absolute;
+  transform: translate3d(
+    calc(var(--mx) * var(--z) * 18px),
+    calc(var(--my) * var(--z) * 14px - var(--hp) * var(--z) * 120px),
+    0
+  );
+  will-change: transform;
+}
+
+.floatIn {
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(22, 26, 24, 0.82), rgba(12, 14, 13, 0.78));
+  border: 1px solid var(--line-2);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 24px 60px -24px rgba(0, 0, 0, 0.9),
+    0 0 0 1px rgba(116, 232, 174, 0.04);
+  animation: floatIn 1.2s var(--ease-out) var(--fd, 1s) both;
+}
+
+@keyframes floatIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0) scale(0.94);
+    filter: blur(8px);
+  }
+}
+
+.floatBalance {
+  left: 46%;
+  top: 9%;
+  min-width: 210px;
+}
+.floatChat {
+  left: 12%;
+  bottom: 14%;
+  width: 270px;
+}
+.floatBudget {
+  right: 8%;
+  bottom: 28%;
+  width: 220px;
+}
+
+.floatLabel {
+  display: block;
+  font-family: var(--f-mono) !important;
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.floatValue {
+  display: block;
+  margin: 6px 0 8px;
+  font-size: 1.55rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+.floatDelta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--mint);
+}
+
+.bubbleUser,
+.bubbleAgent {
+  font-size: 13.5px;
+  line-height: 1.4;
+}
+.bubbleUser {
+  margin-left: auto !important;
+  width: fit-content;
+  padding: 8px 12px;
+  border-radius: 14px 14px 4px 14px;
+  background: var(--mint);
+  color: var(--mint-ink);
+  font-weight: 500;
+}
+.bubbleAgent {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px !important;
+  color: var(--text-2);
+}
+.bubbleAgent b {
+  color: var(--text);
+  font-weight: 600;
+}
+.agentDot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--mint);
+  box-shadow: 0 0 10px var(--mint);
+}
+
+.budgetRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 13.5px;
+  font-weight: 500;
+}
+.budgetRow span:last-child {
+  color: var(--mint);
+}
+.floatBudget .floatLabel {
+  margin-top: 10px;
+}
+
+/* ---- texto ------------------------------------------------------------- */
+.content {
+  position: relative;
+  z-index: 2;
+}
+
+.eyebrow {
+  animation: rise 0.9s var(--ease-out) 0.1s both;
+}
+
+.title {
+  margin-top: 28px !important;
+  font-family: var(--f-display) !important;
+  font-size: var(--t-mega);
+  font-weight: 560;
+  font-variation-settings: 'opsz' 96;
+  line-height: 0.93;
+  letter-spacing: -0.048em;
+  max-width: 9.5em;
+}
+
+.titleLine {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.1em;
+  margin-bottom: -0.1em;
+}
+.titleLine > span {
+  display: inline-block;
+  animation: lineUp 1.15s var(--ease-out) both;
+  animation-delay: calc(0.22s + var(--i) * 0.13s);
+}
+.titleLine:nth-child(2) > span {
+  font-size: 1.04em;
+  padding-right: 0.06em;
+}
+
+@keyframes lineUp {
+  from {
+    transform: translate3d(0, 105%, 0);
+  }
+}
+
+.lead {
+  margin-top: 30px !important;
+  max-width: 33ch;
+  animation: rise 1s var(--ease-out) 0.68s both;
+}
+
+.ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 38px;
+  animation: rise 1s var(--ease-out) 0.86s both;
+}
+
+.note {
+  margin-top: 18px !important;
+  font-size: var(--t-small);
+  color: var(--text-3);
+  animation: rise 1s var(--ease-out) 1s both;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+}
+
+/* ---- indicação de rolagem ---------------------------------------------- */
+.scrollCue {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  bottom: 36px;
+  width: max-content;
+  margin-inline: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--f-mono) !important;
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  animation: rise 1s var(--ease-out) 1.4s both;
+  transition: color 0.3s ease;
+}
+.scrollCue:hover {
+  color: var(--mint);
+}
+.scrollLine {
+  position: relative;
+  width: 1px;
+  height: 44px;
+  background: var(--line-2);
+  overflow: hidden;
+}
+.scrollLine span {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 14px;
+  background: var(--mint);
+  box-shadow: 0 0 8px var(--mint);
+  animation: cue 2.4s var(--ease-in-out) 2s 4 both;
+}
+@keyframes cue {
+  0% {
+    transform: translateY(-14px);
+  }
+  100% {
+    transform: translateY(44px);
+  }
+}
+
+/* ---- responsivo -------------------------------------------------------- */
+@media (max-width: 1100px) {
+  .stage {
+    width: 78vw;
+    right: -22vw;
+    opacity: 0.85;
+  }
+  .floatBalance {
+    left: 30%;
+    top: 8%;
+  }
+  .floatChat {
+    display: none;
+  }
+  /* Parte do palco fica fora da tela à direita; o cartão vem pra dentro. */
+  .floatBudget {
+    right: 34%;
+    bottom: 16%;
+  }
+}
+
+@media (max-width: 760px) {
+  .hero {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 104px 0 96px;
+    min-height: auto;
+  }
+  .stage {
+    position: relative;
+    order: 2;
+    right: auto;
+    top: auto;
+    width: 118vw;
+    margin: -6vw 0 0 -9vw;
+    opacity: 1;
+    transform: translate3d(0, calc(var(--hp) * 60px), 0);
+  }
+  .content {
+    order: 1;
+  }
+  .title {
+    margin-top: 22px !important;
+  }
+  .lead {
+    margin-top: 22px !important;
+  }
+  .ctas {
+    margin-top: 28px;
+  }
+  .ctas > * {
+    flex: 1 1 100%;
+  }
+  .floatBalance {
+    left: 12vw;
+    top: 12%;
+    min-width: 0;
+  }
+  .floatBalance .floatIn {
+    padding: 12px 14px;
+  }
+  .floatValue {
+    font-size: 1.2rem;
+  }
+  .floatBudget {
+    right: 12vw;
+    bottom: 14%;
+    width: 180px;
+  }
+  .floatBudget .floatIn {
+    padding: 12px 14px;
+  }
+  .scrollCue {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glowA,
+  .glowB,
+  .sculpture,
+  .floatIn,
+  .eyebrow,
+  .titleLine > span,
+  .lead,
+  .ctas,
+  .note,
+  .scrollCue,
+  .scrollLine span {
+    animation: none !important;
+  }
+  .stage,
+  .float {
+    transform: none;
+  }
+  .stage {
+    transform: translateY(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) and (max-width: 760px) {
+  .stage {
+    transform: none;
+  }
+}

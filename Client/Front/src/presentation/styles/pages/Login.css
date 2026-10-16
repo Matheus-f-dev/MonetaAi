@@ -79,7 +79,7 @@
   position: relative; z-index: 1;
 }
 
-/* Mesmo glifo da landing (presentation/landing/ui/Icon.jsx -> Mark), não
+/* Mesmo glifo da marca (presentation/components/BrandMark.jsx -> Mark), não
    um crachá "M" inventado -- é o único jeito de "seguir o design da
    landing" ser literal, não só uma cor parecida. */
 .auth-brand-mark {

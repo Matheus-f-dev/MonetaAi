@@ -4,75 +4,77 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>MonetaAI: gestão financeira inteligente para entender seu dinheiro</title>
+    <title>Moneta AI: gestão financeira pessoal com inteligência artificial</title>
     <meta
       name="description"
-      content="Gestão financeira com inteligência artificial: registre gastos por texto, foto ou voz, acompanhe saldo por conta e cartão e receba insights sobre os seus números. Plano Starter grátis."
+      content="Organize gastos, acompanhe metas e entenda suas finanças com um agente de IA dentro da plataforma. Contas, cartões, orçamento, análises e importação de extrato OFX/CSV. Grátis."
     />
     <link rel="canonical" href="https://monetaai.site/" />
     <meta name="robots" content="index, follow, max-image-preview:large" />
 
-    <!-- A landing segue a preferência do sistema, então a cor da barra do
-         navegador acompanha: papel quente no claro, tinta no escuro. -->
-    <meta name="theme-color" content="#FBFAF7" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0A0E0D" media="(prefers-color-scheme: dark)" />
+    <!-- A landing é escura nos dois modos do sistema. -->
+    <meta name="theme-color" content="#050505" />
 
     <link rel="icon" type="image/svg+xml" href="/moneta-mark.svg" />
     <link rel="apple-touch-icon" href="/MonetaAi-minas summit.png" />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="MonetaAI" />
+    <meta property="og:site_name" content="Moneta AI" />
     <meta property="og:locale" content="pt_BR" />
-    <meta property="og:title" content="MonetaAI: entenda seu dinheiro e decida melhor" />
+    <meta property="og:title" content="Moneta AI: seu dinheiro, mais claro e mais inteligente" />
     <meta
       property="og:description"
-      content="Registre gastos por texto, foto ou voz. A MonetaAI organiza o mês, encontra os padrões do seu histórico e explica o que eles significam."
+      content="Gestão financeira pessoal com um agente de IA que registra, consulta e sugere. Contas, cartões, metas e análises num lugar só. Grátis."
     />
     <meta property="og:url" content="https://monetaai.site/" />
     <!--
-      CONFIRMAR / SUBSTITUIR: og-cover.jpg foi produzido para a direção visual
-      anterior (peça de aço sobre fundo escuro). O motivo do anel continua
-      sendo a marca, então ele não está errado, mas a arte de compartilhamento
-      deve ser refeita na nova direção (papel quente, verde profundo, painel do
-      produto). Arquivo esperado: public/assets/moneta/og-cover.jpg, 1200x630.
+      PENDENTE: og-cover.jpg é da direção visual anterior (peça de aço sobre
+      fundo escuro). Continua coerente com a marca, mas deve ser refeito na
+      direção atual (preto #050505, menta #74E8AE, escultura em anel).
+      Arquivo esperado: public/assets/moneta/og-cover.jpg, 1200x630.
     -->
     <meta property="og:image" content="https://monetaai.site/assets/moneta/og-cover.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Marca da MonetaAI: dois anéis concêntricos com a letra M ao centro." />
+    <meta property="og:image:alt" content="Marca da Moneta AI: dois anéis concêntricos com a letra M ao centro." />
 
     <!-- Twitter / X -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="MonetaAI: entenda seu dinheiro e decida melhor" />
+    <meta name="twitter:title" content="Moneta AI: seu dinheiro, mais claro e mais inteligente" />
     <meta
       name="twitter:description"
-      content="Registre gastos por texto, foto ou voz. A MonetaAI organiza o mês, encontra os padrões do seu histórico e explica o que eles significam."
+      content="Gestão financeira pessoal com um agente de IA que registra, consulta e sugere. Contas, cartões, metas e análises num lugar só. Grátis."
     />
     <meta name="twitter:image" content="https://monetaai.site/assets/moneta/og-cover.jpg" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <!--
-      Um pedido só para as cinco famílias, em vez de dois pedidos para dois
-      provedores.
-        landing ....... Instrument Sans (interface), Instrument Serif (uma
-                        metade de manchete, em itálico), JetBrains Mono (todo
-                        número em coluna e todo rótulo)
+      Um pedido só para todas as famílias:
+        landing ....... Bricolage Grotesque (manchetes, eixo óptico),
+                        Instrument Serif (acento em itálico), Instrument Sans
+                        (interface e texto), JetBrains Mono (rótulos)
         painel logado . Hanken Grotesk, Zilla Slab, JetBrains Mono
-      A Satoshi saiu junto com a landing antiga, que era a única a usá-la.
     -->
+    <!-- Carregamento sem bloquear o primeiro paint: o texto aparece na fonte de
+         sistema e troca quando a família chega (display=swap). -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600;700&family=Zilla+Slab:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600;700&family=Zilla+Slab:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap"
+      onload="this.onload=null;this.rel='stylesheet'"
     />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Hanken+Grotesk:wght@400;500;600;700;800&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600;700&family=Zilla+Slab:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap"
+      />
+    </noscript>
 
     <!--
-      Dados estruturados da landing. Mantidos aqui porque o app é uma SPA e o
-      rastreador precisa disso já no HTML servido.
-
-      ATENÇÃO: o bloco FAQPage abaixo espelha QUESTIONS em
-      src/presentation/landing/data/copy.js. Mudou lá, muda aqui.
+      Dados estruturados da landing, no HTML servido porque o app é uma SPA.
+      Só o que o produto faz hoje (ver src/features/landing/data/content.ts).
     -->
     <script type="application/ld+json">
       {
@@ -81,7 +83,7 @@
           {
             "@type": "Organization",
             "@id": "https://monetaai.site/#organization",
-            "name": "MonetaAI",
+            "name": "Moneta AI",
             "url": "https://monetaai.site/",
             "logo": "https://monetaai.site/moneta-mark.svg"
           },
@@ -89,125 +91,40 @@
             "@type": "WebSite",
             "@id": "https://monetaai.site/#website",
             "url": "https://monetaai.site/",
-            "name": "MonetaAI",
+            "name": "Moneta AI",
             "inLanguage": "pt-BR",
             "publisher": { "@id": "https://monetaai.site/#organization" }
           },
           {
             "@type": "SoftwareApplication",
             "@id": "https://monetaai.site/#app",
-            "name": "MonetaAI",
+            "name": "Moneta AI",
             "applicationCategory": "FinanceApplication",
             "operatingSystem": "Web",
             "url": "https://monetaai.site/",
             "inLanguage": "pt-BR",
-            "description": "Plataforma de gestão financeira pessoal com inteligência artificial. O lançamento de despesas é feito por mensagem de texto, foto da nota fiscal ou áudio, com categoria, conta e cartão identificados automaticamente, e o histórico vira análises, alertas e projeção de saldo.",
+            "description": "Plataforma gratuita de gestão financeira pessoal com um agente de inteligência artificial integrado, que registra gastos e receitas por mensagem de texto, lista movimentações, gera relatórios e sugere onde economizar.",
             "publisher": { "@id": "https://monetaai.site/#organization" },
             "featureList": [
-              "Registro de despesa por mensagem de texto, foto ou voz",
+              "Agente de IA que registra gastos e receitas por mensagem de texto",
               "Categorização automática de lançamentos",
-              "Saldo separado por conta e por cartão",
-              "Metas e orçamento por categoria",
-              "Alertas de gasto por categoria",
-              "Análises de despesas por categoria e evolução mensal",
-              "Projeção de saldo futuro em três cenários",
-              "Análise de impacto financeiro de uma compra",
-              "Relatórios consolidados e exportação em planilha"
+              "Contas, carteiras, cartões de crédito e faturas",
+              "Importação de extrato bancário em OFX e CSV",
+              "Gastos fixos e receitas recorrentes",
+              "Orçamento por categoria e metas financeiras",
+              "Calendário de contas a pagar",
+              "Investimentos e criptomoedas com cotação",
+              "Divisão de despesas entre pessoas",
+              "Análises, previsão de saldo, impacto de compra e saúde financeira",
+              "Alertas por categoria no app e por e-mail",
+              "Exportação de relatórios em CSV, PDF e Excel"
             ],
-            "offers": [
-              {
-                "@type": "Offer",
-                "name": "Starter",
-                "price": "0",
-                "priceCurrency": "BRL",
-                "description": "Uma conta conectada, registro por texto, foto ou voz, categorização automática e relatório simples do mês."
-              },
-              {
-                "@type": "Offer",
-                "name": "Pro",
-                "price": "29.90",
-                "priceCurrency": "BRL",
-                "description": "Contas e cartões ilimitados, metas e orçamento por categoria, alertas, análises, tendência e projeção de saldo.",
-                "priceSpecification": {
-                  "@type": "UnitPriceSpecification",
-                  "price": "29.90",
-                  "priceCurrency": "BRL",
-                  "billingDuration": 1,
-                  "billingIncrement": 1,
-                  "unitCode": "MON"
-                }
-              },
-              {
-                "@type": "Offer",
-                "name": "Business",
-                "price": "79.90",
-                "priceCurrency": "BRL",
-                "description": "Múltiplos usuários por conta, fluxo de caixa empresarial, exportação contábil e suporte prioritário.",
-                "priceSpecification": {
-                  "@type": "UnitPriceSpecification",
-                  "price": "79.90",
-                  "priceCurrency": "BRL",
-                  "billingDuration": 1,
-                  "billingIncrement": 1,
-                  "unitCode": "MON"
-                }
-              }
-            ]
-          },
-          {
-            "@type": "FAQPage",
-            "@id": "https://monetaai.site/#faq",
-            "inLanguage": "pt-BR",
-            "mainEntity": [
-              {
-                "@type": "Question",
-                "name": "Meus dados financeiros ficam seguros?",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "Sim. Seus lançamentos ficam isolados por usuário no banco de dados e sua senha nunca é armazenada, porque a autenticação passa pelo Firebase Auth. O tratamento de dados segue a LGPD: você pode pedir exportação ou exclusão dos seus dados quando quiser."
-                }
-              },
-              {
-                "@type": "Question",
-                "name": "Como funciona o registro por mensagem?",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "Você manda uma mensagem de texto descrevendo o gasto. O sistema lê só o que precisa pra registrar o lançamento, ou seja categoria, valor e conta, e não usa suas conversas pra mais nada."
-                }
-              },
-              {
-                "@type": "Question",
-                "name": "Posso cancelar quando quiser?",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "Sim, sem multa e sem fidelidade. O cancelamento de planos pagos é feito direto no seu perfil e vale até o fim do período já pago."
-                }
-              },
-              {
-                "@type": "Question",
-                "name": "Funciona pra conta conjunta ou pra empresa?",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "Pra uso compartilhado, seja conta conjunta, sócios ou time financeiro, o plano Business permite múltiplos usuários na mesma conta, com fluxo de caixa e exportação contábil."
-                }
-              },
-              {
-                "@type": "Question",
-                "name": "Preciso pagar pra começar?",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "Não. O plano Starter é grátis e já registra seus gastos com categorização automática. Você só paga se precisar de contas ilimitadas, metas ou relatórios avançados."
-                }
-              },
-              {
-                "@type": "Question",
-                "name": "Preciso instalar algum aplicativo?",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "Não. Pra registrar, basta mandar a mensagem. Pra ver relatórios, metas e configurações, é só acessar pelo navegador, no computador ou no celular."
-                }
-              }
-            ]
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "BRL",
+              "description": "Uso gratuito."
+            }
           }
         ]
       }

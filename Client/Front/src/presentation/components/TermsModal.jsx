@@ -45,8 +45,6 @@ const TermsModal = ({ isOpen, onAccept, onDecline }) => {
               <li>Senha criptografada - para garantir segurança de acesso aos dados financeiros pessoais</li>
               <li>Média salarial - para cálculo de orçamentos personalizados e previsões de saldo futuro</li>
               <li>Transações (receitas e despesas) - para controle financeiro, geração de relatórios, gráficos e categorização automática de gastos</li>
-              <li>Mensagens de voz - para registro automático de gastos via inteligência artificial e consultas de saldo pelo chatbot WhatsApp</li>
-              <li>Fotos de comprovantes - para detecção automática de valores e estabelecimentos através de reconhecimento de texto (OCR) e registro facilitado de transações</li>
             </ul>
 
             <h3>CLÁUSULA QUARTA – VEDAÇÕES DO USO</h3>

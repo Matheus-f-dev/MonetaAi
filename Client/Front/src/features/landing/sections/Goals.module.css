@@ -1,0 +1,326 @@
+.goals {
+  height: 250vh;
+}
+
+.stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  min-height: 680px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.stage::before {
+  content: '';
+  position: absolute;
+  right: -10%;
+  top: 0;
+  width: 60%;
+  height: 80%;
+  background: radial-gradient(closest-side, rgba(116, 232, 174, 0.08), transparent 70%);
+  pointer-events: none;
+}
+
+.layout {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'copy counter'
+    'journey journey';
+  align-items: end;
+  column-gap: 40px;
+  padding-block: 96px 40px;
+}
+
+.copy {
+  grid-area: copy;
+  max-width: 640px;
+}
+.title {
+  margin-top: 22px !important;
+  font-size: clamp(2.2rem, 4.8vw, 4.6rem);
+}
+.lead {
+  margin-top: 22px !important;
+  max-width: 46ch;
+}
+
+.counter {
+  grid-area: counter;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+}
+.counterLabel {
+  font-family: var(--f-mono) !important;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--mint);
+}
+.counterValue {
+  margin-top: 6px;
+  font-family: var(--f-display) !important;
+  font-size: clamp(2.6rem, 5.4vw, 5.2rem);
+  font-weight: 560;
+  font-variation-settings: 'opsz' 96;
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+.counterOf {
+  font-family: var(--f-serif) !important;
+  font-style: italic;
+  font-size: 1.35rem;
+  color: var(--text-2);
+}
+
+/* ---- percurso ---------------------------------------------------------- */
+.journey {
+  grid-area: journey;
+  margin-top: 28px !important;
+}
+.canvas {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+}
+.plot {
+  position: relative;
+}
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.future {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.16);
+  stroke-width: 2;
+  stroke-dasharray: 2 10;
+  stroke-linecap: round;
+}
+.drawn {
+  fill: none;
+  stroke: url(#mn-goal-line);
+  stroke-width: 4;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 10px rgba(116, 232, 174, 0.6));
+}
+
+.mark {
+  position: absolute;
+  translate: -50% -50%;
+}
+.markDot {
+  display: block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  transition:
+    background-color 0.4s ease,
+    border-color 0.4s ease,
+    box-shadow 0.4s ease;
+}
+.mark[data-lit='true'] .markDot {
+  background: var(--mint);
+  border-color: var(--mint);
+  box-shadow: 0 0 14px var(--mint);
+}
+.markLabel {
+  position: absolute;
+  left: 50%;
+  top: 22px;
+  translate: -50% 0;
+  white-space: nowrap;
+  font-family: var(--f-mono) !important;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--text-3);
+  transition: color 0.4s ease;
+}
+.mark[data-lit='true'] .markLabel {
+  color: var(--mint);
+}
+.mark[data-last='true'] .markDot {
+  width: 18px;
+  height: 18px;
+  border-style: dashed;
+  border-color: var(--mint-glow);
+}
+.mark[data-last='true'] .markLabel {
+  left: auto;
+  right: -6px;
+  top: -34px;
+  translate: none;
+  font-family: var(--f-sans) !important;
+  font-size: 13px;
+  color: var(--text-2);
+}
+.mark[data-last='true'] .markLabel b {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.head {
+  position: absolute;
+  left: 2.5%;
+  top: 90%;
+  translate: -50% -50%;
+  z-index: 2;
+  pointer-events: none;
+}
+.headDot {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--mint-glow);
+  box-shadow:
+    0 0 0 6px rgba(116, 232, 174, 0.18),
+    0 0 30px var(--mint);
+}
+.headLabel {
+  position: absolute;
+  left: 50%;
+  bottom: 30px;
+  translate: -50% 0;
+  padding: 6px 12px;
+  border-radius: 99px;
+  background: var(--mint);
+  color: var(--mint-ink);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ---- cartões ----------------------------------------------------------- */
+.cards {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  gap: 14px;
+}
+.card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  min-width: 280px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01));
+  border: 1px solid var(--line);
+}
+.card strong {
+  display: block;
+  margin-top: 2px;
+  font-size: 14.5px;
+  font-weight: 600;
+}
+.cardIcon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--mint-08);
+  border: 1px solid var(--line-mint);
+  color: var(--mint);
+}
+.cardLabel {
+  display: block;
+  font-size: 12px;
+  color: var(--text-3);
+}
+.cardValue {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  color: var(--mint);
+}
+.cardGrow {
+  flex: 1;
+}
+.cardMeter {
+  margin-top: 10px;
+}
+
+/* ---- estático ---------------------------------------------------------- */
+.goals[data-static='true'] {
+  height: auto;
+}
+.goals[data-static='true'] .stage {
+  position: relative;
+  height: auto;
+  min-height: 0;
+  padding-block: var(--section-y);
+}
+
+/* ---- responsivo -------------------------------------------------------- */
+@media (min-width: 901px) and (max-height: 840px) {
+  .lead {
+    display: none;
+  }
+}
+
+@media (max-width: 1100px) {
+  .cards > :first-child {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .goals {
+    height: 220vh;
+  }
+  .layout {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'copy'
+      'counter'
+      'journey';
+    padding-block: 88px 24px;
+  }
+  .counter {
+    align-items: flex-start;
+    text-align: left;
+    margin-top: 22px;
+  }
+  .lead {
+    font-size: 1rem;
+  }
+  .cards {
+    position: static;
+    flex-direction: column;
+    margin-top: 28px;
+  }
+  .card {
+    min-width: 0;
+  }
+  .cards > :first-child {
+    display: none;
+  }
+  .markLabel {
+    display: none;
+  }
+  .mark[data-last='true'] .markLabel {
+    display: block;
+    top: -30px;
+    font-size: 11.5px;
+  }
+}
+
+@media (max-width: 900px) and (max-height: 760px) {
+  .lead {
+    display: none;
+  }
+}

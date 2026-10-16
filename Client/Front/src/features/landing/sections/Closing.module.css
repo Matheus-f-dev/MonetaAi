@@ -1,0 +1,94 @@
+.closing {
+  position: relative;
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: var(--section-y) 0;
+  overflow: clip;
+  text-align: center;
+}
+
+.closing::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(1200px, 130vw);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: radial-gradient(closest-side, rgba(116, 232, 174, 0.14), rgba(116, 232, 174, 0.03) 50%, transparent 72%);
+  pointer-events: none;
+}
+
+.sculptureWrap {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(1100px, 120vw);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  opacity: 0.75;
+  pointer-events: none;
+}
+.sculpture {
+  position: absolute;
+  inset: 0;
+}
+
+/* Véu central: garante contraste do texto sobre a peça. */
+.sculptureWrap::after {
+  content: '';
+  position: absolute;
+  inset: 22%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(5, 5, 5, 0.85), rgba(5, 5, 5, 0.4) 60%, transparent);
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.title {
+  max-width: 13em;
+  font-size: clamp(2.6rem, 6.2vw, 6rem);
+}
+
+.lead {
+  margin-top: 26px !important;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.ctas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 40px;
+}
+
+.note {
+  margin-top: 18px !important;
+  font-size: var(--t-small);
+  color: var(--text-3);
+}
+
+@media (max-width: 760px) {
+  .closing {
+    min-height: 0;
+    padding: calc(var(--section-y) * 1.2) 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .ctas {
+    width: 100%;
+  }
+  .ctas > * {
+    flex: 1 1 100%;
+  }
+}

@@ -27,7 +27,7 @@ body {
 /* Necessário, não preferência: sem isso a landing e o painel logado
    inteiro herdam o serif padrão do navegador em vez da própria fonte
    (ver o comentário idêntico em styles/global.css e
-   presentation/landing/styles/base.css -- os três bateram no mesmo muro
+   features/landing/Landing.module.css -- os três bateram no mesmo muro
    e resolveram do mesmo jeito). Só sai quando este arquivo sair de vez. */
 * {
     font-family: inherit !important;

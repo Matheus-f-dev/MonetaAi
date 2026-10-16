@@ -1,7 +1,7 @@
 # 💰 MonetaAi
 
 **MonetaAi** é uma plataforma de gestão financeira pessoal com foco em acessibilidade, automação e integração via inteligência artificial.  
-O sistema permite que usuários organizem suas finanças de maneira simples e eficiente, com recursos como chatbot via WhatsApp, categorização de gastos, gráficos e mais.
+O sistema permite que usuários organizem suas finanças de maneira simples e eficiente, com recursos como agente de IA no chat, categorização automática de gastos, importação de extrato, gráficos e mais.
 
 ## 📁 Estrutura do Projeto - Padrão MVC
 
@@ -26,6 +26,10 @@ MonetaAi/
 │   │   │   ├── people/            # Fase 5 -- Pessoas
 │   │   │   ├── alerts/            # Fase 5 -- Alertas
 │   │   │   └── insights/          # Fase 6 -- Análises, Relatórios, Impacto Financeiro
+│   │   │   └── landing/           # Landing pública (rota /) -- seções, copy e dados
+│   │   │                           de demonstração (data/), motion por rolagem
+│   │   │                           (motion/) e a escultura 3D da marca (scene/,
+│   │   │                           three.js carregado sob demanda)
 │   │   ├── presentation/         # Views Layer (páginas ainda não redesenhadas --
 │   │   │   │                       Agente de IA e Perfil, Fases 7-8 -- e os hooks/
 │   │   │   │                       validadores que as features acima reaproveitam)
@@ -51,32 +55,20 @@ MonetaAi/
 │   │   ├── assets/               # Recursos estáticos
 │   │   └── App.jsx               # Componente principal
 │   └── package.json
-├── Service/                      # Backend Node.js (MVC Completo)
-│   ├── src/
-│   │   ├── controllers/          # Controllers (Lógica de controle)
-│   │   │   └── views/            # View Controllers
-│   │   ├── services/             # Services (Lógica de negócio)
-│   │   ├── models/               # Models (Entidades de dados)
-│   │   ├── repositories/         # Data Access Layer
-│   │   ├── routes/               # Rotas da API
-│   │   ├── middleware/           # Middlewares
-│   │   ├── config/               # Configurações
-│   │   └── app.js                # Aplicação principal
-│   ├── views/                    # Views (Templates EJS)
-│   ├── public/                   # Arquivos estáticos
-│   └── package.json
-└── MonetaAi_bot/                 # Chatbot Python
-    ├── services/                 # Services do bot
-    │   ├── conversation_service.py
-    │   ├── openai_client.py
-    │   ├── sns_event_parser.py
-    │   └── whatsapp_service.py
-    ├── utils/                    # Utilitários
-    │   └── models.py
-    ├── app.py                    # Aplicação principal
-    ├── firebase_manager.py       # Gerenciador Firebase
-    ├── dynamodb_manager.py       # Gerenciador DynamoDB
-    └── requirements.txt          # Dependências Python
+└── Service/                      # Backend Node.js (MVC Completo)
+    ├── src/
+    │   ├── controllers/          # Controllers (Lógica de controle)
+    │   │   └── views/            # View Controllers
+    │   ├── services/             # Services (Lógica de negócio)
+    │   ├── models/               # Models (Entidades de dados)
+    │   ├── repositories/         # Data Access Layer
+    │   ├── routes/               # Rotas da API
+    │   ├── middleware/           # Middlewares
+    │   ├── config/               # Configurações
+    │   └── app.js                # Aplicação principal
+    ├── views/                    # Views (Templates EJS)
+    ├── public/                   # Arquivos estáticos
+    └── package.json
 ```
 
 ## 🚀 Como Executar o Projeto
@@ -162,7 +154,6 @@ npm run dev
 - [x] Visualizar histórico de atividades
 - [x] Filtro de gastos por categoria
 - [x] Integração com rede social
-- [x] Registros no WhatsApp através do chatbot
 - [x] Gráfico de gastos
 - [x] Personalização da interface  
 
@@ -173,16 +164,12 @@ npm run dev
  ## ✅ Checklist - Segunda Entrega
 
 ### Funcionalidades já implementadas
-- [x] Detectar gastos por foto
-- [x] consulta de saldo e consumo no chatbot
-- [x] Registro de gastos por voz
-- [x] o chatbot gera resumo dos relatorios
 - [x] exportar relatorios de acompanhamentos
 - [x] Distribuição acumulativa
 - [x] Previsão saldo futuro
-- [x] Categorização automática dos gastos-feita via chatbot
+- [x] Categorização automática dos gastos-feita no agente de IA
 - [x] Análise de impacto financeiro
-- [x] Alertas personalizados feito- e integrado com chatbot
+- [x] Alertas personalizados feito
 
 
       
@@ -433,16 +420,13 @@ Client/Front/src/
 - **Knex** - Query builder e migrations versionadas
 - **bcrypt + JWT** - Autenticação própria
 
-### Chatbot & IA
-- **Python** - Linguagem do bot
-- **OpenAI API** - Inteligência artificial
-- **WhatsApp API** - Integração messaging
+### Agente de IA
+- **xAI/Grok, Groq ou OpenAI** - Inteligência artificial (com fallback local por regex)
 
 ### Arquitetura & Segurança
 - **Padrão MVC** - Organização do código
 - **RESTful API** - Comunicação cliente-servidor
 - **SPA (Single Page Application)** - Frontend React
-- **Microserviços** - Bot separado do backend principal
 - **URL Encryption** - Proteção de rotas com AES-256
 
 

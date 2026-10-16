@@ -1,0 +1,157 @@
+.platform {
+  padding: var(--section-y) 0 calc(var(--section-y) * 0.7);
+}
+
+.glow {
+  position: absolute;
+  left: 50%;
+  top: 38%;
+  width: min(1400px, 140vw);
+  height: 900px;
+  transform: translateX(-50%);
+  background: radial-gradient(closest-side, rgba(116, 232, 174, 0.12), rgba(116, 232, 174, 0.03) 50%, transparent 75%);
+  pointer-events: none;
+}
+
+.head {
+  position: relative;
+  max-width: 860px;
+}
+
+.frame {
+  --e: 0;
+  position: relative;
+  margin-top: clamp(56px, 7vw, 96px);
+  perspective: 2000px;
+}
+
+.figure {
+  transform-origin: 50% 0%;
+  transform: rotateX(calc((1 - var(--e)) * 24deg)) translate3d(0, calc((1 - var(--e)) * 60px), 0)
+    scale(calc(0.88 + var(--e) * 0.12));
+}
+
+.frame[data-settled] .figure {
+  transform: none;
+}
+
+.dash {
+  max-width: 1180px;
+  margin-inline: auto;
+}
+
+/* Reflexo do painel no "chão": reforça a peça física sem custo. */
+.figure::after {
+  content: '';
+  display: block;
+  height: 120px;
+  margin: 0 auto;
+  max-width: 1000px;
+  background: radial-gradient(50% 100% at 50% 0%, rgba(116, 232, 174, 0.18), transparent 70%);
+  filter: blur(10px);
+  opacity: var(--e);
+}
+
+.callouts {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: min(1180px, 100%);
+  margin-inline: auto;
+  pointer-events: none;
+}
+
+.callout {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 150px;
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--text-2);
+}
+.calloutDot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--mint);
+  box-shadow: 0 0 0 4px rgba(116, 232, 174, 0.12);
+}
+.callout::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 36px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--line-mint));
+}
+
+.callout[data-pos='saldo'] {
+  left: -4px;
+  top: 17%;
+  transform: translateX(-100%);
+  padding-right: 44px;
+  flex-direction: row-reverse;
+  text-align: right;
+}
+.callout[data-pos='saldo']::before {
+  right: 0;
+  background: linear-gradient(90deg, var(--line-mint), transparent);
+}
+.callout[data-pos='evolucao'] {
+  left: -4px;
+  top: 44%;
+  transform: translateX(-100%);
+  padding-right: 44px;
+  flex-direction: row-reverse;
+  text-align: right;
+}
+.callout[data-pos='evolucao']::before {
+  right: 0;
+  background: linear-gradient(90deg, var(--line-mint), transparent);
+}
+.callout[data-pos='contas'] {
+  right: -4px;
+  top: 62%;
+  transform: translateX(100%);
+  padding-left: 44px;
+}
+.callout[data-pos='contas']::before {
+  left: 0;
+}
+.callout[data-pos='orcamento'] {
+  right: -4px;
+  top: 36%;
+  transform: translateX(100%);
+  padding-left: 44px;
+}
+.callout[data-pos='orcamento']::before {
+  left: 0;
+}
+
+.caption {
+  margin-top: 8px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+/* Os rótulos laterais só cabem quando há margem fora do painel. */
+@media (max-width: 1719px) {
+  .callouts {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .frame {
+    perspective: 1200px;
+  }
+  .figure {
+    transform: rotateX(calc((1 - var(--e)) * 14deg)) translate3d(0, calc((1 - var(--e)) * 30px), 0);
+  }
+}

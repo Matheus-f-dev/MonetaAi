@@ -6,7 +6,7 @@ import { ValidationContext, EmailValidation, PasswordValidation } from '../../co
 import { useToast } from '../hooks/useToast';
 import { useTerms } from '../hooks/useTerms';
 import TermsModal from '../components/TermsModal';
-import { Mark } from '../landing/ui/Icon';
+import { Mark } from '../components/BrandMark';
 
 export default function LoginCard() {
   const [email, setEmail] = useState('');
@@ -97,7 +97,7 @@ export default function LoginCard() {
 
         <div className="auth-visual-copy">
           <h1>Sua vida financeira, sem abrir planilha.</h1>
-          <p>Registra pelo WhatsApp, categoriza sozinha e mantém o saldo de todas as suas contas e cartões sempre certo.</p>
+          <p>Registra por chat com IA, categoriza sozinha e mantém o saldo de todas as suas contas e cartões sempre certo.</p>
         </div>
 
         <div className="auth-visual-proof">
