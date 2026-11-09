@@ -1,9 +1,0 @@
-services:
-  - type: web
-    name: monetaai-backend
-    env: node
-    buildCommand: npm install
-    startCommand: npm start
-    envVars:
-      - key: NODE_ENV
-        value: production

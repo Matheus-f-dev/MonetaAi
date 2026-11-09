@@ -436,7 +436,7 @@ Client/Front/src/
 
 ## 🆕 Terceira Entrega — Backend (27/08/2026)
 
-Auditoria de segurança completa + roteiro de novas funcionalidades, todo em `Service/`. Nenhuma tela nova ainda — o handoff para quem for construir a UI está em [`FRONTEND_TODO.md`](FRONTEND_TODO.md).
+Auditoria de segurança completa + roteiro de novas funcionalidades, todo em `Service/`.
 
 ### 📖 Documentação da API
 Com o servidor rodando (`npm start`), a documentação interativa de **todas** as rotas fica em:
