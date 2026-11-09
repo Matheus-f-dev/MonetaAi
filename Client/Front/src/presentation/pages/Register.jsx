@@ -6,7 +6,7 @@ import { ValidationContext, EmailValidation, PasswordValidation, AmountValidatio
 import { useToast } from '../hooks/useToast';
 import { useTerms } from '../hooks/useTerms';
 import TermsModal from '../components/TermsModal';
-import { Mark } from '../landing/ui/Icon';
+import { Mark } from '../components/BrandMark';
 
 export default function Cadastro() {
   const [nome, setNome] = useState('');

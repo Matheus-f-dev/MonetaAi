@@ -76,7 +76,7 @@
    Como o `*` também casa com <html>, que não tem de quem herdar, tudo no
    app resolve pro serif inicial do browser -- inclusive style inline.
    Sem empatar com !important aqui, nenhuma fonte do design system aparece.
-   A landing bateu no mesmo muro e resolveu igual (ver home.css:53).
+   A landing bateu no mesmo muro e resolveu igual (ver features/landing/Landing.module.css).
    Some na Fase 9, junto com o App.css legado. */
 .ds-scope {
   background: var(--color-bg);

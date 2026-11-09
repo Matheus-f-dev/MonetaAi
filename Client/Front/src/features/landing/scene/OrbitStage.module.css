@@ -1,0 +1,16 @@
+/* Canvas da peça: fixo, atrás de todo o conteúdo, sem capturar ponteiro. A
+   opacidade é controlada pela cena a cada quadro (presença do capítulo). */
+.canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.canvas[data-mode='fallback'] {
+  display: none;
+}

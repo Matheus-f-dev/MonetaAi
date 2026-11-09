@@ -21,8 +21,6 @@ const PrivacyPolicy = () => {
             <li><strong>Senha criptografada:</strong> Segurança de acesso à conta pessoal e proteção dos dados financeiros</li>
             <li><strong>Média salarial:</strong> Cálculo de orçamentos personalizados, previsões de saldo futuro, análise de capacidade financeira</li>
             <li><strong>Transações (receitas e despesas):</strong> Controle financeiro pessoal, geração de relatórios e gráficos, categorização automática de gastos, análise de padrões de consumo</li>
-            <li><strong>Mensagens de voz:</strong> Registro automático de gastos via IA, facilitar entrada de dados por comando de voz, consultas de saldo via chatbot WhatsApp</li>
-            <li><strong>Fotos de comprovantes:</strong> Detecção automática de valores e estabelecimentos, registro de gastos por reconhecimento de texto (OCR), comprovação de transações</li>
           </ul>
           
           <p><strong>Atenção:</strong> Ainda que não haja coleta direta de dados sensíveis, estes podem estar contidos nos documentos armazenados. Nestes casos, o "MonetaAi" compromete-se a adotar medidas reforçadas de segurança e governança em conformidade com a LGPD e a ISO/IEC 27701.</p>

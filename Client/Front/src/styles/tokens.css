@@ -2,7 +2,7 @@
    Tokens de design — Moneta, redesign pós-login (Fase 0)
    ============================================================
    Direção: "livro-razão" (ledger) — a MESMA identidade da landing nova
-   (src/presentation/landing/styles/tokens.css), não uma variação
+   da landing anterior (a atual, em features/landing, é escura), não uma variação
    parecida por coincidência: papel quente, tinta quase preta, hairline
    estrutural, UMA cor de marca (verde-esmeralda) que só aparece onde há
    ação ou dado, e uma segunda cor (cobre) reservada pra tudo que é

@@ -1,0 +1,344 @@
+.app {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  border-radius: 22px;
+  overflow: hidden;
+  background: #090a0a;
+  border: 1px solid var(--line-2);
+  font-size: 13px;
+  text-align: left;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 60px 140px -60px rgba(0, 0, 0, 1),
+    0 0 0 1px rgba(116, 232, 174, 0.05);
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 26px;
+  padding: 20px 0;
+  border-right: 1px solid var(--line);
+  background: #070808;
+}
+.sideIcons {
+  display: grid;
+  gap: 6px;
+}
+.sideIcon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  color: var(--text-3);
+}
+.sideIcon[data-active='true'] {
+  background: var(--mint-08);
+  color: var(--mint);
+  box-shadow: 0 0 0 1px var(--line-mint) inset;
+}
+
+.main {
+  display: grid;
+  gap: 14px;
+  padding: 20px 22px 22px;
+  min-width: 0;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.kicker {
+  display: block;
+  font-family: var(--f-mono) !important;
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.hello {
+  display: block;
+  margin-top: 2px;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.topRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.month {
+  padding: 7px 12px;
+  border-radius: 99px;
+  border: 1px solid var(--line);
+  color: var(--text-2);
+  font-size: 12px;
+}
+.add {
+  padding: 7px 14px;
+  border-radius: 99px;
+  background: var(--mint);
+  color: var(--mint-ink);
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.card {
+  position: relative;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.015));
+  border: 1px solid var(--line);
+  min-width: 0;
+}
+.cardHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.cardTitle {
+  font-weight: 500;
+  color: var(--text);
+}
+.cardLabel {
+  display: block;
+  font-size: 11.5px;
+  color: var(--text-3);
+}
+.chip {
+  padding: 3px 9px;
+  border-radius: 99px;
+  border: 1px solid var(--line);
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+.kpis {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr 1fr 1fr;
+  gap: 12px;
+}
+.kpiMain {
+  background:
+    radial-gradient(120% 120% at 0% 0%, rgba(116, 232, 174, 0.14), transparent 60%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015));
+  border-color: var(--line-mint);
+}
+.kpiValue {
+  display: block;
+  margin: 6px 0 4px;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.kpiMain .kpiValue {
+  font-size: 23px;
+}
+.kpiFoot {
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+.mint {
+  color: var(--mint);
+}
+.warnText {
+  color: var(--warn);
+}
+.numMuted {
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.row2 {
+  display: grid;
+  grid-template-columns: 1.55fr 1fr;
+  gap: 12px;
+}
+.area {
+  --chart-h: 150px;
+}
+
+.catList,
+.budgets {
+  display: grid;
+  gap: 11px;
+}
+.catRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 12.5px;
+}
+.catTrack {
+  display: block;
+  height: 5px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+.catBar {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, rgba(116, 232, 174, 0.45), var(--mint));
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform 1.1s var(--ease-out);
+}
+.app[data-drawn='true'] .catBar {
+  transform: none;
+}
+
+.row3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+
+.bills {
+  display: grid;
+  gap: 8px;
+}
+.bills li {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+.billDay {
+  display: grid;
+  place-items: center;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  font-size: 9.5px;
+  line-height: 1.05;
+  text-transform: uppercase;
+  color: var(--text-3);
+}
+.billDay b {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 600;
+}
+.billName {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.goalBody {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.goalBody > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.goalName {
+  font-size: 15px;
+  font-weight: 600;
+}
+.goalPct {
+  margin-top: 4px;
+  font-size: 11.5px;
+  color: var(--mint);
+}
+
+.recentList {
+  display: grid;
+}
+.recentList li {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) 70px auto;
+  gap: 12px;
+  padding: 9px 0;
+  border-top: 1px solid var(--line);
+  font-variant-numeric: tabular-nums;
+}
+.recentList li:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+.recentDesc {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.recentCat,
+.recentWhen {
+  color: var(--text-3);
+}
+
+/* ---- responsivo: o painel se reorganiza, não só encolhe ---------------- */
+@media (max-width: 1080px) {
+  .row3 {
+    grid-template-columns: 1fr 1fr;
+  }
+  .goal {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 760px) {
+  .app {
+    grid-template-columns: 1fr;
+    border-radius: 18px;
+  }
+  .side {
+    display: none;
+  }
+  .main {
+    padding: 16px;
+    gap: 10px;
+  }
+  .kpis {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .kpiMain {
+    grid-column: 1 / -1;
+  }
+  .kpiValue {
+    font-size: 17px;
+  }
+  .kpiMain .kpiValue {
+    font-size: 24px;
+  }
+  .row2,
+  .row3 {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .goal {
+    grid-column: auto;
+  }
+  .row3 > :first-child {
+    display: none;
+  }
+  .recentList li {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .recentCat,
+  .recentWhen {
+    display: none;
+  }
+  .month {
+    display: none;
+  }
+}

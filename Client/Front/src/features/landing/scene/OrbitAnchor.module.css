@@ -1,0 +1,17 @@
+/* O posicionamento vem de quem usa (hero, fechamento); aqui só o conteúdo. */
+.anchor {
+  pointer-events: none;
+}
+
+.poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 9%;
+  transition: opacity 1.2s ease;
+}
+
+.anchor[data-mode='live'] .poster {
+  opacity: 0;
+}

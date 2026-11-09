@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import '../styles/pages/Login.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { Mark } from '../landing/ui/Icon';
+import { Mark } from '../components/BrandMark';
 
 /**
  * Compartilha estrutura e classes com Login.jsx/Register.jsx (mesmo
